@@ -6,7 +6,7 @@ import React from 'react';
 export default function HomeWrapper() {
   return (
     <>
-      <h1>홈 페이지입니다!</h1>
+      <h1>홈 페이지입니다!!</h1>
       <Button
         size="lg"
         variant="outline"
