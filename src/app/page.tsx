@@ -15,14 +15,9 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, [router]);
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="">
-        <Image
-          src={'/샘플랜딩페이지.png'}
-          alt="샘플랜딩페이지"
-          width={900}
-          height={900}
-        />
+    <div className="flex items-center justify-center w-full min-h-full">
+      <div className="w-full min-h-full">
+        <Image src={'/샘플랜딩페이지.png'} alt="샘플랜딩페이지" fill />
       </div>
     </div>
   );

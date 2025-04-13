@@ -19,20 +19,6 @@ body {
   font-family: 'NoonnuBasicGothicRegular', sans-serif;
 }
 
-@media (max-width: 1024px) {
-  html,
-  body {
-    background-color: #f1f5f9;
-  }
-}
-
-@media (max-width: 1024px) {
-  html,
-  body {
-    background-color: rgba(255, 249, 242, 1);
-  }
-}
-
 /* 모든 스크롤바 숨기기 */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
