@@ -1,5 +1,3 @@
-'use client';
-
 import clsx from 'clsx';
 import React from 'react';
 
@@ -37,10 +35,10 @@ export default function Button({
           'bg-violet-500 text-white hover:bg-violet-700',
         variant === 'outline' &&
           color === 'rose' &&
-          'border border-rose-500 text-rose-500 bg-white hover:border-rose-700 hover:text-rose-700',
+          'border border-rose-500 text-rose-500 bg-white hover:bg-rose-700 hover:text-white',
         variant === 'outline' &&
           color === 'violet' &&
-          'border border-violet-500 text-violet-500 bg-white hover:border-violet-700 hover:text-violet-700'
+          'border border-violet-500 text-violet-500 bg-white hover:bg-violet-700 hover:text-white'
       )}
       {...rest}
     >
