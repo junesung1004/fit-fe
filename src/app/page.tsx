@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 export default function LandingPage() {
   const router = useRouter();
 
+  // test
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/home');
