@@ -20,7 +20,7 @@ export default function ProfileEdit() {
       {/* 이미지 */}
       <div className="relative w-[130px] h-[130px] rounded-full overflow-hidden">
         <Image
-          src={imgFile || `/강아지 프로필.jpg`}
+          src={imgFile || `/강아지프로필.jpg`}
           alt="강아지사진"
           fill
           priority
