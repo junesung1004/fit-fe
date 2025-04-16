@@ -57,12 +57,13 @@ export default function LoginPage() {
 
       {/* 카카오 로그인 버튼 */}
       <button className="flex items-center justify-center w-full py-3 mb-3 bg-[#FEE500] rounded">
-        <img src="/kakao-logo.png" alt="Kakao Login" className="h-6 object-contain" />
+        <img src="/kakao-logo.png" alt="Kakao Login" className="h-10 object-contain" />
       </button>
 
       {/* 구글 로그인 버튼 */}
       <button className="w-full py-3 text-black text-lg border border-gray-300 rounded bg-white hover:bg-gray-100">
-        구글 로그인
+      <img src="/google-logo.png" alt="Google Login" className="h-9 object-contain" />
+      
       </button>
     </div>
   );

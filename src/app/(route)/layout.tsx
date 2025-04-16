@@ -36,9 +36,9 @@ export default function CommonLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* 박스: 가로는 지정 / 세로는 화면 꽉 채우기 */}
-      <div className="relative flex flex-col min-h-screen xs2:w-full  xs:w-[500px] h-screen bg-white shadow-2xl">
-        <Header />
-        <main className="flex-grow overflow-auto pt-[80px] pb-[80px] scrollbar-hide">
+      <div className="relative flex flex-col min-h-screen xs2:w-full xs:w-[500px] h-screen bg-white shadow-2xl">
+        <Header isLoggedIn={true} />
+        <main className="flex-grow overflow-auto scrollbar-hide  mb-[80px] ">
           {children}
         </main>
         <Footer />

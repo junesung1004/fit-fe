@@ -1,14 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
-export default function SignupPage()  {
+export default function SignupPage() {
   const [gender, setGender] = useState<'남자' | '여자' | ''>('');
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: 입력값 유효성 검사나 저장 로직이 있다면 여기에 작성
+    router.push('signup/profilepage'); // 원하는 경로로 이동
+  };
 
   return (
     <div className="max-w-md mx-auto mt-8 p-10">
-      <form className="space-y-2">
+      <form className="space-y-2" onSubmit={handleSubmit}>
         <Input label="이메일" type="email" />
         <Input label="비밀번호" type="password" />
         <Input label="비밀번호 확인" type="password" />
@@ -23,7 +31,7 @@ export default function SignupPage()  {
           </div>
         </div>
 
-        {/* 닉네임, 생년월일 - 분리됨 */}
+        {/* 닉네임, 생년월일 */}
         <Input label="닉네임" />
         <Input label="생년월일" placeholder="YYYY-MM-DD" />
 

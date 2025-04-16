@@ -6,7 +6,7 @@ import React from 'react';
 
 export default function HomeWrapper() {
   return (
-    <main className="p-10">
+    <main className="p-3">
       <h1>홈 페이지입니다⭐👀👀⭐</h1>
       <HomeProfileCardList />
       <Button
