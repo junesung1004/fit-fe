@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/common/Button';
-import DATING_OPTION from '@/components/datingSettingsOptions';
+import DATING_OPTION from '@/constants/datingSettingsOptions';
 import { FormField, FormValueType } from '@/types/datingOptions.type';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 

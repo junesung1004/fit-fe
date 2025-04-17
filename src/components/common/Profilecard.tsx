@@ -5,6 +5,7 @@ type ProfileCardProps = {
   name: string;
   age: number;
   region: string;
+  likes?: number;
   isOnline: boolean;
   profileImageUrl: string; // 프로필 사진 URL
 };
@@ -13,19 +14,20 @@ const ProfileCard = ({
   name,
   age,
   region,
+  likes = 0,
   isOnline,
   profileImageUrl,
 }: ProfileCardProps) => {
   return (
-    <div className="w-[200px] p-4 bg-white rounded-lg shadow-md">
+    <div className="w-[120px] p-4 bg-white rounded-lg shadow-md">
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-4">
         <div className="w-24 h-24 relative ">
           <Image
             src={profileImageUrl}
             alt="Profile Image"
-            fill 
-            className='rounded-full'
+            fill
+            className="rounded-full"
           />
         </div>
       </div>
@@ -33,8 +35,13 @@ const ProfileCard = ({
       {/* 이름 */}
       <p className="text-center text-xl font-semibold mb-2">{name}</p>
 
+      {/* 좋아요 수 */}
+      <div className="text-center">
+        <p>❤️ {likes}</p>
+      </div>
+
       {/* 나이, 지역 같은 줄에 표시 */}
-      <div className="text-center text-sm text-gray-600 flex justify-center gap-2">
+      <div className="text-center text-sm text-gray-600 flex justify-center">
         <p>{age}세</p>
         <span className="mx-1">•</span>
         <p>{region}</p>

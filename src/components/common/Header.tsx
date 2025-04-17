@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import FitLogo from '@/assets/fitlogo.png';
+import FitLogo from '@/assets/1.png';
 import Link from 'next/link';
 import {
   ArrowLeftIcon,

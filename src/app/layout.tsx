@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ReactQueryProvider from '@/lib/ReactQueryProvider';
 
 export const metadata: Metadata = {
   title: 'Fit',
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </body>
     </html>
   );
 }

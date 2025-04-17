@@ -1,6 +1,6 @@
 'use client';
 
-import TagBadge from '@/components/page/members/TagBadge';
+import TagBadge from '@/components/common/TagBadge';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
