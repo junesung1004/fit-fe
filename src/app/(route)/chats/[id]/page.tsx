@@ -12,6 +12,7 @@ export default function ChatDetailPage() {
     {
       id: 5,
       text: '아 그거 보시는군요! 저는 기안84편 재밌게 봤었는데!',
+      isMine: false,
     },
   ]);
   const [input, setInput] = useState('');
