@@ -55,10 +55,10 @@ const DUMMYDATA: UserDataType[] = [
 ];
 
 export default function HomeWrapper() {
-  const [firstUser, setFirstUser] = useState<UserDataType>(null);
-  const [twoUser, setTwoUser] = useState<UserDataType>(null);
-  const [thirdUser, setThirdUser] = useState<UserDataType>(null);
-  const [fourUser, setFourUser] = useState<UserDataType>(null);
+  const [firstUser, setFirstUser] = useState<UserDataType | null>(null);
+  const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
+  const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
+  const [fourUser, setFourUser] = useState<UserDataType | null>(null);
 
   useEffect(() => {
     setFirstUser(DUMMYDATA[0]);

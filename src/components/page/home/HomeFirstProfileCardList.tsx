@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import { UserDataType } from '@/app/(route)/home/HomeWrapper';
 
 interface FirstProps {
-  firstUser: UserDataType;
-  secondUser: UserDataType;
+  firstUser: UserDataType | null;
+  secondUser: UserDataType | null;
 }
 
 export default function HomeFirstProfileCardList({
