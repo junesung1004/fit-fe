@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { HeartIcon } from '@heroicons/react/24/solid';
+// import { HeartIcon } from '@heroicons/react/24/solid';
 import { BellIcon } from '@heroicons/react/24/solid';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -65,9 +65,12 @@ export default function Header() {
       {/* right container */}
       <div className="flex justify-center items-center gap-1">
         {/* 나의 하트 */}
-        <div className="flex gap-1 px-2 py-1 border border-rose-500 rounded-full">
-          <HeartIcon height={24} width={24} className="fill-rose-500" />
-          <span>30</span>
+        <div className="flex justify-center items-center gap-1 px-2 pb-0.5 border border-black rounded-full">
+          {/* <HeartIcon height={24} width={24} className="fill-rose-500" /> */}
+          <div className="relative w-[30px] h-[30px]">
+            <Image src={'/coffee-beans.png'} alt="커피이미지" fill />
+          </div>
+          <span className="pt-1">30</span>
         </div>
         {/* 나의 알람 */}
         <Link href={'/notification'}>
