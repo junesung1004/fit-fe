@@ -2,37 +2,27 @@
 
 import React, { useState, FormEvent } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+
+import { useLoginMutation } from '@/hooks/mutation/useLoginMutation';
+import { LoginProps } from '@/services/login';
 
 export default function LoginPage() {
   const [emailOrId, setEmailOrId] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
+  const { mutate } = useLoginMutation();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // 로컬스토리지에서 사용자 정보 가져오기
-    const storedUserData = localStorage.getItem('user');
-    
-    if (!storedUserData) {
-      alert('회원가입된 유저만 로그인할 수 있습니다.');
-      return;
+    const loginData: LoginProps = {
+      email: emailOrId,
+      password,
+    };
+    try {
+      mutate(loginData);
+    } catch (error) {
+      console.log('로그인 기능 에러 : ', error);
     }
-
-    const storedUser = JSON.parse(storedUserData);
-    
-    // 입력된 이메일 또는 아이디가 로컬스토리지의 사용자 정보와 일치하는지 확인
-    if (storedUser.emailOrId !== emailOrId) {
-      alert('등록된 이메일 또는 아이디가 없습니다.');
-      return;
-    }
-
-    // 로그인 성공 시 로컬스토리지에 사용자 정보 저장
-    localStorage.setItem('user', JSON.stringify({ emailOrId }));
-
-    // 로그인 후 헤더 업데이트를 위해 페이지 리다이렉트 (필요시)
-    router.push('/'); // 로그인 후 홈 페이지로 리다이렉트 (예시)
   };
 
   return (
@@ -64,11 +54,17 @@ export default function LoginPage() {
       </form>
 
       <div className="flex justify-center flex-wrap gap-3 text-sm text-gray-500 mb-5">
-        <a href="/signup" className="hover:underline">회원가입</a>
+        <a href="/signup" className="hover:underline">
+          회원가입
+        </a>
         <span>|</span>
-        <a href="/find-id" className="hover:underline">아이디 찾기</a>
+        <a href="/find-id" className="hover:underline">
+          아이디 찾기
+        </a>
         <span>|</span>
-        <a href="/find-password" className="hover:underline">비밀번호 찾기</a>
+        <a href="/find-password" className="hover:underline">
+          비밀번호 찾기
+        </a>
       </div>
 
       <div className="my-6 text-gray-400 text-sm">또는</div>
@@ -77,21 +73,36 @@ export default function LoginPage() {
         {/* 네이버 로그인 */}
         <button className="flex items-center justify-center w-full py-3 bg-[#03C75A] rounded text-white">
           <div className="relative w-6 h-6 mr-2">
-            <Image src="/naver-logo.png" alt="Naver" fill className="object-contain" />
+            <Image
+              src="/naver-logo.png"
+              alt="Naver"
+              fill
+              className="object-contain"
+            />
           </div>
         </button>
 
         {/* 카카오 로그인 */}
         <button className="flex items-center justify-center w-full py-3 bg-[#FEE500] rounded text-black">
           <div className="relative w-6 h-6 mr-2">
-            <Image src="/kakao-logo.png" alt="Kakao" fill className="object-contain" />
+            <Image
+              src="/kakao-logo.png"
+              alt="Kakao"
+              fill
+              className="object-contain"
+            />
           </div>
         </button>
 
         {/* 구글 로그인 */}
         <button className="flex items-center justify-center w-full py-3 border border-gray-300 rounded bg-white hover:bg-gray-100">
           <div className="relative w-6 h-6 mr-2">
-            <Image src="/google-logo.png" alt="Google" fill className="object-contain" />
+            <Image
+              src="/google-logo.png"
+              alt="Google"
+              fill
+              className="object-contain"
+            />
           </div>
         </button>
       </div>
