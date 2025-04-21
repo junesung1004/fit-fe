@@ -225,12 +225,12 @@ export default function SignUpPage() {
           type="text"
           label="이름"
           required
-          placeholder="닉네임을 입력해주세요"
+          placeholder="이름을 입력해주세요"
           register={register('name', {
-            required: '닉네임은 필수 입력입니다.',
+            required: '이름은 필수 입력입니다.',
             minLength: {
               value: 2,
-              message: '2자리 이상 닉네임을 사용하세요.',
+              message: '2자리 이상 이름을 사용하세요.',
             },
           })}
           error={errors.name as FieldError}

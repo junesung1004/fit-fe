@@ -3,14 +3,17 @@
 import React from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/common/Button';
+import { useLogOutMutation } from '@/hooks/mutation/useLogOutMutation';
 
 export default function AccountInformationPage() {
+  const { mutate } = useLogOutMutation();
+
   const handleDeleteAccount = () => {
     console.log('탈퇴');
   };
 
   const handleClickLogout = () => {
-    console.log('로그아웃');
+    mutate();
   };
 
   return (
@@ -24,7 +27,6 @@ export default function AccountInformationPage() {
 
         <h1 className="text-3xl mb-3">계정 관리</h1>
         <div
-          role="button"
           onClick={handleClickLogout}
           className="cursor-pointer w-full px-5 py-4 border border-black rounded-2xl flex justify-between items-center hover:shadow-lg"
         >
