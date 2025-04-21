@@ -15,6 +15,6 @@ export const logout = async () => {
     console.error('로그아웃 요청 실패 : ', err);
     console.error('응답 상태 코드 : ', err.response?.status);
     console.error('메시지 : ', err.response?.data?.message);
-    throw err;
+    throw new Error('로그아웃 실패');
   }
 };
