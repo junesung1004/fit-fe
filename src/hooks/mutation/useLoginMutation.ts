@@ -13,7 +13,7 @@ export const useLoginMutation = () => {
     mutationFn: async (data: LoginProps) => await login(data),
     onSuccess: (res) => {
       const accessToken = res.accessToken;
-      const nickName = res.user?.nickName || '사용자';
+      const nickName = res.user?.nickname || '사용자';
       setAuth(accessToken, nickName);
       console.log('✅ 로그인 응답:', res);
 
