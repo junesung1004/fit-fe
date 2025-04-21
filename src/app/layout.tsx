@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import ReactQueryProvider from '@/lib/ReactQueryProvider';
+import { ToastContainer } from 'react-toastify';
 
 export const metadata: Metadata = {
   title: 'Fit',
@@ -16,6 +17,13 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+        />
       </body>
     </html>
   );

@@ -3,11 +3,8 @@
 import { usePathname, useRouter } from 'next/navigation';
 import FitLogo from '@/assets/1.png';
 import Link from 'next/link';
-import {
-  ArrowLeftIcon,
-  BellIcon,
-  HeartIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, BellIcon, HeartIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react';
 
 interface HeaderProps {
   isLoggedIn: boolean;
@@ -17,13 +14,32 @@ interface HeaderProps {
 export default function Header({ isLoggedIn, likeCount = 0 }: HeaderProps) {
   const pathname = usePathname();
 
+  const [isLoggedInState, setIsLoggedInState] = useState(isLoggedIn);
+
   const isBackHeader = pathname.includes('/signup');
   const isFriendsHeader = pathname.startsWith('/friends');
-  const isSimpleHeader = !isLoggedIn;
+  const isSimpleHeader = !isLoggedInState;
+
+  useEffect(() => {
+    // 쿠키에서 로그인 토큰이 있는지 확인
+    const cookies = document.cookie
+      .split('; ')
+      .reduce((acc: Record<string, string>, current) => {
+        const [key, value] = current.split('=');
+        acc[key] = value;
+        return acc;
+      }, {});
+
+    if (cookies['token']) {
+      setIsLoggedInState(true);
+    } else {
+      setIsLoggedInState(false);
+    }
+  }, []);
 
   if (isBackHeader) return <BackHeader />;
-  if (isFriendsHeader) return <FriendsHeader likeCount={likeCount} />;
   if (isSimpleHeader) return <SimpleHeader />;
+  if (isFriendsHeader) return <FriendsHeader likeCount={likeCount} />;
   return <HomeHeader likeCount={likeCount} />;
 }
 
@@ -47,7 +63,7 @@ function HeaderLayout({
 
 function Logo() {
   return (
-    <Link href="/">
+    <Link href="/home">
       <img
         src={FitLogo.src}
         alt="logo"
@@ -57,7 +73,6 @@ function Logo() {
   );
 }
 
-//뒤로가기 버튼이 있는 헤더(회원가입페이지에서)//
 function BackHeader() {
   const router = useRouter();
   return (
@@ -72,23 +87,28 @@ function BackHeader() {
   );
 }
 
-//로그인 안했을때//
 function SimpleHeader() {
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
   return (
     <HeaderLayout
       center={<Logo />}
       right={
-        <Link href="/login">
-          <button className="bg-rose-400 text-white px-3 py-1.5 text-sm rounded w-[80px]">
-            로그인
-          </button>
-        </Link>
+        <button
+          onClick={handleLogin}
+          className="bg-rose-400 text-white px-3 py-1.5 text-sm rounded w-[80px]"
+        >
+          로그인
+        </button>
       }
     />
   );
 }
 
-//로그인 했을때//
 function HomeHeader({ likeCount }: { likeCount: number }) {
   return (
     <HeaderLayout
@@ -114,7 +134,6 @@ function HomeHeader({ likeCount }: { likeCount: number }) {
   );
 }
 
-//로그인을 하고 친구리스트페이지에 들어갔을때//
 function FriendsHeader({ likeCount }: { likeCount: number }) {
   const pathname = usePathname();
   const isReceived = pathname.includes('/received');
