@@ -14,6 +14,7 @@ export default function Header() {
 
   const { isLoggedIn, userName } = useAuthStore();
   console.log('이름', userName);
+  console.log('로그인 상태 : ', isLoggedIn);
 
   return isLoggedIn ? (
     <header className="relative flex items-center justify-between h-20 border-b px-4">

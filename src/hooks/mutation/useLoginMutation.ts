@@ -15,6 +15,7 @@ export const useLoginMutation = () => {
       const accessToken = res.accessToken;
       const nickName = res.user?.nickName || '사용자';
       setAuth(accessToken, nickName);
+      console.log('✅ 로그인 응답:', res);
 
       toast.success(`${nickName}님 환영합니다.`);
       router.push('/home');

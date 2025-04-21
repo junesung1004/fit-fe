@@ -19,7 +19,7 @@ const ProfileCard = ({
   profileImageUrl,
 }: ProfileCardProps) => {
   return (
-    <div className="w-[120px] p-4 bg-white rounded-lg shadow-md">
+    <div className="w-[120px] p-4 bg-white rounded-lg shadow-md" >
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-4">
         <div className="w-24 h-24 relative ">
