@@ -2,15 +2,16 @@ export interface SignUpFormValues {
   email: string;
   password: string;
   confirmPassword: string;
-  name: string;
   nickname: string;
+  name: string;
   job: string;
   gender: string;
   birthday: string;
-  address: string;
-  phoneNumber?: string;
+  region: string;
+  phone?: string;
   mbti: string;
   interests: string[];
   listening: string[];
   selfintro: string[];
+  images: string[];
 }

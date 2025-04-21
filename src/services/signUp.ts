@@ -35,6 +35,25 @@ export const signUp = async (data: SignUpPayload) => {
     console.error('📍 서버 응답 메시지:', err.response?.data?.message);
     console.error('📍 전체 응답 데이터:', err.response?.data);
     console.error('📍 요청 데이터:', data);
-    throw new Error(err.response?.data?.message || '회원가입 실패패');
+    throw new Error(err.response?.data?.message || '회원가입 실패');
+  }
+};
+
+export const signUpImageUpload = async (file: File) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await instance.post('/profile-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return response.data.imageUrl;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 이미지 업로드 실패');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+    throw new Error(err.response?.data?.message || '이미지 업로드 실패');
   }
 };

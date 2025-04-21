@@ -39,14 +39,14 @@ export default function RegionSelector({
 }: RegionSelectorProps) {
   return (
     <div className="flex flex-col gap-1 mb-4">
-      <label htmlFor="address" className="text-sm font-medium text-gray-400">
+      <label htmlFor="region" className="text-sm font-medium text-gray-400">
         지역
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>
       <select
-        id="address"
+        id="region"
         defaultValue=""
-        {...register('address', {
+        {...register('region', {
           required: required ? '지역을 선택해주세요' : false,
         })}
         className={clsx(

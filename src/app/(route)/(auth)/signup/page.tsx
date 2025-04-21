@@ -10,6 +10,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSignUpMutation } from '@/hooks/mutation/useSignUpMutation';
 import { SignUpFormValues } from '@/types/signUp.type';
+// import { signUpImageUpload } from '@/services/signUp';
 
 const INTERESTS = [
   '운동',
@@ -95,10 +96,6 @@ export default function SignUpPage() {
   };
   const { mutate, isPending } = useSignUpMutation();
 
-  useEffect(() => {
-    validateImages();
-  }, [images]);
-
   const handleImageChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -125,13 +122,29 @@ export default function SignUpPage() {
     }
   };
 
+  const handleCreateUserSubmit = async (data: SignUpFormValues) => {
+    try {
+      // 이미지가 2장 이상 등록되었는지 확인
+      // const vaildImages = images.filter((file): file is File => file !== null);
+
+      //이미지 업로드 -> URL 배열로 변환
+      // const imageUploadPromise = vaildImages.map((file) =>
+      //   signUpImageUpload(file)
+      // );
+      // const imageUrls = await Promise.all(imageUploadPromise);
+
+      mutate({
+        ...data,
+        // images: imageUrls,
+      });
+    } catch (error) {
+      console.error('회원가입 도중 에러 발생 : ', error);
+    }
+  };
+
   useEffect(() => {
     validateImages();
   }, [images]);
-
-  const handleCreateUserSubmit = (data: SignUpFormValues) => {
-    mutate(data);
-  };
 
   return (
     <div className="w-full min-h-full py-10 px-5">
@@ -220,8 +233,8 @@ export default function SignUpPage() {
               message: '2자리 이상 닉네임을 사용하세요.',
             },
           })}
-          error={errors.nickname as FieldError}
-          isDirty={dirtyFields.nickname}
+          error={errors.name as FieldError}
+          isDirty={dirtyFields.name}
         />
 
         {/* 닉네임 필드 */}
@@ -289,24 +302,24 @@ export default function SignUpPage() {
         {/* 지역 필드 */}
         <RegionSelector
           register={register}
-          error={errors.address?.message as string}
+          error={errors.region?.message as string}
           required
         />
 
         {/* 휴대폰번호 필드 */}
         <InputField
-          id="phoneNumber"
+          id="phone"
           type="text"
           label="전화번호"
           placeholder="010-1234-1234"
-          register={register('phoneNumber', {
+          register={register('phone', {
             pattern: {
               value: /^\d{3}-\d{4}-\d{4}$/,
               message: '올바른 형식을 입력해주세요.',
             },
           })}
-          error={errors.phoneNumber as FieldError}
-          isDirty={dirtyFields.phoneNumber}
+          error={errors.phone as FieldError}
+          isDirty={dirtyFields.phone}
         />
 
         {/* MBTI 필드 */}
