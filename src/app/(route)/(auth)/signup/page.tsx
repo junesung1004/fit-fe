@@ -206,6 +206,24 @@ export default function SignUpPage() {
           isDirty={dirtyFields.confirmPassword}
         />
 
+        {/* 이름 필드 */}
+        <InputField
+          id="name"
+          type="text"
+          label="이름"
+          required
+          placeholder="닉네임을 입력해주세요"
+          register={register('name', {
+            required: '닉네임은 필수 입력입니다.',
+            minLength: {
+              value: 2,
+              message: '2자리 이상 닉네임을 사용하세요.',
+            },
+          })}
+          error={errors.nickname as FieldError}
+          isDirty={dirtyFields.nickname}
+        />
+
         {/* 닉네임 필드 */}
         <InputField
           id="nickname"
@@ -271,24 +289,24 @@ export default function SignUpPage() {
         {/* 지역 필드 */}
         <RegionSelector
           register={register}
-          error={errors.region?.message as string}
+          error={errors.address?.message as string}
           required
         />
 
         {/* 휴대폰번호 필드 */}
         <InputField
-          id="phone"
+          id="phoneNumber"
           type="text"
           label="전화번호"
           placeholder="010-1234-1234"
-          register={register('phone', {
+          register={register('phoneNumber', {
             pattern: {
               value: /^\d{3}-\d{4}-\d{4}$/,
               message: '올바른 형식을 입력해주세요.',
             },
           })}
-          error={errors.phone as FieldError}
-          isDirty={dirtyFields.phone}
+          error={errors.phoneNumber as FieldError}
+          isDirty={dirtyFields.phoneNumber}
         />
 
         {/* MBTI 필드 */}
