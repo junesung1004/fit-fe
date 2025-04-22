@@ -84,7 +84,7 @@ export const emailVerificationRequest = async (data: string) => {
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
-    console.error('❌ 이메일 인증코드 발송 에러');
+    console.error('❌ 이메일 인증코드 발송 에러.');
     console.error('📍 상태 코드:', err.response?.status);
     console.error('📍 메시지:', err.response?.data?.message);
     throw new Error(err.response?.data?.message || '이메일 인증코드 발송 실패');
