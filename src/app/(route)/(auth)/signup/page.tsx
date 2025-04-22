@@ -10,6 +10,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import {
   useEmailCheckMutation,
+  useEmailSuccessMutation,
   useEmailVerificationMutation,
   useSignUpMutation,
 } from '@/hooks/mutation/useSignUpMutation';
@@ -37,7 +38,7 @@ export default function SignUpPage() {
 
   const password = watch('password');
   const selectedGender = watch('gender');
-
+  const [emailSuccessCode, setEmailSuccessCode] = useState('');
   const [images, setImages] = useState<(File | null)[]>(Array(6).fill(null));
   const [previews, setPreviews] = useState<(string | null)[]>(
     Array(6).fill(null)
@@ -60,6 +61,7 @@ export default function SignUpPage() {
       sendVerificationEmail(watch('email')); // ✅ 인증코드 발송
     }
   });
+  const { mutate: successEmail } = useEmailSuccessMutation();
 
   //이미지 미리보기
   const handleImageChange = (
@@ -111,6 +113,15 @@ export default function SignUpPage() {
     }
   };
 
+  //이메일 인증코드 확인
+  const handleClickEmailSuccess = (emailSuccessCode: string) => {
+    successEmail(Number(emailSuccessCode));
+  };
+
+  const handleChangeEmailCode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmailSuccessCode(e.target.value);
+  };
+
   useEffect(() => {
     validateImages();
   }, [images]);
@@ -151,13 +162,20 @@ export default function SignUpPage() {
         {/* 인증코드 필드 */}
         {isEmailCode && (
           <div className="flex items-center gap-3">
-            <InputField
+            <input
+              value={emailSuccessCode}
+              className="w-full border border-violet-500 rounded-full py-2 px-4"
               id="email-code"
               type="text"
-              label="이메일 인증 코드"
               placeholder="6자리 인증코드를 입력해주세요."
+              onChange={handleChangeEmailCode}
             />
-            <Button rounded="full" variant="outline" size="full">
+            <Button
+              rounded="full"
+              variant="outline"
+              size="full"
+              onClick={() => handleClickEmailSuccess(emailSuccessCode)}
+            >
               인증 확인
             </Button>
           </div>

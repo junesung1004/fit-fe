@@ -5,9 +5,11 @@ import { toast } from 'react-toastify';
 import {
   emailCheck,
   emailVerificationRequest,
+  emailVerificationSuccess,
   signUp,
 } from '@/services/signUp';
 
+// 회원가입 mutation
 export const useSignUpMutation = () => {
   const router = useRouter();
 
@@ -23,6 +25,7 @@ export const useSignUpMutation = () => {
   });
 };
 
+//이메일 중복 mutation
 export const useEmailCheckMutation = (
   // eslint-disable-next-line no-unused-vars
   onValid: (isAvailable: boolean) => void
@@ -44,6 +47,7 @@ export const useEmailCheckMutation = (
   });
 };
 
+//이메일 인증메일 발송 mutation
 export const useEmailVerificationMutation = () => {
   return useMutation({
     mutationFn: async (email: string) => await emailVerificationRequest(email),
@@ -52,6 +56,21 @@ export const useEmailVerificationMutation = () => {
     },
     onError: (error) => {
       toast.error(error.message || '이메일 인증 코드 요청이 실패했습니다.');
+    },
+  });
+};
+
+//이메일 인증코드 확인 mutation
+export const useEmailSuccessMutation = () => {
+  return useMutation({
+    mutationFn: async (data: number) => await emailVerificationSuccess(data),
+    onSuccess: () => {
+      toast.success('인증 코드가 확인되었습니다.');
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || '이메일 인증 코드 확인 요청이 실패했습니다.'
+      );
     },
   });
 };

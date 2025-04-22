@@ -27,7 +27,7 @@ interface SignUpErrorResponse {
 // 이메일 중복
 export const emailCheck = async (data: string) => {
   try {
-    const response = await instance.post('/auth/check-email', { data });
+    const response = await instance.post('/auth/check-email', data);
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
@@ -42,7 +42,7 @@ export const emailCheck = async (data: string) => {
 // 회원가입
 export const signUp = async (data: SignUpPayload) => {
   try {
-    const response = await instance.post('/auth/register', { data });
+    const response = await instance.post('/auth/register', data);
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
@@ -88,5 +88,19 @@ export const emailVerificationRequest = async (data: string) => {
     console.error('📍 상태 코드:', err.response?.status);
     console.error('📍 메시지:', err.response?.data?.message);
     throw new Error(err.response?.data?.message || '이메일 인증코드 발송 실패');
+  }
+};
+
+//d이메일 인증코드 확인 api
+export const emailVerificationSuccess = async (data: number) => {
+  try {
+    const response = await instance.post('/auth/verify-email', { data });
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 이메일 인증코드 확인 발송 에러');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+    throw new Error(err.response?.data?.message || '이메일 인증코드 확인 실패');
   }
 };
