@@ -27,7 +27,7 @@ interface SignUpErrorResponse {
 // 이메일 중복
 export const emailCheck = async (data: string) => {
   try {
-    const response = await instance.post('/auth/check-email', data);
+    const response = await instance.post('/auth/check-email', { data });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
