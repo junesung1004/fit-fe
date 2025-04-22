@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HeartIcon } from '@heroicons/react/24/solid';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
+import { sendNotification } from '@/services/notification';  // NotificationService import
 
 const dummyData = [
   { id: 1, text: '동안' },
@@ -31,8 +32,40 @@ export default function MemberDetailPage() {
     setTimeout(() => setIsClicked(false), 300); // 애니메이션 끝나고 리셋
   };
 
-  const handleClickDatingChatRequest = () => {
-    console.log('클릭');
+  const handleLikeClick = async (receiverId: number) => {
+    try {
+      // 좋아요 알림 전송
+      const notificationPayload = {
+        receiverId,
+        type: 'like',  // 알림 타입 (좋아요)
+        title: '좋아요 알림',
+        content: '회원님을 마음에 들어하는 사람이 있어요 💕',
+      };
+
+      await sendNotification(notificationPayload);
+      alert('좋아요 알림이 전송되었습니다!');
+    } catch (error) {
+      console.error('좋아요 알림 전송 실패:', error);
+      alert('알림 전송에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handleDatingChatRequest = async (receiverId: number) => {
+    try {
+      // 커피챗 신청 알림 전송
+      const notificationPayload = {
+        receiverId,
+        type: 'chat_request',  // 알림 타입 (커피챗 신청)
+        title: '커피챗 신청',
+        content: '커피챗 요청이 도착했어요 ☕',
+      };
+
+      await sendNotification(notificationPayload);
+      alert('커피챗 신청 알림이 전송되었습니다!');
+    } catch (error) {
+      console.error('커피챗 신청 알림 전송 실패:', error);
+      alert('알림 전송에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
@@ -63,7 +96,11 @@ export default function MemberDetailPage() {
           {/* 하트 애니메이션 */}
           <motion.div
             style={{ color: '#f87171' }}
-            onClick={handleClick}
+            
+            onClick={() => {
+              handleClick(); 
+              handleLikeClick(1);// receiverId 예시로 1
+            }}  
             animate={
               isClicked
                 ? {
@@ -93,7 +130,7 @@ export default function MemberDetailPage() {
       {/* AboutMe */}
       <MemberProfileDetailCard.AboutMe>
         <button
-          onClick={handleClickDatingChatRequest}
+          onClick={() => handleDatingChatRequest(1)}  // receiverId 예시로 1
           className="text-white bg-cyan-500 py-5 rounded-2xl hover:bg-cyan-300 active:bg-cyan-400"
         >
           ☕ 커피챗을 신청해보세요.

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 // 알림 타입 정의
@@ -29,6 +30,13 @@ function NotificationItem({
   // eslint-disable-next-line no-unused-vars
   onDelete: (id: number) => void;
 }) {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    const path = notification.type === 'like' ? '/members/1' : '/chats/1';
+    router.push(path);
+  };
+
   const bgColor =
     notification.type === 'match'
       ? 'bg-pink-100'
@@ -36,33 +44,33 @@ function NotificationItem({
       ? 'bg-purple-100'
       : 'bg-gray-100';
 
-  // 프로필 보기 링크 또는 채팅 링크 결정
-  const profileLink = notification.type === 'like' ? '/members/1' : '/chats/1';
-
   return (
-    <div className={`p-2 rounded-lg shadow-sm mb-2 ${bgColor}`}> {/* 둥근 모서리 변경 */}
+    <div
+      className={`p-2 rounded-lg shadow-sm mb-2 ${bgColor} cursor-pointer`}
+      onClick={handleCardClick}
+    >
       <div className="flex justify-between items-center">
         <div className="text-sm font-medium text-gray-800">{notification.message}</div>
-        
-        {/* X 아이콘 클릭 시 알림 삭제 */}
         <button
-          onClick={() => onDelete(notification.id)}
+          onClick={(e) => {
+            e.stopPropagation(); // 카드 클릭과 삭제 버튼 충돌 방지
+            onDelete(notification.id);
+          }}
           className="text-gray-500 hover:text-gray-700"
         >
           &times;
         </button>
       </div>
-
-      {/* 버튼들을 메시지 아래에 배치 */}
-      <div className="mt-2 flex justify-between">
-        <a
-          href={profileLink}
-          className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center space-x-1"
-        >
-          <span>&rarr;</span>
-          <span>{notification.type === 'like' ? '프로필 보러 가기' : '채팅하기'}</span>
-        </a>
+        {/* 이 부분 추가: 텍스트 표시만 하고 클릭은 카드 전체로 */}
+        <div  
+        className={`mt-1 text-xs font-medium ${
+          notification.type === 'like' ? 'text-violet-500' : 'text-rose-500'
+        }`}
+      >
+        {notification.type === 'like' && '프로필 보러 가기'}
+        {notification.type === 'match' && '채팅하러 가기'}
       </div>
+
       <div className="text-[10px] text-gray-400 mt-1">{formatDate(notification.createdAt)}</div>
     </div>
   );
@@ -85,17 +93,13 @@ export default function NotificationPage() {
     },
   ]);
 
-  // 알림 삭제 함수
   const handleDeleteNotification = (id: number) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.filter((notification) => notification.id !== id)
-    );
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   return (
     <main className="min-h-screen bg-white p-4 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">알림</h2>
-
       {notifications.map((notification) => (
         <NotificationItem
           key={notification.id}
