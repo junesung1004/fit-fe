@@ -39,10 +39,10 @@ export const signUp = async (data: SignUpPayload) => {
   }
 };
 
-export const signUpImageUpload = async (file: File) => {
+export const signUpImageUpload = async (image: File) => {
   try {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('image', image);
 
     const response = await instance.post('/profile-image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

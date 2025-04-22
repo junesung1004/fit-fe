@@ -85,8 +85,8 @@ export default function SignUpPage() {
       const vaildImages = images.filter((file): file is File => file !== null);
 
       //이미지 업로드 -> URL 배열로 변환
-      const imageUploadPromise = vaildImages.map((file) =>
-        signUpImageUpload(file)
+      const imageUploadPromise = vaildImages.map((image) =>
+        signUpImageUpload(image)
       );
       const imageUrls = await Promise.all(imageUploadPromise);
 
