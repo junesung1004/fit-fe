@@ -25,9 +25,9 @@ interface SignUpErrorResponse {
 }
 
 // 이메일 중복
-export const emailCheck = async (data: string) => {
+export const emailCheck = async (email: string) => {
   try {
-    const response = await instance.post('/auth/check-email', { data });
+    const response = await instance.post('/auth/check-email', { email });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
@@ -35,7 +35,7 @@ export const emailCheck = async (data: string) => {
     console.error('📍 응답 상태 코드:', err.response?.status);
     console.error('📍 서버 응답 메시지:', err.response?.data?.message);
     console.error('📍 전체 응답 데이터:', err.response?.data);
-    console.error('📍 요청 데이터:', data);
+    console.error('📍 요청 데이터:', email);
   }
 };
 
@@ -76,10 +76,10 @@ export const signUpImageUpload = async (file: File) => {
 };
 
 //이메일 인증코드 메일 발송
-export const emailVerificationRequest = async (data: string) => {
+export const emailVerificationRequest = async (email: string) => {
   try {
     const response = await instance.post('/auth/send-verification-email', {
-      data,
+      email,
     });
     return response.data;
   } catch (error) {
@@ -91,10 +91,10 @@ export const emailVerificationRequest = async (data: string) => {
   }
 };
 
-//d이메일 인증코드 확인 api
-export const emailVerificationSuccess = async (data: number) => {
+//이메일 인증코드 확인 api
+export const emailVerificationSuccess = async (code: number) => {
   try {
-    const response = await instance.post('/auth/verify-email', { data });
+    const response = await instance.post('/auth/verify-email', { code });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
