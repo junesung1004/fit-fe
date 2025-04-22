@@ -56,13 +56,11 @@ export const signUp = async (data: SignUpPayload) => {
 };
 
 //이미지 업로드
-export const signUpImageUpload = async (file: File) => {
+export const signUpImageUpload = async (image: File) => {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await instance.post('/profile-image', formData, {
+    const response = await instance.post('/profile-image/temp', {
       headers: { 'Content-Type': 'multipart/form-data' },
+      image,
     });
 
     return response.data.imageUrl;

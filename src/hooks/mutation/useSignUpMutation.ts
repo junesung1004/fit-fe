@@ -7,7 +7,21 @@ import {
   emailVerificationRequest,
   emailVerificationSuccess,
   signUp,
+  signUpImageUpload,
 } from '@/services/signUp';
+
+// 이미지 업로드 mutation
+export const useUploadImageMutataion = () => {
+  return useMutation({
+    mutationFn: async (image: File) => await signUpImageUpload(image),
+    onSuccess: () => {
+      toast.success('이미지 업로드 성공');
+    },
+    onError: (error) => {
+      toast.error(error.message || '이미지 업로드 실패');
+    },
+  });
+};
 
 // 회원가입 mutation
 export const useSignUpMutation = () => {

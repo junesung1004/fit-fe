@@ -13,15 +13,16 @@ import {
   useEmailSuccessMutation,
   useEmailVerificationMutation,
   useSignUpMutation,
+  useUploadImageMutataion,
 } from '@/hooks/mutation/useSignUpMutation';
 import { SignUpFormValues } from '@/types/signUp.type';
-import { signUpImageUpload } from '@/services/signUp';
 import {
   INTERESTS,
   LISTENING,
   MBTI,
   SELPINTRO,
 } from '@/constants/signupDummyData';
+import { toast } from 'react-toastify';
 
 export default function SignUpPage() {
   const {
@@ -43,6 +44,9 @@ export default function SignUpPage() {
   const [previews, setPreviews] = useState<(string | null)[]>(
     Array(6).fill(null)
   );
+  const [uploadImageUrl, setUploadImageUrl] = useState<(string | null)[]>(
+    Array(6).fill(null)
+  ); // 이미지 같이 업로드해야함
   const [error, setError] = useState<string | null>(null);
   const [isImageValid, setIsImageValid] = useState(false);
 
@@ -62,8 +66,9 @@ export default function SignUpPage() {
     }
   });
   const { mutate: successEmail } = useEmailSuccessMutation();
+  const { mutate: uploadImage } = useUploadImageMutataion();
 
-  //이미지 미리보기
+  //이미지 업로드
   const handleImageChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -73,11 +78,23 @@ export default function SignUpPage() {
 
     const updatedImages = [...images];
     const updatedPreviews = [...previews];
+    const updatedUploadedUrls = [...uploadImageUrl];
+
+    //미리보기 먼저 보여주는 코드
     updatedImages[index] = file;
     updatedPreviews[index] = URL.createObjectURL(file);
 
     setImages(updatedImages);
     setPreviews(updatedPreviews);
+
+    //s3 업로드 후 url 저장
+    uploadImage(file, {
+      onSuccess: (s3Url) => {
+        // ✅ 개별 업로드에 대한 상태 업데이트
+        updatedUploadedUrls[index] = s3Url;
+        setUploadImageUrl(updatedUploadedUrls);
+      },
+    });
   };
 
   // 이메일 중복확인 함수
@@ -95,21 +112,24 @@ export default function SignUpPage() {
   // 유저 생성 함수
   const handleCreateUserSubmit = async (data: SignUpFormValues) => {
     try {
-      // 이미지가 2장 이상 등록되었는지 확인
-      const vaildImages = images.filter((file): file is File => file !== null);
-
-      //이미지 업로드 -> URL 배열로 변환
-      const imageUploadPromise = vaildImages.map((file) =>
-        signUpImageUpload(file)
+      // ✅ 1. 업로드된 S3 URL 중 null이 아닌 것만 필터링
+      const validImageUrls = uploadImageUrl.filter(
+        (url): url is string => url !== null
       );
-      const imageUrls = await Promise.all(imageUploadPromise);
 
+      // ✅ 2. 최소 2장 이상인지 검증
+      if (validImageUrls.length < 2) {
+        toast.error('최소 2장의 이미지를 업로드해주세요.');
+        return;
+      }
+
+      // ✅ 3. 회원가입 요청
       mutate({
         ...data,
-        images: imageUrls,
+        images: validImageUrls, // ⬅️ 이게 S3에서 가져온 URL 배열
       });
     } catch (error) {
-      console.error('회원가입 도중 에러 발생 : ', error);
+      console.error('회원가입 도중 에러 발생:', error);
     }
   };
 
