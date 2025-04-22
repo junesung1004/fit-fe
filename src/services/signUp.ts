@@ -27,7 +27,7 @@ interface SignUpErrorResponse {
 // 이메일 중복
 export const emailCheck = async (data: string) => {
   try {
-    const response = await instance.post('/auth/check-email', data);
+    const response = await instance.post('/auth/check-email', { data });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
@@ -42,7 +42,7 @@ export const emailCheck = async (data: string) => {
 // 회원가입
 export const signUp = async (data: SignUpPayload) => {
   try {
-    const response = await instance.post('/auth/register', data);
+    const response = await instance.post('/auth/register', { data });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
@@ -78,7 +78,9 @@ export const signUpImageUpload = async (file: File) => {
 //이메일 인증코드 메일 발송
 export const emailVerificationRequest = async (data: string) => {
   try {
-    const response = await instance.post('/auth/send-verification-email', data);
+    const response = await instance.post('/auth/send-verification-email', {
+      data,
+    });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
