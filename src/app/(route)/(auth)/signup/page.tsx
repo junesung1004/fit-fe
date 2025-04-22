@@ -10,56 +10,13 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSignUpMutation } from '@/hooks/mutation/useSignUpMutation';
 import { SignUpFormValues } from '@/types/signUp.type';
-// import { signUpImageUpload } from '@/services/signUp';
-
-const INTERESTS = [
-  '운동',
-  '영화',
-  '여행',
-  '요리',
-  '카페투어',
-  '뮤지컬',
-  '술',
-  '캠핑',
-];
-
-const LISTENING = [
-  '동안',
-  '예쁜 눈 웃음',
-  '건강한 몸매',
-  '비율이 좋아요',
-  '귀여운 보조개',
-  '애교 많음',
-];
-
-const SELPINTRO = [
-  '웃음이 많아요',
-  '배려심 깊어요',
-  '적극적이에요',
-  '예의가 발라요',
-  '애교가 넘쳐요',
-  '털털한 편이에요',
-  '훌륭한 요리실력',
-];
-
-const MBTI = [
-  'ISTJ',
-  'ISFJ',
-  'INFJ',
-  'INTJ',
-  'ISTP',
-  'ISFP',
-  'INFP',
-  'INTP',
-  'ESTP',
-  'ESFP',
-  'ENFP',
-  'ENTP',
-  'ESTJ',
-  'ESFJ',
-  'ENFJ',
-  'ENTJ',
-];
+import { signUpImageUpload } from '@/services/signUp';
+import {
+  INTERESTS,
+  LISTENING,
+  MBTI,
+  SELPINTRO,
+} from '@/constants/signupDummyData';
 
 export default function SignUpPage() {
   const {
@@ -125,17 +82,17 @@ export default function SignUpPage() {
   const handleCreateUserSubmit = async (data: SignUpFormValues) => {
     try {
       // 이미지가 2장 이상 등록되었는지 확인
-      // const vaildImages = images.filter((file): file is File => file !== null);
+      const vaildImages = images.filter((file): file is File => file !== null);
 
       //이미지 업로드 -> URL 배열로 변환
-      // const imageUploadPromise = vaildImages.map((file) =>
-      //   signUpImageUpload(file)
-      // );
-      // const imageUrls = await Promise.all(imageUploadPromise);
+      const imageUploadPromise = vaildImages.map((file) =>
+        signUpImageUpload(file)
+      );
+      const imageUrls = await Promise.all(imageUploadPromise);
 
       mutate({
         ...data,
-        // images: imageUrls,
+        images: imageUrls,
       });
     } catch (error) {
       console.error('회원가입 도중 에러 발생 : ', error);
