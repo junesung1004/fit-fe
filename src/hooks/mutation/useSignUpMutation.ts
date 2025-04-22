@@ -2,7 +2,11 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { SignUpFormValues } from '@/types/signUp.type';
 import { toast } from 'react-toastify';
-import { signUp } from '@/services/signUp';
+import {
+  emailCheck,
+  emailVerificationRequest,
+  signUp,
+} from '@/services/signUp';
 
 export const useSignUpMutation = () => {
   const router = useRouter();
@@ -15,6 +19,39 @@ export const useSignUpMutation = () => {
     },
     onError: (error) => {
       toast.error(error.message || '회원가입 실패');
+    },
+  });
+};
+
+export const useEmailCheckMutation = (
+  // eslint-disable-next-line no-unused-vars
+  onValid: (isAvailable: boolean) => void
+) => {
+  return useMutation({
+    mutationFn: (email: string) => emailCheck(email),
+    onSuccess: (data) => {
+      if (data?.isDuplicate) {
+        toast.error('이미 사용 중인 이메일입니다.');
+        onValid(false);
+      } else {
+        toast.success('사용 가능한 이메일입니다!');
+        onValid(true); // ✅ 중복 아님
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || '이메일 중복 확인 요청이 실패했습니다.');
+    },
+  });
+};
+
+export const useEmailVerificationMutation = () => {
+  return useMutation({
+    mutationFn: async (email: string) => await emailVerificationRequest(email),
+    onSuccess: () => {
+      toast.success('인증 코드가 이메일로 전송되었습니다.');
+    },
+    onError: (error) => {
+      toast.error(error.message || '이메일 인증 코드 요청이 실패했습니다.');
     },
   });
 };

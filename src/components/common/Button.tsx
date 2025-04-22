@@ -30,7 +30,7 @@ export default function Button({
 
         //사이즈
         size === 'sm' && 'w-[60px] h-10',
-        size === 'md' && 'w-[130px] h-8',
+        size === 'md' && 'w-[130px] h-10',
         size === 'lg' && 'w-[270px] h-8',
         size === 'full' && 'w-full h-10',
 

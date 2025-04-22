@@ -9,7 +9,7 @@ interface InputFieldProps {
   type?: string;
   label: string;
   placeholder?: string;
-  register: UseFormRegisterReturn;
+  register?: UseFormRegisterReturn;
   error?: FieldError;
   isDirty?: boolean;
   required?: boolean;
@@ -38,7 +38,7 @@ export default function InputField({
         {...register}
         aria-invalid={error ? 'true' : 'false'}
         className={clsx(
-          'px-5 py-3 rounded-full border transition-all duration-200 outline-none',
+          'px-5 py-2 rounded-full border transition-all duration-200 outline-none',
           {
             'border-red-400 focus:border-red-500': error,
             'border-green-500 focus:border-green-600': !error && isDirty,

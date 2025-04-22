@@ -24,6 +24,22 @@ interface SignUpErrorResponse {
   };
 }
 
+// 이메일 중복
+export const emailCheck = async (data: string) => {
+  try {
+    const response = await instance.post('/auth/check-email', data);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 이메일 중복 확인 요청 실패');
+    console.error('📍 응답 상태 코드:', err.response?.status);
+    console.error('📍 서버 응답 메시지:', err.response?.data?.message);
+    console.error('📍 전체 응답 데이터:', err.response?.data);
+    console.error('📍 요청 데이터:', data);
+  }
+};
+
+// 회원가입
 export const signUp = async (data: SignUpPayload) => {
   try {
     const response = await instance.post('/auth/register', data);
@@ -39,10 +55,11 @@ export const signUp = async (data: SignUpPayload) => {
   }
 };
 
-export const signUpImageUpload = async (image: File) => {
+//이미지 업로드
+export const signUpImageUpload = async (file: File) => {
   try {
     const formData = new FormData();
-    formData.append('files', image);
+    formData.append('file', file);
 
     const response = await instance.post('/profile-image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -55,5 +72,19 @@ export const signUpImageUpload = async (image: File) => {
     console.error('📍 상태 코드:', err.response?.status);
     console.error('📍 메시지:', err.response?.data?.message);
     throw new Error(err.response?.data?.message || '이미지 업로드 실패');
+  }
+};
+
+//이메일 인증코드 메일 발송
+export const emailVerificationRequest = async (data: string) => {
+  try {
+    const response = await instance.post('/auth/send-verification-email', data);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 이메일 인증코드 발송 에러');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+    throw new Error(err.response?.data?.message || '이메일 인증코드 발송 실패');
   }
 };

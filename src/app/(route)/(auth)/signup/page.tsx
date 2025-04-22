@@ -8,7 +8,11 @@ import Button from '@/components/common/Button';
 import MultiToggleButtonGroup from '@/components/common/MultiToggleButtonGroup';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useSignUpMutation } from '@/hooks/mutation/useSignUpMutation';
+import {
+  useEmailCheckMutation,
+  useEmailVerificationMutation,
+  useSignUpMutation,
+} from '@/hooks/mutation/useSignUpMutation';
 import { SignUpFormValues } from '@/types/signUp.type';
 import { signUpImageUpload } from '@/services/signUp';
 import {
@@ -34,10 +38,6 @@ export default function SignUpPage() {
   const password = watch('password');
   const selectedGender = watch('gender');
 
-  // const [emailCheckResult, setEmailCheckResult] = React.useState<
-  //   'valid' | 'invalid' | null
-  // >(null);
-
   const [images, setImages] = useState<(File | null)[]>(Array(6).fill(null));
   const [previews, setPreviews] = useState<(string | null)[]>(
     Array(6).fill(null)
@@ -52,7 +52,16 @@ export default function SignUpPage() {
     setError(valid ? null : '최소 2장의 이미지를 등록해야 합니다.');
   };
   const { mutate, isPending } = useSignUpMutation();
+  const [isEmailCode, setIsEmailCode] = useState(false);
+  const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
+  const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
+    if (isAvailable) {
+      setIsEmailCode(true); // 인증코드 입력창 열기
+      sendVerificationEmail(watch('email')); // ✅ 인증코드 발송
+    }
+  });
 
+  //이미지 미리보기
   const handleImageChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -70,23 +79,26 @@ export default function SignUpPage() {
   };
 
   // 이메일 중복확인 함수
-  const checkEmailDuplicate = () => {
+  const checkEmailDuplicate = async () => {
     const currentEmail = watch('email');
 
     if (!currentEmail) {
       alert('이메일을 입력해주세요');
       return;
     }
+
+    checkEmail(currentEmail);
   };
 
+  // 유저 생성 함수
   const handleCreateUserSubmit = async (data: SignUpFormValues) => {
     try {
       // 이미지가 2장 이상 등록되었는지 확인
       const vaildImages = images.filter((file): file is File => file !== null);
 
       //이미지 업로드 -> URL 배열로 변환
-      const imageUploadPromise = vaildImages.map((image) =>
-        signUpImageUpload(image)
+      const imageUploadPromise = vaildImages.map((file) =>
+        signUpImageUpload(file)
       );
       const imageUrls = await Promise.all(imageUploadPromise);
 
@@ -135,12 +147,21 @@ export default function SignUpPage() {
         >
           이메일 중복 확인
         </Button>
-        {/* {emailCheckResult === 'invalid' && (
-          <small className="text-red-400">이미 등록된 이메일입니다.</small>
+
+        {/* 인증코드 필드 */}
+        {isEmailCode && (
+          <div className="flex items-center gap-3">
+            <InputField
+              id="email-code"
+              type="text"
+              label="이메일 인증 코드"
+              placeholder="6자리 인증코드를 입력해주세요."
+            />
+            <Button rounded="full" variant="outline" size="full">
+              인증 확인
+            </Button>
+          </div>
         )}
-        {emailCheckResult === 'valid' && (
-          <small className="text-green-500">가입이 가능한 이메일입니다.</small>
-        )} */}
 
         {/* 비밀번호 필드 */}
         <InputField
