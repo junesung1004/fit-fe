@@ -1,23 +1,27 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
+import React, { FormEvent, useRef } from 'react';
 import Image from 'next/image';
 
 import { useLoginMutation } from '@/hooks/mutation/useLoginMutation';
 import { LoginProps } from '@/services/login';
 
 export default function LoginPage() {
-  const [emailOrId, setEmailOrId] = useState('');
-  const [password, setPassword] = useState('');
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const { mutate } = useLoginMutation();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    const email = emailRef.current?.value ?? '';
+    const password = passwordRef.current?.value ?? '';
+
     const loginData: LoginProps = {
-      email: emailOrId,
+      email,
       password,
     };
+
     try {
       mutate(loginData);
     } catch (error) {
@@ -33,15 +37,13 @@ export default function LoginPage() {
         <input
           type="text"
           placeholder="이메일 또는 아이디"
-          value={emailOrId}
-          onChange={(e) => setEmailOrId(e.target.value)}
+          ref={emailRef}
           className="block w-full mb-3 p-4 text-sm border border-rose-500 rounded"
         />
         <input
           type="password"
           placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          ref={passwordRef}
           className="block w-full mb-4 p-4 text-sm border border-rose-500 rounded"
         />
 

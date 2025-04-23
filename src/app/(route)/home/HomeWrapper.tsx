@@ -2,63 +2,29 @@
 
 import HomeFristProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
 import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCardList';
+import { DUMMYDATA } from '@/constants/homeDummyData';
+// import { useTodayDatingMatchMutation } from '@/hooks/mutation/useTodayDatingMatchMutation';
+import { UserDataType } from '@/types/homePage.type';
 import React, { useEffect, useState } from 'react';
-
-export interface UserDataType {
-  id: number;
-  nickname: string;
-  age: number;
-  region: string;
-  height: number;
-  mbti: string;
-  image: string;
-}
-
-const DUMMYDATA: UserDataType[] = [
-  {
-    id: 1,
-    nickname: '박준성',
-    age: 20,
-    region: '인천',
-    height: 176,
-    mbti: 'INFP',
-    image: '/june.jpg',
-  },
-  {
-    id: 2,
-    nickname: '차은우',
-    age: 22,
-    region: '서울',
-    height: 182,
-    mbti: 'ISTJ',
-    image: '/cha.jpg',
-  },
-
-  {
-    id: 3,
-    nickname: '서현진',
-    age: 20,
-    region: '인천',
-    height: 176,
-    mbti: 'INFP',
-    image: '/seo.jpg',
-  },
-  {
-    id: 4,
-    nickname: '카리나',
-    age: 22,
-    region: '서울',
-    height: 182,
-    mbti: 'ISTJ',
-    image: '/ka.jpg',
-  },
-];
 
 export default function HomeWrapper() {
   const [firstUser, setFirstUser] = useState<UserDataType | null>(null);
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
+  // const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
+
+  // const getTodayDatingUserMatch = async () => {
+  //   todayDatingUser()
+  // };
+
+  // useEffect(()=> {
+  //   const res = getTodayDatingUserMatch()
+  //   setFirstUser(res[0]);
+  //   setTwoUser(res[1]);
+  //   setThirdUser(res[2]);
+  //   setFourUser(res[3]);
+  // },[])
 
   useEffect(() => {
     setFirstUser(DUMMYDATA[0]);

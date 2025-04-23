@@ -40,7 +40,7 @@ function NotificationItem({
       onClick={handleCardClick}
     >
       <div className="flex justify-between items-center">
-        <div className="text-sm font-medium text-gray-800">{notification.message}</div>
+        <div className="text-sm font-medium text-gray-800">{notification.content}</div>
         <button
           onClick={(e) => {
             e.stopPropagation(); // 카드 클릭과 삭제 버튼 충돌 방지
