@@ -7,6 +7,7 @@ import Button from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 import { UserDataType } from '@/types/homePage.type';
 
+
 interface FirstProps {
   firstUser: UserDataType | null;
   secondUser: UserDataType | null;

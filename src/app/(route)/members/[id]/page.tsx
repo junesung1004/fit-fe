@@ -23,31 +23,30 @@ const dummyData1 = [
 ];
 
 export default function MemberDetailPage() {
-  const [score, setScore] = useState(0);
+  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태
   const [isClicked, setIsClicked] = useState(false);
 
-  // 예시로 현재 로그인된 사용자 ID를 설정. 실제로는 로그인 상태에서 가져와야 합니다.
-  const senderId = 123; // 로그인된 사용자의 ID 예시
+  const senderId = 123; // 로그인된 사용자 ID 예시
 
-  const handleClick = () => {
-    setScore((prev) => prev + 1);
-    setIsClicked(true);
-    setTimeout(() => setIsClicked(false), 300); // 애니메이션 끝나고 리셋
-  };
-
-  const handleLikeClick = async (senderId: number, receiverId: number) => {
+  const handleLikeToggle = async (senderId: number, receiverId: number) => {
     try {
-      // 좋아요 알림 전송
-      const notificationPayload = {
-        senderId, // 알림을 보낸 사용자 ID
-        receiverId, // 알림을 받을 사용자 ID
-        type: 'like',  // 알림 타입 (좋아요)
-        title: '좋아요 알림',
-        content: '회원님을 마음에 들어하는 사람이 있어요 💕',
-      };
+      if (!isLiked) {
+        // 좋아요 알림 전송
+        const notificationPayload = {
+          senderId,
+          receiverId,
+          type: 'like',
+          title: '좋아요 알림',
+          content: '회원님을 마음에 들어하는 사람이 있어요 💕',
+        };
+        await sendNotification(notificationPayload);
+        alert('좋아요 알림이 전송되었습니다!');
+      }
 
-      await sendNotification(notificationPayload); // 서비스 파일에서 sendNotification 호출
-      alert('좋아요 알림이 전송되었습니다!');
+      // 상태 토글 및 애니메이션
+      setIsLiked((prev) => !prev);
+      setIsClicked(true);
+      setTimeout(() => setIsClicked(false), 300);
     } catch (error) {
       console.error('좋아요 알림 전송 실패:', error);
       alert('알림 전송에 실패했습니다. 다시 시도해주세요.');
@@ -56,16 +55,14 @@ export default function MemberDetailPage() {
 
   const handleDatingChatRequest = async (senderId: number, receiverId: number) => {
     try {
-      // 커피챗 신청 알림 전송
       const notificationPayload = {
-        senderId, // 알림을 보낸 사용자 ID
-        receiverId, // 알림을 받을 사용자 ID
-        type: 'chat_request',  // 알림 타입 (커피챗 신청)
+        senderId,
+        receiverId,
+        type: 'chat_request',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
       };
-
-      await sendNotification(notificationPayload); // 서비스 파일에서 sendNotification 호출
+      await sendNotification(notificationPayload);
       alert('커피챗 신청 알림이 전송되었습니다!');
     } catch (error) {
       console.error('커피챗 신청 알림 전송 실패:', error);
@@ -75,9 +72,7 @@ export default function MemberDetailPage() {
 
   return (
     <div className="w-full min-h-full flex flex-col gap-10 px-2 xs:px-20 py-5">
-      {/* 멤버 디테일 컴포넌트 */}
       <MemberProfileDetailCard>
-        {/* 이미지 */}
         <MemberProfileDetailCard.Image>
           <Image
             src={'/june.jpg'}
@@ -87,7 +82,6 @@ export default function MemberDetailPage() {
           />
         </MemberProfileDetailCard.Image>
 
-        {/* information */}
         <MemberProfileDetailCard.Information>
           <p className="flex items-center gap-2">직업 : 개발자</p>
           <p>키 : 176cm</p>
@@ -96,20 +90,17 @@ export default function MemberDetailPage() {
           <p>관심사 : 운동, 여행, 술 </p>
         </MemberProfileDetailCard.Information>
 
-        {/* LikeCountBadge */}
         <MemberProfileDetailCard.LikeCountBadge>
-          {/* 하트 애니메이션 */}
           <motion.div
-            style={{ color: '#f87171' }}
+            style={{ color: isLiked ? '#f87171' : '#d1d5db' }} // 빨간색 or 회색
             onClick={() => {
-              handleClick();
-              handleLikeClick(senderId, 1); // senderId와 receiverId 전달
+              handleLikeToggle(senderId, 1);
             }}
             animate={
               isClicked
                 ? {
                     scale: [1, 1.4, 1],
-                    color: ['#f43f5e', '#be123c', '#f43f5e'], // Tailwind rose-500 → rose-700 → rose-500
+                    color: ['#f43f5e', '#be123c', '#f43f5e'],
                   }
                 : {}
             }
@@ -119,41 +110,34 @@ export default function MemberDetailPage() {
             <HeartIcon className="w-10 h-10" />
           </motion.div>
 
-          {/* 점수 숫자 애니메이션 */}
           <motion.div
-            key={score} // key가 변해야 AnimatePresence가 동작함!
+            key={isLiked ? 1 : 0}
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            {score}
+            {isLiked ? 1 : 0}
           </motion.div>
         </MemberProfileDetailCard.LikeCountBadge>
       </MemberProfileDetailCard>
 
-      {/* AboutMe */}
       <MemberProfileDetailCard.AboutMe>
         <button
-          onClick={() => handleDatingChatRequest(senderId, 1)}  // senderId와 receiverId 전달
+          onClick={() => handleDatingChatRequest(senderId, 1)}
           className="text-white bg-cyan-500 py-5 rounded-2xl hover:bg-cyan-300 active:bg-cyan-400"
         >
           ☕ 커피챗을 신청해보세요.
         </button>
 
-        {/* 나에 대한 정보*/}
         <div className="flex flex-col">
-          {/* 이런 얘기 많이 들어요 */}
           <h1 className="text-violet-500 mb-3">이런 얘기 많이 들어요</h1>
-
           <div className="flex flex-wrap gap-3 mb-10">
             {dummyData.map((el) => (
               <TagBadge key={el.id}>{el.text}</TagBadge>
             ))}
           </div>
 
-          {/* 저는 이런 사람이에요 */}
           <h1 className="text-violet-500 mb-3">저는 이런 사람이에요</h1>
-
           <div className="flex flex-wrap gap-3">
             {dummyData1.map((el) => (
               <TagBadge key={el.id}>{el.text}</TagBadge>

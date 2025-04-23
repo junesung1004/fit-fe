@@ -3,7 +3,7 @@
 import HomeFristProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
 import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCardList';
 import { DUMMYDATA } from '@/constants/homeDummyData';
-import { useTodayDatingMatchMutation } from '@/hooks/mutation/useTodayDatingMatchMutation';
+// import { useTodayDatingMatchMutation } from '@/hooks/mutation/useTodayDatingMatchMutation';
 import { UserDataType } from '@/types/homePage.type';
 import React, { useEffect, useState } from 'react';
 
@@ -12,29 +12,19 @@ export default function HomeWrapper() {
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
-  const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
-  const [data, setData] = useState([]);
-  console.log('data :', data);
+  // const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
 
-  const getTodayDatingUserMatch = async () => {
-    todayDatingUser(undefined, {
-      onSuccess: (data) => {
-        // 여기서 data 배열을 설정
-        setData(data);
-      },
-      onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패', err);
-      },
-    });
-  };
+  // const getTodayDatingUserMatch = async () => {
+  //   todayDatingUser()
+  // };
 
-  useEffect(() => {
-    getTodayDatingUserMatch();
-    // setFirstUser(res[0]);
-    // setTwoUser(res[1]);
-    // setThirdUser(res[2]);
-    // setFourUser(res[3]);
-  }, []);
+  // useEffect(()=> {
+  //   const res = getTodayDatingUserMatch()
+  //   setFirstUser(res[0]);
+  //   setTwoUser(res[1]);
+  //   setThirdUser(res[2]);
+  //   setFourUser(res[3]);
+  // },[])
 
   useEffect(() => {
     setFirstUser(DUMMYDATA[0]);
