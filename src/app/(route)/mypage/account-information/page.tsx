@@ -4,16 +4,18 @@ import React from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/common/Button';
 import { useLogOutMutation } from '@/hooks/mutation/useLogOutMutation';
+import { useUserDeleteMutation } from '@/hooks/mutation/useUserDeleteMutation';
 
 export default function AccountInformationPage() {
-  const { mutate } = useLogOutMutation();
+  const { mutate: logout } = useLogOutMutation();
+  const { mutate: userDelete } = useUserDeleteMutation();
 
   const handleDeleteAccount = () => {
-    console.log('탈퇴');
+    userDelete();
   };
 
   const handleClickLogout = () => {
-    mutate();
+    logout();
   };
 
   return (

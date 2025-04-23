@@ -51,6 +51,7 @@ export default function SignUpPage() {
   const [isImageValid, setIsImageValid] = useState(false);
   const { mutate, isPending } = useSignUpMutation();
   const [isEmailCode, setIsEmailCode] = useState(false);
+
   const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
   const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
     if (isAvailable) {
@@ -144,6 +145,7 @@ export default function SignUpPage() {
   //이메일 인증코드 확인
   const handleClickEmailSuccess = (emailSuccessCode: string) => {
     successEmail(Number(emailSuccessCode));
+    setIsEmailCode(false);
   };
 
   const handleChangeEmailCode = (e: React.ChangeEvent<HTMLInputElement>) => {
