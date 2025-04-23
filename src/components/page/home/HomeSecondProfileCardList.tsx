@@ -5,7 +5,7 @@ import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
 import Button from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
-import { UserDataType } from '@/types/homePage.type';
+import { UserDataType } from '@/app/(route)/home/HomeWrapper';
 
 interface SecondProps {
   thirdUser: UserDataType | null;
