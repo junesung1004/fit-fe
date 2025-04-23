@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { HeartIcon } from '@heroicons/react/24/solid';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
 import { sendNotification } from '@/services/notification';  // NotificationService import
+import { likeMember } from '@/services/like';
 
 const dummyData = [
   { id: 1, text: '동안' },
@@ -31,11 +32,12 @@ export default function MemberDetailPage() {
   const handleLikeToggle = async (senderId: number, receiverId: number) => {
     try {
       if (!isLiked) {
+        await likeMember(receiverId);
         // 좋아요 알림 전송
         const notificationPayload = {
           senderId,
           receiverId,
-          type: 'like',
+          type: 'LIKE',
           title: '좋아요 알림',
           content: '회원님을 마음에 들어하는 사람이 있어요 💕',
         };
@@ -58,7 +60,7 @@ export default function MemberDetailPage() {
       const notificationPayload = {
         senderId,
         receiverId,
-        type: 'chat_request',
+        type: 'COFFEE_CHAT',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
       };

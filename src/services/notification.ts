@@ -1,4 +1,4 @@
-import instance from '@/lib/axios';  
+import instance from '@/lib/axios';
 
 export interface Notification {
   id: number;
@@ -39,15 +39,36 @@ export const sendNotification = async (notificationPayload: NotificationPayload)
   }
 };
 
-// 실시간 알림을 받는 함수 (SSE 사용)
+// 알림 하나 삭제
+export const deleteNotification = async (id: number) => {
+  try {
+    const response = await instance.delete(`/notification/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('알림 삭제 실패:', error);
+    throw error;
+  }
+};
+
+// 전체 알림 삭제 (Id 불필요)
+export const deleteAllNotifications = async () => {
+  try {
+    const response = await instance.delete('/notification');
+    return response.data;
+  } catch (error) {
+    console.error('전체 알림 삭제 실패:', error);
+    throw error;
+  }
+};
+
+// 실시간 알림 받기 (SSE)
 // eslint-disable-next-line no-unused-vars
 export const listenToRealTimeNotifications = (callback: (notification: Notification) => void) => {
-  const eventSource = new EventSource('https://api.fit-date.co.kr/api/v1/notification/events'); 
-  // ⚠️ SSE는 axios 인스턴스를 못 써서 직접 전체 URL 명시 필요!
+  const eventSource = new EventSource('https://api.fit-date.co.kr/api/v1/notification/events');
 
   eventSource.onmessage = (event) => {
     const notification = JSON.parse(event.data);
-    callback(notification); // 알림을 받아서 콜백 함수로 전달
+    callback(notification);
   };
 
   eventSource.onerror = (error) => {
