@@ -11,7 +11,8 @@ import { useNotificationStore } from '@/store/notificationStore'; // Zustand sto
 export default function Header() {
   const pathName = usePathname();
   const router = useRouter();
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, user } = useAuthStore();
+  console.log('user : ', user);
 
   // Zustand에서 알림 상태 가져오기
   const { notifications, hasNew } = useNotificationStore();

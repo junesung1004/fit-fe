@@ -5,6 +5,7 @@ export interface SignUpFormValues {
   nickname: string;
   name: string;
   job: string;
+  height: string;
   gender: string;
   birthday: string;
   region: string;

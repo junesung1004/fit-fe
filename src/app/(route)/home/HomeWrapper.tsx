@@ -2,10 +2,10 @@
 
 import HomeFristProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
 import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCardList';
-import { DUMMYDATA } from '@/constants/homeDummyData';
+// import { DUMMYDATA } from '@/constants/homeDummyData';
 import {
   usePublicTodayDatingMatchMutation,
-  useTodayDatingMatchMutation,
+  // useTodayDatingMatchMutation,
 } from '@/hooks/mutation/useTodayDatingMatchMutation';
 import { UserDataType } from '@/types/homePage.type';
 import React, { useEffect, useState } from 'react';
@@ -13,26 +13,30 @@ import React, { useEffect, useState } from 'react';
 export default function HomeWrapper() {
   const [firstUser, setFirstUser] = useState<UserDataType | null>(null);
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
+  //console.log('firstUser :', firstUser);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
-  const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
+  // const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
-  const [data, setData] = useState([]);
-  console.log('data :', data);
-  const [publicData, setPublicData] = useState([]);
-  console.log('publicData :', publicData);
+  // const [data, setData] = useState([]);
+  //console.log('data :', data);
+  const [publicData, setPublicData] = useState<{
+    matches: { user1: UserDataType; user2: UserDataType }[];
+  }>({
+    matches: [],
+  });
 
-  const getTodayDatingUserMatch = async () => {
-    todayDatingUser(undefined, {
-      onSuccess: (data) => {
-        // 여기서 data 배열을 설정
-        setData(data);
-      },
-      onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패', err);
-      },
-    });
-  };
+  // const getTodayDatingUserMatch = async () => {
+  //   todayDatingUser(undefined, {
+  //     onSuccess: (data) => {
+  //       // 여기서 data 배열을 설정
+  //       setData(data);
+  //     },
+  //     onError: (err) => {
+  //       console.error('❌ 매칭 데이터 가져오기 실패', err);
+  //     },
+  //   });
+  // };
 
   const getPublicTodayDatingUserMatch = async () => {
     publicTodayDatingUser(undefined, {
@@ -47,7 +51,7 @@ export default function HomeWrapper() {
   };
 
   useEffect(() => {
-    getTodayDatingUserMatch();
+    // getTodayDatingUserMatch();
     getPublicTodayDatingUserMatch();
     // setFirstUser(res[0]);
     // setTwoUser(res[1]);
@@ -56,11 +60,15 @@ export default function HomeWrapper() {
   }, []);
 
   useEffect(() => {
-    setFirstUser(DUMMYDATA[0]);
-    setTwoUser(DUMMYDATA[1]);
-    setThirdUser(DUMMYDATA[2]);
-    setFourUser(DUMMYDATA[3]);
-  }, []);
+    if (publicData?.matches?.length > 0) {
+      setFirstUser(publicData.matches[0].user1);
+      setTwoUser(publicData.matches[0].user2);
+    }
+    if (publicData?.matches?.length > 0) {
+      setThirdUser(publicData.matches[1].user1);
+      setFourUser(publicData.matches[1].user2);
+    }
+  }, [publicData]);
 
   return (
     <main className="p-3">

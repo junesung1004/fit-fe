@@ -12,6 +12,12 @@ interface FirstProps {
   secondUser: UserDataType | null;
 }
 
+const getKoreanAge = (birthday: string): number => {
+  const birthYear = new Date(birthday).getFullYear();
+  const currentYear = new Date().getFullYear();
+  return currentYear - birthYear + 1;
+};
+
 export default function HomeFirstProfileCardList({
   firstUser,
   secondUser,
@@ -22,6 +28,17 @@ export default function HomeFirstProfileCardList({
   const handleCickMemberDetailMove = (id: string) => {
     router.push(`/members/${id}`);
   };
+
+  const age = firstUser?.birthday
+    ? getKoreanAge(String(firstUser.birthday))
+    : null;
+
+  const age2 = secondUser?.birthday
+    ? getKoreanAge(String(firstUser.birthday))
+    : null;
+
+  // console.log(firstUser.profile?.profileImage?.[0].imageUrl);
+
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6">
       {/* 프로필 영역*/}
@@ -29,15 +46,15 @@ export default function HomeFirstProfileCardList({
         {/* 왼쪽 프로필 */}
         <HomeProfileCard
           onClick={() => handleCickMemberDetailMove('123')}
-          backgroundImageUrl={firstUser.image}
+          backgroundImageUrl={firstUser.profile?.profileImage?.[0].imageUrl}
         >
           <HomeProfileCard.Header>
-            <Mbti>{firstUser.mbti}</Mbti>
+            <Mbti>{firstUser.profile.mbti.mbti}</Mbti>
           </HomeProfileCard.Header>
           <HomeProfileCard.Body>
-            <p className="text-white">{firstUser.nickname}</p>
-            <div className="flex xs2:flex-col xs:flex-row gap-1 text-white text-xs">
-              <p>{firstUser.age}세</p>
+            <p className="text-cyan-200">{firstUser.nickname}</p>
+            <div className="flex xs2:flex-col xs:flex-row gap-1 text-cyan-200 text-xs">
+              <p>{age}세</p>
               <p>● {firstUser.region}</p>
               <p>● {firstUser.height}cm</p>
             </div>
@@ -61,15 +78,15 @@ export default function HomeFirstProfileCardList({
         {/* 오른쪽 프로필 */}
         <HomeProfileCard
           onClick={() => handleCickMemberDetailMove('123')}
-          backgroundImageUrl={secondUser.image}
+          backgroundImageUrl={secondUser.profile?.profileImage?.[1].imageUrl}
         >
           <HomeProfileCard.Header>
-            <Mbti>{secondUser.mbti}</Mbti>
+            <Mbti>{secondUser.profile.mbti.mbti}</Mbti>
           </HomeProfileCard.Header>
           <HomeProfileCard.Body>
-            <p className="text-white">{secondUser.nickname}</p>
-            <div className="flex xs2:flex-col xs:flex-row gap-1 text-white text-xs">
-              <p>{secondUser.age}세</p>
+            <p className="text-cyan-200">{secondUser.nickname}</p>
+            <div className="flex xs2:flex-col xs:flex-row gap-1 bg-[rgb] text-cyan-200 text-xs">
+              <p>{age2}세</p>
               <p>● {secondUser.region}</p>
               <p>● {secondUser.height}cm</p>
             </div>

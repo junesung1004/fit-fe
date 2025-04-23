@@ -264,6 +264,28 @@ export default function SignUpPage() {
           isDirty={dirtyFields.name}
         />
 
+        {/* 키 필드 */}
+        <InputField
+          id="height"
+          type="text"
+          label="키"
+          required
+          placeholder="숫자로 입력해주세요"
+          register={register('height', {
+            required: '키는 필수 입력입니다.',
+            minLength: {
+              value: 2,
+              message: '숫자로 2자리 이상 입력해주세요.',
+            },
+            pattern: {
+              value: /^[0-9]{2,}$/, // 숫자만, 최소 2자리 이상
+              message: '숫자만 입력 가능하며 2자리 이상이어야 합니다.',
+            },
+          })}
+          error={errors.height as FieldError}
+          isDirty={dirtyFields.height}
+        />
+
         {/* 닉네임 필드 */}
         <InputField
           id="nickname"
