@@ -49,13 +49,6 @@ export default function SignUpPage() {
   ); // 이미지 같이 업로드해야함
   const [error, setError] = useState<string | null>(null);
   const [isImageValid, setIsImageValid] = useState(false);
-
-  const validateImages = () => {
-    const uploadedCount = images.filter(Boolean).length;
-    const valid = uploadedCount >= 2;
-    setIsImageValid(valid);
-    setError(valid ? null : '최소 2장의 이미지를 등록해야 합니다.');
-  };
   const { mutate, isPending } = useSignUpMutation();
   const [isEmailCode, setIsEmailCode] = useState(false);
   const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
@@ -68,6 +61,13 @@ export default function SignUpPage() {
   const { mutate: successEmail } = useEmailSuccessMutation();
   const { mutate: uploadImage } = useUploadImageMutataion();
 
+  const validateImages = () => {
+    const uploadedCount = images.filter(Boolean).length;
+    const valid = uploadedCount >= 2;
+    setIsImageValid(valid);
+    setError(valid ? null : '최소 2장의 이미지를 등록해야 합니다.');
+  };
+
   //이미지 업로드
   const handleImageChange = (
     index: number,
@@ -78,7 +78,6 @@ export default function SignUpPage() {
 
     const updatedImages = [...images];
     const updatedPreviews = [...previews];
-    const updatedUploadedUrls = [...uploadImageUrl];
 
     //미리보기 먼저 보여주는 코드
     updatedImages[index] = file;
@@ -90,9 +89,13 @@ export default function SignUpPage() {
     //s3 업로드 후 url 저장
     uploadImage(file, {
       onSuccess: (s3Url) => {
-        // ✅ 개별 업로드에 대한 상태 업데이트
-        updatedUploadedUrls[index] = s3Url;
-        setUploadImageUrl(updatedUploadedUrls);
+        setUploadImageUrl((prev) => {
+          const newUrls = [...prev];
+          newUrls[index] = s3Url;
+          // console.log(`✅ ${index}번 이미지 업로드 성공:`, s3Url);
+          // console.log('📦 최신 업로드 상태:', newUrls);
+          return newUrls;
+        });
       },
     });
   };
@@ -114,8 +117,10 @@ export default function SignUpPage() {
     try {
       // ✅ 1. 업로드된 S3 URL 중 null이 아닌 것만 필터링
       const validImageUrls = uploadImageUrl.filter(
-        (url): url is string => url !== null
+        (url): url is string => url !== null && url !== undefined
       );
+
+      console.log('✅ 필터링된 유효한 이미지 URL:', validImageUrls);
 
       // ✅ 2. 최소 2장 이상인지 검증
       if (validImageUrls.length < 2) {
@@ -124,10 +129,13 @@ export default function SignUpPage() {
       }
 
       // ✅ 3. 회원가입 요청
-      mutate({
+      const payload = {
         ...data,
-        images: validImageUrls, // ⬅️ 이게 S3에서 가져온 URL 배열
-      });
+        images: validImageUrls,
+      };
+      console.log('회원가입 최종 전송 데이터:', payload);
+
+      mutate(payload);
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
     }
@@ -191,6 +199,7 @@ export default function SignUpPage() {
               onChange={handleChangeEmailCode}
             />
             <Button
+              type="button"
               rounded="full"
               variant="outline"
               size="full"

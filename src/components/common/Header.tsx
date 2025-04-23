@@ -12,23 +12,23 @@ export default function Header() {
   const pathName = usePathname();
   const router = useRouter();
 
-  const { isLoggedIn, userName } = useAuthStore();
-  console.log('이름', userName);
-  console.log('로그인 상태 : ', isLoggedIn);
+  const { isLoggedIn } = useAuthStore();
+  // console.log('이름', userName);
+  // console.log('로그인 상태 : ', isLoggedIn);
 
   return isLoggedIn ? (
-    <header className="relative flex items-center justify-between h-20 border-b px-4">
+    <header className="relative flex items-center justify-between  border-b px-4 py-4">
       {/* left nav */}
       <div>
         <nav>
-          <ul className="flex gap-4">
+          <ul className="flex gap-2">
             <li>
               <Link
                 href={'/home'}
                 className={
                   pathName === '/home'
-                    ? 'text-black font-bold'
-                    : 'text-gray-400'
+                    ? 'text-black font-bold text-sm'
+                    : 'text-gray-400 text-sm'
                 }
               >
                 오늘의 매칭
@@ -39,8 +39,8 @@ export default function Header() {
                 href={'/matching-results'}
                 className={
                   pathName === '/matching-results'
-                    ? 'text-black font-bold'
-                    : 'text-gray-400'
+                    ? 'text-black font-bold text-sm'
+                    : 'text-gray-400 text-sm'
                 }
               >
                 매칭 결과

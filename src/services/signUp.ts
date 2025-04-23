@@ -43,6 +43,8 @@ export const emailCheck = async (email: string) => {
 export const signUp = async (data: SignUpPayload) => {
   try {
     const response = await instance.post('/auth/register', data);
+    console.log('회원가입 성공 : ', response.data);
+
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
@@ -62,8 +64,9 @@ export const signUpImageUpload = async (file: File) => {
     formData.append('file', file);
 
     const response = await instance.post('/profile-image/temp', formData);
+    console.log('📸 이미지 업로드 응답:', response);
 
-    return response.data.imageUrl;
+    return response.data.url;
   } catch (error) {
     const err = error as AxiosError<SignUpErrorResponse>;
     console.error('❌ 이미지 업로드 실패');

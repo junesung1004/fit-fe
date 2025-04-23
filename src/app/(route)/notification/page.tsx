@@ -1,18 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-
-// 알림 타입 정의
-type NotificationType = 'like' | 'match';
-
-interface Notification {
-  id: number;
-  type: NotificationType;
-  message: string;
-  subMessage?: string;
-  createdAt: string;
-}
+import { fetchNotifications, Notification } from '@/services/notification'; // 서비스 파일 불러오기
 
 // 날짜 포맷
 const formatDate = (dateString: string) =>
@@ -21,7 +11,6 @@ const formatDate = (dateString: string) =>
     timeStyle: 'short',
   });
 
-// 알림 컴포넌트
 function NotificationItem({
   notification,
   onDelete,
@@ -33,7 +22,8 @@ function NotificationItem({
   const router = useRouter();
 
   const handleCardClick = () => {
-    const path = notification.type === 'like' ? '/members/1' : '/chats/1';
+    const path =
+      notification.type === 'like' ? `/members/${notification.senderId}` : `/chats/1`;
     router.push(path);
   };
 
@@ -61,8 +51,7 @@ function NotificationItem({
           &times;
         </button>
       </div>
-        {/* 이 부분 추가: 텍스트 표시만 하고 클릭은 카드 전체로 */}
-        <div  
+      <div
         className={`mt-1 text-xs font-medium ${
           notification.type === 'like' ? 'text-violet-500' : 'text-rose-500'
         }`}
@@ -78,20 +67,20 @@ function NotificationItem({
 
 // 메인 페이지 컴포넌트
 export default function NotificationPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      type: 'like',
-      message: 'A님이 당신에게 좋아요를 눌렀어요!',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      type: 'match',
-      message: 'B님과 매칭되었어요!',
-      createdAt: new Date().toISOString(),
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    const fetchNotificationsData = async () => {
+      try {
+        const data = await fetchNotifications(); // 서비스 파일에서 데이터 불러오기
+        setNotifications(data); // 받아온 데이터를 상태에 저장
+      } catch (error) {
+        console.error('알림을 불러오는 중 오류가 발생했습니다:', error);
+      }
+    };
+
+    fetchNotificationsData();
+  }, []);
 
   const handleDeleteNotification = (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
