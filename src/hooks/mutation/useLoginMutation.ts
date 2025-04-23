@@ -13,11 +13,20 @@ export const useLoginMutation = () => {
     mutationFn: async (data: LoginProps) => await login(data),
     onSuccess: (res) => {
       const accessToken = res.accessToken;
-      const nickName = res.user?.nickname || '사용자';
-      setAuth(accessToken, nickName);
+      const user = res.user;
+      if (!user) {
+        toast.error('유저 정보가 없습니다.');
+        return;
+      }
+
+      setAuth(accessToken, {
+        id: user.id,
+        nickname: user.nickname,
+      });
+
       console.log('✅ 로그인 응답:', res);
 
-      toast.success(`${nickName}님 환영합니다.`);
+      toast.success(`${user.nickname}님 환영합니다.`);
       router.push('/home');
     },
     onError: (error) => {

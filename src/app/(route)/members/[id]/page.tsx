@@ -1,12 +1,13 @@
 'use client';
 
-import TagBadge from '@/components/common/TagBadge';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import Image from 'next/image';
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HeartIcon } from '@heroicons/react/24/solid';
+import TagBadge from '@/components/common/TagBadge';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
-import { sendNotification } from '@/services/notification';  // NotificationService import
+import { sendNotification } from '@/services/notification';
 import { likeMember } from '@/services/like';
 
 const dummyData = [
@@ -24,28 +25,30 @@ const dummyData1 = [
 ];
 
 export default function MemberDetailPage() {
-  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태
+  const params = useParams();
+  const receiverId = params.id as string;  // URL에서 받은 UUID!
+
+  const [isLiked, setIsLiked] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
-  const senderId = 123; // 로그인된 사용자 ID 예시
+  const handleLikeToggle = async () => {
+    if (!receiverId) return alert('상대방 ID가 없습니다!');
 
-  const handleLikeToggle = async (senderId: number, receiverId: number) => {
     try {
       if (!isLiked) {
         await likeMember(receiverId);
-        // 좋아요 알림 전송
+
         const notificationPayload = {
-          senderId,
           receiverId,
           type: 'LIKE',
           title: '좋아요 알림',
           content: '회원님을 마음에 들어하는 사람이 있어요 💕',
         };
+
         await sendNotification(notificationPayload);
         alert('좋아요 알림이 전송되었습니다!');
       }
 
-      // 상태 토글 및 애니메이션
       setIsLiked((prev) => !prev);
       setIsClicked(true);
       setTimeout(() => setIsClicked(false), 300);
@@ -55,15 +58,17 @@ export default function MemberDetailPage() {
     }
   };
 
-  const handleDatingChatRequest = async (senderId: number, receiverId: number) => {
+  const handleDatingChatRequest = async () => {
+    if (!receiverId) return alert('상대방 ID가 없습니다!');
+
     try {
       const notificationPayload = {
-        senderId,
         receiverId,
         type: 'COFFEE_CHAT',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
       };
+
       await sendNotification(notificationPayload);
       alert('커피챗 신청 알림이 전송되었습니다!');
     } catch (error) {
@@ -94,16 +99,11 @@ export default function MemberDetailPage() {
 
         <MemberProfileDetailCard.LikeCountBadge>
           <motion.div
-            style={{ color: isLiked ? '#f87171' : '#d1d5db' }} // 빨간색 or 회색
-            onClick={() => {
-              handleLikeToggle(senderId, 1);
-            }}
+            style={{ color: isLiked ? '#f87171' : '#d1d5db' }}
+            onClick={handleLikeToggle}
             animate={
               isClicked
-                ? {
-                    scale: [1, 1.4, 1],
-                    color: ['#f43f5e', '#be123c', '#f43f5e'],
-                  }
+                ? { scale: [1, 1.4, 1], color: ['#f43f5e', '#be123c', '#f43f5e'] }
                 : {}
             }
             transition={{ duration: 0.4 }}
@@ -125,7 +125,7 @@ export default function MemberDetailPage() {
 
       <MemberProfileDetailCard.AboutMe>
         <button
-          onClick={() => handleDatingChatRequest(senderId, 1)}
+          onClick={handleDatingChatRequest}
           className="text-white bg-cyan-500 py-5 rounded-2xl hover:bg-cyan-300 active:bg-cyan-400"
         >
           ☕ 커피챗을 신청해보세요.
