@@ -3,8 +3,9 @@
 import HomeFristProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
 import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCardList';
 import { DUMMYDATA } from '@/constants/homeDummyData';
-// import { useTodayDatingMatchMutation } from '@/hooks/mutation/useTodayDatingMatchMutation';
 import { UserDataType } from '@/types/homePage.type';
+// import { useTodayDatingMatchMutation } from '@/hooks/mutation/useTodayDatingMatchMutation';
+
 import React, { useEffect, useState } from 'react';
 
 export default function HomeWrapper() {
