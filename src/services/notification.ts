@@ -63,26 +63,5 @@ export const deleteAllNotifications = async () => {
   }
 };
 
-// 실시간 알림 받기 (SSE)
- 
-export const listenToRealTimeNotifications = (
-  // eslint-disable-next-line no-unused-vars
-  callback: (notification: Notification) => void
-) => {
-  const eventSource = new EventSource(
-    'https://api.fit-date.co.kr/api/v1/notification/events'
-  );
 
-  eventSource.onmessage = (event) => {
-    const notification = JSON.parse(event.data);
-    callback(notification);
-  };
 
-  eventSource.onerror = (error) => {
-    console.error('SSE 오류 발생:', error);
-  };
-
-  return () => {
-    eventSource.close();
-  };
-};

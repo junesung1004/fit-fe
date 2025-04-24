@@ -11,11 +11,13 @@ import { selectMatchUser } from '@/services/todayDatingMatch';
 interface FirstProps {
   firstUser: UserDataType | null;
   secondUser: UserDataType | null;
+  onSelectAll: () => void;  // ✅ 부모에서 받은 함수
 }
 
 export default function HomeFirstProfileCardList({
   firstUser,
   secondUser,
+  onSelectAll,
 }: FirstProps) {
   const router = useRouter();
   if (!firstUser || !secondUser) return null;
@@ -36,7 +38,7 @@ export default function HomeFirstProfileCardList({
         matchId: firstUser.matchId,
         selectedUserId: selectedUserId.toString(),
       });
-      // 성공 시 후속 처리...
+      console.log('선택 성공');
     } catch (err) {
       console.error('매칭 선택 실패:', err);
     }
@@ -46,7 +48,6 @@ export default function HomeFirstProfileCardList({
     router.push(`/members/${id}`);
   };
 
-  // 안전하게 이미지 URL 뽑기
   const firstImg = firstUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
   const secondImg = secondUser.profile.profileImage?.[1]?.imageUrl
     ?? secondUser.profile.profileImage?.[0]?.imageUrl
@@ -55,7 +56,6 @@ export default function HomeFirstProfileCardList({
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6">
       <div className="relative flex gap-3">
-        {/* 왼쪽 */}
         <HomeProfileCard
           onClick={() => moveToDetail(firstUser.id)}
           backgroundImageUrl={firstImg}
@@ -86,7 +86,6 @@ export default function HomeFirstProfileCardList({
           </HomeProfileCard.Footer>
         </HomeProfileCard>
 
-        {/* VS 아이콘 */}
         <div className="absolute left-1/2 top-1/2 
                         -translate-x-1/2 -translate-y-1/2 
                         w-12 h-12 flex justify-center items-center 
@@ -95,7 +94,6 @@ export default function HomeFirstProfileCardList({
           V S
         </div>
 
-        {/* 오른쪽 */}
         <HomeProfileCard
           onClick={() => moveToDetail(secondUser.id)}
           backgroundImageUrl={secondImg}
@@ -127,12 +125,12 @@ export default function HomeFirstProfileCardList({
         </HomeProfileCard>
       </div>
 
-      {/* 하단 */}
+      {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3">
         <Button rounded="full" variant="outline" onClick={() => console.log('취소')}>
           X
         </Button>
-        <Button rounded="full" size="full" onClick={() => console.log('모두 선택')}>
+        <Button rounded="full" size="full" onClick={onSelectAll}>
           모두 선택
         </Button>
       </div>

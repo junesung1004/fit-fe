@@ -10,6 +10,11 @@ export interface SelectMatchPayload {
   matchId: string;
   selectedUserId: string;
 }
+export interface SelectAllMatchPayload {
+  matchId: string;
+  firstSelectedUserId: string;
+  secondSelectedUserId: string;
+}
 
 // 로그인 오늘의 매칭 4명 프로필 가져오는 api
 export const todayDatingMatch = async () => {
@@ -45,6 +50,19 @@ export const selectMatchUser = async (payload: SelectMatchPayload) => {
   } catch (error) {
     const err = error as AxiosError<TodayDatingMatch>;
     console.error('오늘의 매칭 중 한명 선택 실패 : ', err);
+    console.error('응답 상태 코드 : ', err.response?.status);
+    console.error('메시지 : ', err.response?.data?.message);
+  }
+};
+
+//모두 선택하기 api
+export const selectAllMatchUser = async (payload: SelectAllMatchPayload) => {
+  try {
+    const response = await instance.post('/match/select', payload);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<TodayDatingMatch>;
+    console.error('오늘의 매칭 모두 실패 : ', err);
     console.error('응답 상태 코드 : ', err.response?.status);
     console.error('메시지 : ', err.response?.data?.message);
   }

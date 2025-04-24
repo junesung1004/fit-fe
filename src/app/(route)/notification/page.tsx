@@ -6,7 +6,6 @@ import {
   fetchNotifications,
   deleteNotification,
   deleteAllNotifications,
-  listenToRealTimeNotifications,
   Notification,
 } from '@/services/notification';
 
@@ -86,13 +85,7 @@ export default function NotificationPage() {
       .catch((err) => console.error('초기 알림 로드 실패:', err));
   }, []);
 
-  // 2) SSE 구독: 실시간 알림 추가
-  useEffect(() => {
-    const unsubscribe = listenToRealTimeNotifications((newNotif) => {
-      setNotifications((prev) => [newNotif, ...prev]);
-    });
-    return () => unsubscribe();
-  }, []);
+  
 
   const handleDelete = async (id: number) => {
     try {
