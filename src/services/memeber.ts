@@ -11,10 +11,19 @@ export interface FilteredUser {
       imageUrl: string;
     }[];
   };
-
 }
 
+// 실제 API가 반환하는 전체 형식
+interface FilteredUsersResponse {
+  users: FilteredUser[];
+  nextCursor: string;
+}
+
+// 컴포넌트에서는 순수 배열을 기대하므로,
+// 서비스에서 배열만 꺼내 반환하도록 수정합니다.
 export const fetchFilteredUsers = async (): Promise<FilteredUser[]> => {
-  const res = await instance.get<FilteredUser[]>('/user-filter/filtered-users');
-  return res.data;
+  const res = await instance.get<FilteredUsersResponse>(
+    '/user-filter/filtered-users'
+  );
+  return res.data.users;  // ← users 배열만 반환
 };

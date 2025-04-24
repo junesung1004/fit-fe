@@ -13,7 +13,7 @@ import {
 const menus = [
   { href: '/home', icon: TrophyIcon, label: '월드컵' },
   { href: '/members', icon: UserGroupIcon, label: '회원 목록' },
-  { href: '/friends', icon: UsersIcon, label: '친구 목록' },
+  { href: '/friends', icon: UsersIcon, label: '호감' },
   { href: '/chats', icon: ChatBubbleOvalLeftIcon, label: '채팅' },
   { href: '/mypage', icon: UserCircleIcon, label: '마이페이지' },
 ];

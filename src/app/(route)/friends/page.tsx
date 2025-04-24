@@ -80,7 +80,7 @@ export default function FriednsPage() {
       {/* 1ROUND 섹션 */}
       <section className="pt-10">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="font-semibold text-lg">1ROUND</h2>
+          <h2 className="font-semibold text-lg">월드컵</h2>
           <Button size="sm" variant="outline" color="rose" className="text-xs">
             ✏️ 편집
           </Button>
