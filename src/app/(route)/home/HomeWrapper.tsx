@@ -21,7 +21,9 @@ export default function HomeWrapper() {
   const [firstUser, setFirstUser] = useState<UserDataType | null>(null);
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
+  console.log('thirdUser : ', thirdUser);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
+  console.log('fourUser : ', fourUser);
   const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
   const {} = useAuthStore();
