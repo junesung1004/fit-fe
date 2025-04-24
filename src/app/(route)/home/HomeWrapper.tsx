@@ -53,20 +53,21 @@ export default function HomeWrapper() {
   // 🔐 로그인 유저용 API 호출 함수
   const getTodayDatingUserMatch = () => {
     todayDatingUser(undefined, {
-      onSuccess: (data: MatchItem[]) => {
-        if (data.length > 0) {
-          const { matchId, user1, user2 } = data[0];
+      onSuccess: (data: { matches: MatchItem[] }) => {
+        const matches = data.matches;
+        if (matches.length > 0) {
+          const { matchId, user1, user2 } = matches[0];
           setFirstUser({ ...user1, matchId });
           setTwoUser({ ...user2, matchId });
         }
-        if (data.length > 1) {
-          const { matchId, user1, user2 } = data[1];
+        if (matches.length > 0) {
+          const { matchId, user1, user2 } = matches[1];
           setThirdUser({ ...user1, matchId });
           setFourUser({ ...user2, matchId });
         }
       },
       onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패 (로그인)', err);
+        console.error('❌ 매칭 데이터 가져오기 실패 (비로그인)', err);
       },
     });
   };
