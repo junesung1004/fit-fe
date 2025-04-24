@@ -22,11 +22,11 @@ export default function HomeWrapper() {
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
+
   const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
-  const { isLoggedIn } = useAuthStore();
 
-  // 🌐 비로그인 유저용 API 호출 함수
+  // 🌐 비로그인 유저용 API
   const getPublicTodayDatingUserMatch = () => {
     publicTodayDatingUser(undefined, {
       onSuccess: (data: { matches: MatchItem[] }) => {
@@ -48,7 +48,7 @@ export default function HomeWrapper() {
     });
   };
 
-  // 🔐 로그인 유저용 API 호출 함수
+  // 🔐 로그인 유저용 API
   const getTodayDatingUserMatch = () => {
     todayDatingUser(undefined, {
       onSuccess: (data: MatchItem[]) => {
@@ -69,16 +69,18 @@ export default function HomeWrapper() {
     });
   };
 
-  // 로그인 여부에 따라 적절한 API 호출
+  // ✅ 상태 변화 감지해서 로그인 여부 따라 API 호출
   useEffect(() => {
-    if (isLoggedIn === null) return; // 초기 렌더 방지
-    if (isLoggedIn) {
-      getTodayDatingUserMatch();
-    } else {
-      getPublicTodayDatingUserMatch();
-    }
-  }, [isLoggedIn]);
+    const unsubscribe = useAuthStore.subscribe((state) => {
+      if (state.isLoggedIn === null) return;
+      if (state.isLoggedIn) getTodayDatingUserMatch();
+      else getPublicTodayDatingUserMatch();
+    });
 
+    return () => unsubscribe();
+  }, []);
+
+  // 전체 선택
   const handleSelectAll = async () => {
     if (!firstUser || !twoUser || !firstUser.matchId) return;
 
