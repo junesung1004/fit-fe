@@ -22,11 +22,11 @@ export default function HomeWrapper() {
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
-
   const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
+  const {} = useAuthStore();
 
-  // 🌐 비로그인 유저용 API
+  // 🌐 비로그인 유저용 API 호출 함수
   const getPublicTodayDatingUserMatch = () => {
     publicTodayDatingUser(undefined, {
       onSuccess: (data: { matches: MatchItem[] }) => {
@@ -48,7 +48,7 @@ export default function HomeWrapper() {
     });
   };
 
-  // 🔐 로그인 유저용 API
+  // 🔐 로그인 유저용 API 호출 함수
   const getTodayDatingUserMatch = () => {
     todayDatingUser(undefined, {
       onSuccess: (data: MatchItem[]) => {
@@ -69,18 +69,42 @@ export default function HomeWrapper() {
     });
   };
 
-  // ✅ 상태 변화 감지해서 로그인 여부 따라 API 호출
+  // Zustand subscribe를 사용하여 로그인 상태 변경 감지
   useEffect(() => {
     const unsubscribe = useAuthStore.subscribe((state) => {
-      if (state.isLoggedIn === null) return;
-      if (state.isLoggedIn) getTodayDatingUserMatch();
-      else getPublicTodayDatingUserMatch();
+      const currentIsLoggedIn = state.isLoggedIn;
+      if (currentIsLoggedIn === null) return;
+
+      // 이미 API가 호출되었는지 확인
+      const hasApiBeenCalled = firstUser !== null || twoUser !== null;
+      if (hasApiBeenCalled) return;
+
+      if (currentIsLoggedIn) {
+        console.log('로그인 유저 매칭 데이터 가져오기');
+        getTodayDatingUserMatch();
+      } else {
+        console.log('비로그인 유저 매칭 데이터 가져오기');
+        getPublicTodayDatingUserMatch();
+      }
     });
 
-    return () => unsubscribe();
+    // 초기 상태에 대한 처리
+    const currentIsLoggedIn = useAuthStore.getState().isLoggedIn;
+    if (currentIsLoggedIn !== null) {
+      if (currentIsLoggedIn) {
+        console.log('초기 로그인 유저 매칭 데이터 가져오기');
+        getTodayDatingUserMatch();
+      } else {
+        console.log('초기 비로그인 유저 매칭 데이터 가져오기');
+        getPublicTodayDatingUserMatch();
+      }
+    }
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  // 전체 선택
   const handleSelectAll = async () => {
     if (!firstUser || !twoUser || !firstUser.matchId) return;
 
