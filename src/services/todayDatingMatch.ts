@@ -1,9 +1,14 @@
 import instance from '@/lib/axios';
 import { AxiosError } from 'axios';
 
-interface TodatDatingMatch {
+interface TodayDatingMatch {
   message: string;
   errorCode?: string;
+}
+
+export interface SelectMatchPayload {
+  matchId: string;
+  selectedUserId: string;
 }
 
 // 로그인 오늘의 매칭 4명 프로필 가져오는 api
@@ -12,7 +17,7 @@ export const todayDatingMatch = async () => {
     const response = await instance.get('/match/random');
     return response.data;
   } catch (error) {
-    const err = error as AxiosError<TodatDatingMatch>;
+    const err = error as AxiosError<TodayDatingMatch>;
     console.error('오늘의 데이팅 매칭 조회 실패 : ', err);
     console.error('응답 상태 코드 : ', err.response?.status);
     console.error('메시지 : ', err.response?.data?.message);
@@ -25,20 +30,20 @@ export const publicTodayDatingMatch = async () => {
     const response = await instance.get('/match/random/public');
     return response.data;
   } catch (error) {
-    const err = error as AxiosError<TodatDatingMatch>;
+    const err = error as AxiosError<TodayDatingMatch>;
     console.error('오늘의 데이팅 매칭 조회 실패 : ', err);
     console.error('응답 상태 코드 : ', err.response?.status);
     console.error('메시지 : ', err.response?.data?.message);
   }
 };
 
-// 2명중 1명 선택하는 api
-export const datingOnePickUser = async () => {
+// 2명 중 1명 선택하는 api (이름 통일)
+export const selectMatchUser = async (payload: SelectMatchPayload) => {
   try {
-    const response = await instance.post('/match/select');
+    const response = await instance.post('/match/select', payload);
     return response.data;
   } catch (error) {
-    const err = error as AxiosError<TodatDatingMatch>;
+    const err = error as AxiosError<TodayDatingMatch>;
     console.error('오늘의 매칭 중 한명 선택 실패 : ', err);
     console.error('응답 상태 코드 : ', err.response?.status);
     console.error('메시지 : ', err.response?.data?.message);

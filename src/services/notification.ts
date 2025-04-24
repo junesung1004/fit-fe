@@ -10,6 +10,7 @@ export interface Notification {
 }
 
 export interface NotificationPayload {
+
   receiverId: string;
   type: string;
   title: string;

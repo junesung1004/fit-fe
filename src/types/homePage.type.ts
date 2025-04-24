@@ -1,4 +1,6 @@
 export interface UserDataType {
+
+  matchId?:string;
   id: number;
   nickname: string;
   birthday: number;
