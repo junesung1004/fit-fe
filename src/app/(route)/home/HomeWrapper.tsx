@@ -71,8 +71,7 @@ export default function HomeWrapper() {
 
   // 로그인 여부에 따라 적절한 API 호출
   useEffect(() => {
-    if (typeof isLoggedIn !== 'boolean') return;
-
+    if (isLoggedIn === null) return; // 초기 렌더 방지
     if (isLoggedIn) {
       getTodayDatingUserMatch();
     } else {
