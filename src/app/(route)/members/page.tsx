@@ -19,6 +19,13 @@ export default function MembersPage() {
   // 실제 서버에서 불러온 사용자 목록
   const [users, setUsers] = useState<FilteredUser[]>([]);
 
+  useEffect(()=> {
+ if(users.length > 0) {
+  console.log(users[0]?.profileImage)
+
+ }
+  },[users])
+
   // 필터 값 (나중에 쿼리 파라미터로 API 호출에 활용)
   const [distance, setDistance] = useState(0);
   const [age, setAge] = useState(20);
