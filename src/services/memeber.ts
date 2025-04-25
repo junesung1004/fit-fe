@@ -6,11 +6,7 @@ export interface FilteredUser {
   region: string;
   likeCount: number;
   age: number;
-  profile: {
-    profileImage: {
-      imageUrl: string;
-    }[];
-  };
+  profileImage: string;
 }
 
 // 실제 API가 반환하는 전체 형식
