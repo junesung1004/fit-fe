@@ -135,7 +135,11 @@ export default function HomeWrapper() {
         secondUser={twoUser}
         onSelectAll={handleSelectAll}
       />
-      <HomeTwoProfileCardList thirdUser={thirdUser} fourUser={fourUser} />
+      <HomeTwoProfileCardList 
+      thirdUser={thirdUser} 
+      fourUser={fourUser} 
+      onSelectAll={handleSelectAll}
+      />
     </main>
   );
 }
