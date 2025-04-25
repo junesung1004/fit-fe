@@ -28,7 +28,7 @@ const ProfileCard = ({
             alt="Profile Image"
             fill
             className="rounded-full"
-            unoptimized
+            unoptimized={true}
           />
         </div>
       </div>
