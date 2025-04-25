@@ -16,6 +16,7 @@ export interface SelectAllMatchPayload {
   secondSelectedUserId: string;
 }
 
+
 // 로그인 오늘의 매칭 4명 프로필 가져오는 api
 export const todayDatingMatch = async () => {
   try {
@@ -58,7 +59,7 @@ export const selectMatchUser = async (payload: SelectMatchPayload) => {
 //모두 선택하기 api
 export const selectAllMatchUser = async (payload: SelectAllMatchPayload) => {
   try {
-    const response = await instance.post('/match/select', payload);
+    const response = await instance.post('/match/select-all', payload);
     return response.data;
   } catch (error) {
     const err = error as AxiosError<TodayDatingMatch>;
