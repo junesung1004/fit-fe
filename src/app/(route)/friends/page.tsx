@@ -5,40 +5,19 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
 import ProfileCardRoundOne from '@/components/common/ProfileCardRoundOne';
-import { fetchSparkList } from '@/services/sparklist';
+import { fetchSparkList, MatchItem, LikeUser } from '@/services/sparklist';
 
 interface SparkUser {
-  id: number;
+  id: string;
   nickname: string;
   likeCount: number;
-  birthday: string;
+  birthday: string | null;
   region: string;
-  profileImageUrl?: string;
+  profileImage: string;
 }
 
-interface RawUser {
-  id: number;
-  nickname: string;
-  likeCount?: number;
-  birthday: string;
-  region: string;
-  profile?: {
-    profileImage?: { imageUrl: string }[];
-  };
-}
-
-interface Match {
-  user1: RawUser;
-  user2: RawUser;
-}
-
-interface FetchSparkListResponse {
-  matchList: Match[];
-  likeList: RawUser[];
-  coffeeChatList: RawUser[];
-}
-
-const getKoreanAge = (birthday: string): number => {
+const getKoreanAge = (birthday: string | null): number => {
+  if (!birthday) return 0;
   const birthYear = new Date(birthday).getFullYear();
   const currentYear = new Date().getFullYear();
   return currentYear - birthYear + 1;
@@ -49,58 +28,63 @@ export default function FriendsPage() {
 
   const [roundProfiles, setRoundProfiles] = useState<SparkUser[]>([]);
   const [likeProfiles, setLikeProfiles] = useState<SparkUser[]>([]);
-  const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
+  // const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
 
   const [isRoundExpanded, setIsRoundExpanded] = useState(false);
   const [isLikeExpanded, setIsLikeExpanded] = useState(false);
-  const [isCoffeeChatExpanded, setIsCoffeeChatExpanded] = useState(false);
+  // const [isCoffeeChatExpanded, setIsCoffeeChatExpanded] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data: FetchSparkListResponse = await fetchSparkList();
+      const data = await fetchSparkList();
 
-      const matchList = data.matchList || [];
-      const likeList = data.likeList || [];
-      const coffeeChatList = data.coffeeChatList || [];
+      // matchList 변환
+      const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
+        id: item.matchedUserId,
+        nickname: item.matchedNickname,
+        likeCount: item.matchedLikeCount,
+        birthday: item.matchedAge ? `${new Date().getFullYear() - item.matchedAge + 1}-01-01` : null,
+        region: item.matchedRegion,
+        profileImage: item.matchedProfileImage ?? '/default.png',
+      }));
 
-      const matchUsers = matchList.flatMap((m) => [m.user1, m.user2]);
+      // likeList 변환
+      const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
+        id: item.likeUserid,
+        nickname: item.nickname,
+        likeCount: item.likeCount,
+        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
+        region: item.region,
+        profileImage: item.profileImage ?? '/default.png',
+      }));
 
-      const simplify = (users: RawUser[]): SparkUser[] =>
-        users.map((u) => ({
-          id: u.id,
-          nickname: u.nickname,
-          likeCount: u.likeCount || 0,
-          birthday: u.birthday,
-          region: u.region,
-          profileImageUrl: u.profile?.profileImage?.[0]?.imageUrl ?? '/default.png',
-        }));
-
-      setRoundProfiles(simplify(matchUsers));
-      setLikeProfiles(simplify(likeList));
-      setCoffeeChatProfiles(simplify(coffeeChatList));
+      // 상태 설정
+      setRoundProfiles(simplifiedMatchList);
+      setLikeProfiles(simplifiedLikeList);
+      // setCoffeeChatProfiles(simplifiedCoffeeChatList);
     };
 
     fetchData();
   }, []);
 
-  const handleClickMemberDetailMove = (id: number) => {
+  const handleClickMemberDetailMove = (id: string) => {
     router.push(`/members/${id}`);
   };
 
-  const handleAccept = (id: number) => {
+  const handleAccept = (id: string) => {
     router.push(`/chats/${id}`);
   };
 
-  const handleReject = (id: number) => {
+  const handleReject = (id: string) => {
     setRoundProfiles(prev => prev.filter(p => p.id !== id));
   };
 
   const renderProfileCards = (
     profiles: SparkUser[],
-  // eslint-disable-next-line no-unused-vars
-    onAccept?: (id: number) => void,
-  // eslint-disable-next-line no-unused-vars
-    onReject?: (id: number) => void
+    // eslint-disable-next-line no-unused-vars
+    onAccept?: (id: string) => void,
+    // eslint-disable-next-line no-unused-vars
+    onReject?: (id: string) => void
   ) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
       {profiles.map((profile) =>
@@ -111,7 +95,7 @@ export default function FriendsPage() {
             age={getKoreanAge(profile.birthday)}
             region={profile.region}
             likes={profile.likeCount}
-            profileImageUrl={profile.profileImageUrl ?? "/default.png"}
+            profileImageUrl={profile.profileImage}
             onAccept={() => onAccept(profile.id)}
             onReject={() => onReject(profile.id)}
             onClick={() => handleClickMemberDetailMove(profile.id)}
@@ -124,7 +108,7 @@ export default function FriendsPage() {
               region={profile.region}
               likes={profile.likeCount}
               isOnline={true}
-              profileImageUrl={profile.profileImageUrl ?? "/default.png"}
+              profileImageUrl={profile.profileImage}
             />
           </div>
         )
@@ -166,7 +150,8 @@ export default function FriendsPage() {
         </Button>
       </section>
 
-      {/* 커피챗 신청 */}
+      {/*
+      커피챗 신청
       <section>
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-semibold text-lg">커피챗 신청</h2>
@@ -181,6 +166,7 @@ export default function FriendsPage() {
           {isCoffeeChatExpanded ? '접기' : '+ 전체 보기'}
         </Button>
       </section>
+      */}
     </main>
   );
 }
