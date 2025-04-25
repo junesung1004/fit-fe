@@ -27,7 +27,8 @@ export default function MembersPage() {
   // 1) 페이지 마운트 시 서버 호출
   useEffect(() => {
     fetchFilteredUsers()
-      .then((data) => setUsers(data))
+      .then((data) => {
+        console.log('받아온 사용자 데이터:', data);setUsers(data);})
       .catch((err) => console.error('사용자 목록 로드 실패:', err));
   }, []);
 
@@ -142,7 +143,7 @@ export default function MembersPage() {
                 likes={u.likeCount}
                 region={u.region}
                 isOnline={true}
-                profileImageUrl={u.profileImage ?? '/default.png'}
+                profileImage={u.profileImage ?? '/default.png'}
               />
             </Link>
           ))}

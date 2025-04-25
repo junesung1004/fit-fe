@@ -7,7 +7,7 @@ type ProfileCardProps = {
   region: string;
   likes?: number;
   isOnline: boolean;
-  profileImageUrl: string; // 프로필 사진 URL
+  profileImage: string; // 프로필 사진 URL
 };
 
 const ProfileCard = ({
@@ -16,7 +16,7 @@ const ProfileCard = ({
   region,
   likes = 0,
   isOnline,
-  profileImageUrl,
+  profileImage,
 }: ProfileCardProps) => {
   return (
     <div className="w-[120px] p-4 bg-white rounded-lg shadow-md" >
@@ -24,7 +24,7 @@ const ProfileCard = ({
       <div className="flex justify-center mb-4">
         <div className="w-24 h-24 relative ">
           <Image
-            src={profileImageUrl}
+            src={profileImage}
             alt="Profile Image"
             fill
             className="rounded-full"
