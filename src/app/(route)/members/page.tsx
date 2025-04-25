@@ -150,7 +150,7 @@ export default function MembersPage() {
                 likes={u.likeCount}
                 region={u.region}
                 isOnline={true}
-                profileImage={u.profileImage ?? '/default.png'}
+                profileImageUrl={u.profileImage ?? '/default.png'}
               />
             </Link>
           ))}
