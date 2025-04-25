@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+
 
 type ProfileCardProps = {
   name: string;
@@ -23,13 +23,15 @@ const ProfileCard = ({
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-4">
         <div className="w-24 h-24 relative ">
-          <Image
-            src={profileImage}
-            alt="Profile Image"
-            fill
-            className="rounded-full"
-            unoptimized={true}
-          />
+        <div className="flex justify-center mb-4">
+  <div className="w-24 h-24 relative">
+      <img
+      src={profileImage || '/default.png'}
+      alt="Profile Image"
+      className="rounded-full object-cover w-full h-full"
+    />
+    </div>
+    </div>
         </div>
       </div>
 
