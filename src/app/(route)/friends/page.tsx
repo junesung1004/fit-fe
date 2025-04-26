@@ -38,15 +38,16 @@ export default function FriendsPage() {
     const fetchData = async () => {
       const data = await fetchSparkList();
 
-      // matchList 변환
-      const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
-        id: item.matchedUserId,
-        nickname: item.matchedNickname,
-        likeCount: item.matchedLikeCount,
-        birthday: item.matchedAge ? `${new Date().getFullYear() - item.matchedAge + 1}-01-01` : null,
-        region: item.matchedRegion,
-        profileImage: item.matchedProfileImage ?? '/default.png',
+     // matchList 변환
+    const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
+      id: item.matchedUserId,  // 상대방 ID를 사용
+      nickname: item.nickname,
+      likeCount: item.likeCount,
+      birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
+      region: item.region,
+      profileImage: item.profileImage ?? '/default.png',
       }));
+
 
       // likeList 변환
       const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({

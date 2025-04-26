@@ -1,14 +1,14 @@
 import instance from '@/lib/axios';
 
 export interface MatchItem {
-  matchId: string;
   matchedUserId: string;
-  matchedNickname: string;
-  matchedProfileImage: string;
-  matchedAge: number;
-  matchedRegion: string;
-  matchedLikeCount: number;
+  nickname: string;
+  likeCount: number;
+  age: number;
+  region: string;
+  profileImage: string;
 }
+
 
 export interface LikeUser {
   likeUserid: string;
