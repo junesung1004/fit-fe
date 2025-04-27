@@ -18,10 +18,10 @@ export interface MemberDetailResponse {
     interestCategory: {
       id: string;
     }[];
-    userIntroduction: {
+    userIntroductions: {
       id: string;
     }[];
-    userFeedback: {
+    userFeedbacks: {
       id: string;
     }[];
   };
