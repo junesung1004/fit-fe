@@ -23,3 +23,13 @@ export const fetchFilteredUsers = async (): Promise<FilteredUser[]> => {
   );
   return res.data.users;  // ← users 배열만 반환
 };
+
+
+//비로그인
+// services/member.ts
+export const fetchAnonymousUsers = async (): Promise<FilteredUser[]> => {
+  const res = await instance.get<{ users: FilteredUser[] }>(
+    '/user-filter/users-for-anonymous-user'
+  );
+  return res.data.users;
+};

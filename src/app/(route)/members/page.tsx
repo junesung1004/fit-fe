@@ -10,48 +10,50 @@ import Button from '@/components/common/Button';
 import Divider from '@/components/common/Divider';
 import RangeSlider from '@/components/page/members/RangeSlider';
 import ProfileCard from '@/components/common/Profilecard';
-import { fetchFilteredUsers, FilteredUser } from '@/services/memeber';
+import { fetchFilteredUsers, fetchAnonymousUsers, FilteredUser } from '@/services/memeber';
+import { useAuthStore } from '@/store/authStore';
 
 export default function MembersPage() {
-  // 필터 모달 토글 상태
   const [isShowFilter, setIsShowFilter] = useState(false);
-
-  // 실제 서버에서 불러온 사용자 목록
   const [users, setUsers] = useState<FilteredUser[]>([]);
-
-  useEffect(()=> {
- if(users.length > 0) {
-  console.log(users[0]?.profileImage)
-
- }
-  },[users])
-
-  // 필터 값 (나중에 쿼리 파라미터로 API 호출에 활용)
-  const [distance, setDistance] = useState(0);
+  const [distance, setDistance] = useState(0); // 일단 사용 안함
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  // 1) 페이지 마운트 시 서버 호출
   useEffect(() => {
-    fetchFilteredUsers()
-      .then((data) => {
-        console.log('받아온 사용자 데이터:', data);setUsers(data);})
-      .catch((err) => console.error('사용자 목록 로드 실패:', err));
-  }, []);
+    const fetchUsers = async () => {
+      try {
+        let data: FilteredUser[] = [];
+        if (isLoggedIn) {
+          data = await fetchFilteredUsers({ minAge: age, maxAge: 60, minLikeCount: likes });
+        } else {
+          data = await fetchAnonymousUsers();
+        }
+        setUsers(data);
+      } catch (err) {
+        console.error('사용자 목록 로드 실패:', err);
+      }
+    };
+    fetchUsers();
+  }, [isLoggedIn]);
 
-  // 필터 토글
   const toggleFilter = () => setIsShowFilter((v) => !v);
-  const resetFilter  = () => {
+  const resetFilter = () => {
     setDistance(0);
     setAge(20);
     setLikes(0);
   };
 
-  // 필터 적용 (나중에 쿼리스트링 붙여 재호출)
-  const applyFilter = (e: FormEvent) => {
+  const applyFilter = async (e: FormEvent) => {
     e.preventDefault();
-    console.log({ distance, age, likes });
-    // 예: fetchFilteredUsers({ distance, age, likes }).then(...)
+    try {
+      const filteredUsers = await fetchFilteredUsers({ minAge: age, maxAge: 60, minLikeCount: likes });
+      setUsers(filteredUsers);
+      toggleFilter(); // 필터 닫기
+    } catch (err) {
+      console.error('필터 적용 실패:', err);
+    }
   };
 
   return (
@@ -72,6 +74,7 @@ export default function MembersPage() {
             <Divider />
 
             <form className="flex flex-col gap-7" onSubmit={applyFilter}>
+              
               <RangeSlider
                 id="distance"
                 name="distance"
@@ -90,7 +93,7 @@ export default function MembersPage() {
                 label="나이"
                 min={20}
                 max={60}
-                step={5}
+                step={1}
                 value={age}
                 unit="세"
                 rangeText="20세 ~ 60세"
