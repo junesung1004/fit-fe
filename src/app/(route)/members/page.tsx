@@ -10,34 +10,26 @@ import Button from '@/components/common/Button';
 import Divider from '@/components/common/Divider';
 import RangeSlider from '@/components/page/members/RangeSlider';
 import ProfileCard from '@/components/common/Profilecard';
-import {
-  fetchFilteredUsersInitial,
-  applyUserFilter,
-  fetchFilteredUsersAfterFilter,
-  fetchAnonymousUsers,
-  FilteredUser
-} from '@/services/memeber';
+import { fetchFilteredUsersFromGet, fetchAnonymousUsers, saveFilterSettings, FilteredUser } from '@/services/memeber';
 import { useAuthStore } from '@/store/authStore';
 
 export default function MembersPage() {
   const [isShowFilter, setIsShowFilter] = useState(false);
   const [users, setUsers] = useState<FilteredUser[]>([]);
-  const [distance, setDistance] = useState(0); // 사용 안함
+  const [distance, setDistance] = useState(0); // 일단 사용 안함
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  // 🔥 초기 데이터 불러오기 (로그인 / 비로그인)
+  // 유저 목록 불러오기
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         let data: FilteredUser[] = [];
         if (isLoggedIn) {
-          // 로그인 → 첫 조회
-          data = await fetchFilteredUsersInitial();
+          data = await fetchFilteredUsersFromGet(); // 로그인 후 필터 조회
         } else {
-          // 비로그인
-          data = await fetchAnonymousUsers();
+          data = await fetchAnonymousUsers(); // 비로그인
         }
         setUsers(data);
       } catch (err) {
@@ -47,10 +39,7 @@ export default function MembersPage() {
     fetchUsers();
   }, [isLoggedIn]);
 
-  // 필터 모달 열기/닫기
   const toggleFilter = () => setIsShowFilter((v) => !v);
-
-  // 필터 초기화
   const resetFilter = () => {
     setDistance(0);
     setAge(20);
@@ -61,13 +50,14 @@ export default function MembersPage() {
   const applyFilter = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      // 로그인 유저만 필터 적용 가능
-      if (isLoggedIn) {
-        await applyUserFilter({ minAge: age, maxAge: 60, minLikeCount: likes });
-        const filteredUsers = await fetchFilteredUsersAfterFilter();
-        setUsers(filteredUsers);
-        toggleFilter(); // 필터 닫기
-      }
+      // PATCH로 필터 저장
+      await saveFilterSettings({ minAge: age, maxAge: 60, minLikeCount: likes });
+
+      // 필터 저장 후 GET으로 유저 다시 불러오기
+      const refreshedUsers = await fetchFilteredUsersFromGet();
+      setUsers(refreshedUsers);
+
+      toggleFilter(); // 필터 닫기
     } catch (err) {
       console.error('필터 적용 실패:', err);
     }
@@ -76,7 +66,7 @@ export default function MembersPage() {
   return (
     <div className="relative w-full min-h-full flex flex-col gap-10">
       {/* 필터 모달 */}
-      {isShowFilter && isLoggedIn && (
+      {isShowFilter && (
         <div className="absolute z-10 w-full h-full bg-[rgba(0,0,0,0.7)] px-8 py-10">
           <div className="bg-white rounded-3xl p-6 flex flex-col gap-6">
             <div className="flex items-center">
@@ -91,7 +81,6 @@ export default function MembersPage() {
             <Divider />
 
             <form className="flex flex-col gap-7" onSubmit={applyFilter}>
-              {/* 거리 필터 (사용 안함) */}
               <RangeSlider
                 id="distance"
                 name="distance"
@@ -152,14 +141,12 @@ export default function MembersPage() {
       <div className="w-full py-10 px-8 flex flex-col">
         <div className="flex justify-between items-center">
           <h1 className="font-semibold">접속 중인 이성</h1>
-          {isLoggedIn && (
-            <AdjustmentsHorizontalIcon
-              width={24}
-              height={24}
-              className="cursor-pointer"
-              onClick={toggleFilter}
-            />
-          )}
+          <AdjustmentsHorizontalIcon
+            width={24}
+            height={24}
+            className="cursor-pointer"
+            onClick={toggleFilter}
+          />
         </div>
         <p className="text-gray-400 text-sm">새로운 인연을 찾아 보세요</p>
 
