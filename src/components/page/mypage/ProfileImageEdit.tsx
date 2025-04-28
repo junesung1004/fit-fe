@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { getMyProfile } from '@/services/user'; // ✅ 서비스에서 가져오기
+import { useRouter } from 'next/navigation';
+import { getMyProfile } from '@/services/user';
 
 interface UserProfile {
   nickname: string;
@@ -10,22 +11,21 @@ interface UserProfile {
 }
 
 export default function ProfileEdit() {
-  const [user, setUser] = useState<UserProfile>({ nickname: '', profileImage: '' });
+  const router = useRouter();
+  const [user, setUser] = useState<UserProfile | null>(null); // null이면 비로그인
   const [imgFile, setImgFile] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await getMyProfile(); // ✅ 서비스 함수 호출
+        const data = await getMyProfile(); // 로그인된 유저 정보 가져오기
         setUser(data);
-      } catch (err) {
-        console.error('유저 정보를 불러오는 데 실패했습니다.', err);
+      } catch {
+        setUser(null); // 비로그인 처리
       }
     };
     fetchUser();
   }, []);
-
-  const displayedImage = imgFile || user.profileImage || '/default.png';
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -33,6 +33,24 @@ export default function ProfileEdit() {
     const imageUrl = URL.createObjectURL(file);
     setImgFile(imageUrl);
   };
+
+  // 비로그인 상태일 때
+  if (!user) {
+    return (
+      <div className="flex flex-col justify-center items-center mt-20">
+        <p className="text-xl mb-4">로그인이 필요합니다.</p>
+        <button
+          onClick={() => router.push('/login')}
+          className="px-4 py-2 bg-violet-500 text-white rounded"
+        >
+          로그인 하러 가기
+        </button>
+      </div>
+    );
+  }
+
+  // 로그인 상태일 때 프로필 편집 UI
+  const displayedImage = imgFile || user.profileImage || '/default.png';
 
   return (
     <div className="flex flex-col justify-center items-center">
