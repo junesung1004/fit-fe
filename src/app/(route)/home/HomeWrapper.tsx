@@ -1,15 +1,14 @@
 'use client';
 
-import HomeFristProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
+import React, { useEffect, useState } from 'react';
+import HomeFirstProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
 import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCardList';
 import {
   usePublicTodayDatingMatchMutation,
   useTodayDatingMatchMutation,
 } from '@/hooks/mutation/useTodayDatingMatchMutation';
-import { selectAllMatchUser } from '@/services/todayDatingMatch';
 import { useAuthStore } from '@/store/authStore';
 import { UserDataType } from '@/types/homePage.type';
-import React, { useEffect, useState } from 'react';
 
 interface MatchItem {
   matchId: string;
@@ -21,125 +20,97 @@ export default function HomeWrapper() {
   const [firstUser, setFirstUser] = useState<UserDataType | null>(null);
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
-  console.log('thirdUser : ', thirdUser);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
-  console.log('fourUser : ', fourUser);
+  const [hiddenIds, setHiddenIds] = useState<number[]>([]);
+
   const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
-  const {} = useAuthStore();
 
-  // 🌐 비로그인 유저용 API 호출 함수
+  // 🌟 숨겨진 ID localStorage에서 불러오기
+  useEffect(() => {
+    const saved = localStorage.getItem('hiddenUserIds');
+    if (saved) setHiddenIds(JSON.parse(saved));
+  }, []);
+
+  // 🌟 숨겨야 하는 ID들 필터링 후 유저 설정
+  const setUsersWithFilter = (matches: MatchItem[]) => {
+    if (matches.length > 0) {
+      const { matchId, user1, user2 } = matches[0];
+      setFirstUser(hiddenIds.includes(user1.id) ? null : { ...user1, matchId });
+      setTwoUser(hiddenIds.includes(user2.id) ? null : { ...user2, matchId });
+    }
+    if (matches.length > 1) {
+      const { matchId, user1, user2 } = matches[1];
+      setThirdUser(hiddenIds.includes(user1.id) ? null : { ...user1, matchId });
+      setFourUser(hiddenIds.includes(user2.id) ? null : { ...user2, matchId });
+    }
+  };
+
+  // 🌐 비로그인 유저용 데이터
   const getPublicTodayDatingUserMatch = () => {
     publicTodayDatingUser(undefined, {
       onSuccess: (data: { matches: MatchItem[] }) => {
-        const matches = data.matches;
-        if (matches.length > 0) {
-          const { matchId, user1, user2 } = matches[0];
-          setFirstUser({ ...user1, matchId });
-          setTwoUser({ ...user2, matchId });
-        }
-        if (matches.length > 1) {
-          const { matchId, user1, user2 } = matches[1];
-          setThirdUser({ ...user1, matchId });
-          setFourUser({ ...user2, matchId });
-        }
-      },
-      onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패 (비로그인)', err);
+        setUsersWithFilter(data.matches);
       },
     });
   };
 
-  // 🔐 로그인 유저용 API 호출 함수
+  // 🔐 로그인 유저용 데이터
   const getTodayDatingUserMatch = () => {
     todayDatingUser(undefined, {
       onSuccess: (data: { matches: MatchItem[] }) => {
-        const matches = data.matches;
-        if (matches.length > 0) {
-          const { matchId, user1, user2 } = matches[0];
-          setFirstUser({ ...user1, matchId });
-          setTwoUser({ ...user2, matchId });
-        }
-        if (matches.length > 0) {
-          const { matchId, user1, user2 } = matches[1];
-          setThirdUser({ ...user1, matchId });
-          setFourUser({ ...user2, matchId });
-        }
-      },
-      onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패 (비로그인)', err);
+        setUsersWithFilter(data.matches);
       },
     });
   };
 
-  // Zustand subscribe를 사용하여 로그인 상태 변경 감지
+  // 로그인 상태에 따라 데이터 불러오기
   useEffect(() => {
     const unsubscribe = useAuthStore.subscribe((state) => {
       const currentIsLoggedIn = state.isLoggedIn;
-      if (currentIsLoggedIn === null) return;
-
-      // 이미 API가 호출되었는지 확인
       const hasApiBeenCalled = firstUser !== null || twoUser !== null;
       if (hasApiBeenCalled) return;
 
-      if (currentIsLoggedIn) {
-        console.log('로그인 유저 매칭 데이터 가져오기');
-        getTodayDatingUserMatch();
-      } else {
-        console.log('비로그인 유저 매칭 데이터 가져오기');
-        getPublicTodayDatingUserMatch();
-      }
+      if (currentIsLoggedIn) getTodayDatingUserMatch();
+      else getPublicTodayDatingUserMatch();
     });
 
-    // 초기 상태에 대한 처리
     const currentIsLoggedIn = useAuthStore.getState().isLoggedIn;
     if (currentIsLoggedIn !== null) {
-      if (currentIsLoggedIn) {
-        console.log('초기 로그인 유저 매칭 데이터 가져오기');
-        getTodayDatingUserMatch();
-      } else {
-        console.log('초기 비로그인 유저 매칭 데이터 가져오기');
-        getPublicTodayDatingUserMatch();
-      }
+      if (currentIsLoggedIn) getTodayDatingUserMatch();
+      else getPublicTodayDatingUserMatch();
     }
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    return () => unsubscribe();
+  }, [hiddenIds]);
 
-  const handleSelectAll = async () => {
-    if (!firstUser || !twoUser || !firstUser.matchId) return;
-
-    try {
-      await selectAllMatchUser({
-        matchId: firstUser.matchId,
-        firstSelectedUserId: firstUser.id.toString(),
-        secondSelectedUserId: twoUser.id.toString(),
-      });
-      console.log('모두 선택 완료');
-    } catch (err) {
-      console.error('모두 선택 실패:', err);
-    }
+  // 🌟 유저 선택 시 숨기기 + 저장
+  const handleUsersSelected = (selectedIds: number[]) => {
+    const updatedHidden = [...hiddenIds, ...selectedIds];
+    setHiddenIds(updatedHidden);
+    localStorage.setItem('hiddenUserIds', JSON.stringify(updatedHidden));
   };
 
   return (
     <main className="p-3">
       <h1 className="text-lg font-semibold">매일 오전 10시</h1>
-      <small className="text-slate-400">
-        당신을 기다리는 인연이 도착합니다.
-      </small>
+      <small className="text-slate-400">당신을 기다리는 인연이 도착합니다.</small>
 
-      <HomeFristProfileCardList
-        firstUser={firstUser}
-        secondUser={twoUser}
-        onSelectAll={handleSelectAll}
-      />
-      <HomeTwoProfileCardList 
-      thirdUser={thirdUser} 
-      fourUser={fourUser} 
-      onSelectAll={handleSelectAll}
-      />
+      {firstUser && twoUser && (
+        <HomeFirstProfileCardList
+          firstUser={firstUser}
+          secondUser={twoUser}
+          onUsersSelected={handleUsersSelected}
+        />
+      )}
+
+      {thirdUser && fourUser && (
+        <HomeTwoProfileCardList
+          thirdUser={thirdUser}
+          fourUser={fourUser}
+          onUsersSelected={handleUsersSelected}
+        />
+      )}
     </main>
   );
 }
