@@ -9,9 +9,10 @@ interface AuthUser {
 
 interface AuthState {
   isLoggedIn: boolean;
+  accessToken: string | null;
   user: AuthUser | null;
   // eslint-disable-next-line no-unused-vars
-  login: (user: AuthUser) => void;
+  login: (token: string, user: AuthUser) => void;
   logout: () => void;
 }
 
@@ -23,15 +24,17 @@ export const useAuthStore = create<AuthState>()(
       user: null,
 
       // ✅ 여기서 실제로 인자를 사용해서 상태에 반영
-      login: (user) =>
+      login: (token, user) =>
         set({
           isLoggedIn: true,
+          accessToken: token,
           user: user,
         }),
 
       logout: () =>
         set({
           isLoggedIn: false,
+          accessToken: null,
           user: null,
         }),
     }),
