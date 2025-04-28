@@ -33,7 +33,7 @@ export default function FriendsPage() {
   const router = useRouter();
 
   const [roundProfiles, setRoundProfiles] = useState<SparkUser[]>([]);
-  console.log('roundProfiles : ', roundProfiles);
+  console.log('roundProfiles :: ', roundProfiles);
   const [likeProfiles, setLikeProfiles] = useState<SparkUser[]>([]);
   const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
 
