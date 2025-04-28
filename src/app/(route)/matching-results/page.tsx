@@ -5,7 +5,7 @@ import { fetchMatchResults, MatchResult } from '@/services/matchResult';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import logofit from '@/assets/1.png';
 
@@ -14,6 +14,7 @@ export default function MatchingResultsPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFalse, setIsFalse] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const loadMatchResults = async () => {
@@ -23,17 +24,22 @@ export default function MatchingResultsPage() {
     loadMatchResults();
   }, []);
 
+  // ✅ URL 쿼리로 success 값 받아서 팝업 상태 설정
+  useEffect(() => {
+    const successParam = searchParams.get('success');
+    if (successParam === 'true') {
+      setIsSuccess(true);
+    } else if (successParam === 'false') {
+      setIsFalse(true);
+    }
+  }, [searchParams]);
+
   const handleClickChattingMove = () => {
     router.push('/chats/1');
   };
 
   const handleClickMembersMove = () => {
     router.push('/members');
-  };
-
-  const handleClickMatchedResult = (matched: boolean) => {
-    if (matched) setIsSuccess(true);
-    else setIsFalse(true);
   };
 
   return (
@@ -68,7 +74,7 @@ export default function MatchingResultsPage() {
       {/* 실패 팝업 */}
       {isFalse && (
         <div className="absolute z-10 w-full h-full bg-[rgba(0,0,0,0.7)] px-2 xs:px-8 py-10">
-          <div className="bg-white w-full h-auto rounded-3xl flex flex-col mt-40 py-10 px-5 ">
+          <div className="bg-white w-full h-auto rounded-3xl flex flex-col mt-40 py-10 px-5">
             <h1 className="text-xs xs:text-xl text-center mb-5">
               “매칭 실패! 🙊 인연이 아니었습니다.”
             </h1>
@@ -108,13 +114,16 @@ export default function MatchingResultsPage() {
               />
             </Link>
 
-            {/* 결과 버튼 */}
+            {/* 결과 버튼은 유지할 수도 있고 제거 가능 */}
             <div className="flex flex-col gap-5 justify-center items-center">
               <Image src={logofit} alt="로고" width={70} height={100} />
               <Button
                 rounded="md"
                 size="sm"
-                onClick={() => handleClickMatchedResult(group.matched)}
+                onClick={() => {
+                  if (group.matched) setIsSuccess(true);
+                  else setIsFalse(true);
+                }}
               >
                 결과 보기
               </Button>
