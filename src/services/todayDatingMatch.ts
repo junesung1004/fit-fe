@@ -16,6 +16,7 @@ export interface SelectAllMatchPayload {
   secondSelectedUserId: string;
 }
 
+
 // 로그인 오늘의 매칭 4명 프로필 가져오는 api
 export const todayDatingMatch = async () => {
   try {
@@ -63,19 +64,6 @@ export const selectAllMatchUser = async (payload: SelectAllMatchPayload) => {
   } catch (error) {
     const err = error as AxiosError<TodayDatingMatch>;
     console.error('오늘의 매칭 모두 실패 : ', err);
-    console.error('응답 상태 코드 : ', err.response?.status);
-    console.error('메시지 : ', err.response?.data?.message);
-  }
-};
-
-// 오늘의 매칭 선택받은 후 답변 수락 or 거절 api
-export const todayDatingSuccessSelector = async (partnerId: string) => {
-  try {
-    const response = await instance.post(`/chat/match/accept/${partnerId}`);
-    return response.data;
-  } catch (error) {
-    const err = error as AxiosError<TodayDatingMatch>;
-    console.error('오늘의 매칭 답변에 대한 응답 요청 실패패 : ', err);
     console.error('응답 상태 코드 : ', err.response?.status);
     console.error('메시지 : ', err.response?.data?.message);
   }

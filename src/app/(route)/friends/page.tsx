@@ -5,13 +5,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
 import ProfileCardRoundOne from '@/components/common/ProfileCardRoundOne';
-import {
-  fetchSparkList,
-  MatchItem,
-  LikeUser,
-  CoffeeChatUser,
-} from '@/services/sparklist';
-import { useTodayDatingSuccess } from '@/hooks/mutation/useTodayDatingMatchMutation';
+import { fetchSparkList, MatchItem, LikeUser, CoffeeChatUser } from '@/services/sparklist';
 
 interface SparkUser {
   id: string;
@@ -33,7 +27,6 @@ export default function FriendsPage() {
   const router = useRouter();
 
   const [roundProfiles, setRoundProfiles] = useState<SparkUser[]>([]);
-  console.log('roundProfiles :: ', roundProfiles);
   const [likeProfiles, setLikeProfiles] = useState<SparkUser[]>([]);
   const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
 
@@ -41,55 +34,40 @@ export default function FriendsPage() {
   const [isLikeExpanded, setIsLikeExpanded] = useState(false);
   const [isCoffeeChatExpanded, setIsCoffeeChatExpanded] = useState(false);
 
-  const { mutate: successDating } = useTodayDatingSuccess();
-  console.log('successDating : ', successDating);
-
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchSparkList();
 
-      const simplifiedMatchList: SparkUser[] = data.matchList.map(
-        (item: MatchItem) => ({
-          id: item.matchedUserId,
-          nickname: item.nickname,
-          likeCount: item.likeCount,
-          birthday: item.age
-            ? `${new Date().getFullYear() - item.age + 1}-01-01`
-            : null,
-          region: item.region,
-          profileImage: item.profileImage ?? '/default.png',
-        })
-      );
+      const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
+        id: item.matchedUserId,
+        nickname: item.nickname,
+        likeCount: item.likeCount,
+        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
+        region: item.region,
+        profileImage: item.profileImage ?? '/default.png',
+      }));
 
-      const simplifiedLikeList: SparkUser[] = data.likeList.map(
-        (item: LikeUser) => ({
-          id: item.likeUserid,
-          nickname: item.nickname,
-          likeCount: item.likeCount,
-          birthday: item.age
-            ? `${new Date().getFullYear() - item.age + 1}-01-01`
-            : null,
-          region: item.region,
-          profileImage: item.profileImage ?? '/default.png',
-        })
-      );
+      const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
+        id: item.likeUserid,
+        nickname: item.nickname,
+        likeCount: item.likeCount,
+        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
+        region: item.region,
+        profileImage: item.profileImage ?? '/default.png',
+      }));
 
-      const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map(
-        (item: CoffeeChatUser) => ({
-          id: item.CoffeeChatUserid,
-          nickname: item.nickname,
-          likeCount: item.likeCount,
-          birthday: item.age
-            ? `${new Date().getFullYear() - item.age + 1}-01-01`
-            : null,
-          region: item.region,
-          profileImage: item.profileImage ?? '/default.png',
-        })
-      );
+      const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map((item: CoffeeChatUser) => ({
+        id: item.CoffeeChatUserid,
+        nickname: item.nickname,
+        likeCount: item.likeCount,
+        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
+        region: item.region,
+        profileImage: item.profileImage ?? '/default.png',
+      }));
 
       setRoundProfiles(simplifiedMatchList);
       setLikeProfiles(simplifiedLikeList);
-      setCoffeeChatProfiles(simplifiedCoffeeChatList);
+      setCoffeeChatProfiles(simplifiedCoffeeChatList); 
     };
 
     fetchData();
@@ -100,27 +78,20 @@ export default function FriendsPage() {
   };
 
   const handleAccept = (id: string) => {
-    successDating(id, {
-      onSuccess: () => {
-        setRoundProfiles((prev) => prev.filter((p) => p.id !== id));
-        router.push(`/chats/${id}`);
-      },
-      onError: (error) => {
-        console.error('❌ 성공 API 실패: ', error);
-      },
-    });
+    router.push(`/chats/${id}`);
   };
 
   const handleReject = (id: string) => {
-    setRoundProfiles((prev) => prev.filter((p) => p.id !== id));
+    setRoundProfiles(prev => prev.filter(p => p.id !== id));
   };
 
   const renderProfileCards = (
     profiles: SparkUser[],
-    // eslint-disable-next-line no-unused-vars
+     // eslint-disable-next-line no-unused-vars
     onAccept?: (id: string) => void,
-    // eslint-disable-next-line no-unused-vars
+     // eslint-disable-next-line no-unused-vars
     onReject?: (id: string) => void
+     
   ) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
       {profiles.map((profile) =>
@@ -137,10 +108,7 @@ export default function FriendsPage() {
             onClick={() => handleClickMemberDetailMove(profile.id)}
           />
         ) : (
-          <div
-            key={profile.id}
-            onClick={() => handleClickMemberDetailMove(profile.id)}
-          >
+          <div key={profile.id} onClick={() => handleClickMemberDetailMove(profile.id)}>
             <ProfileCard
               name={profile.nickname}
               age={getKoreanAge(profile.birthday)}
@@ -162,11 +130,7 @@ export default function FriendsPage() {
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-semibold text-lg">월드컵</h2>
         </div>
-        {renderProfileCards(
-          roundProfiles.slice(0, isRoundExpanded ? undefined : 3),
-          handleAccept,
-          handleReject
-        )}
+        {renderProfileCards(roundProfiles.slice(0, isRoundExpanded ? undefined : 3), handleAccept, handleReject)}
         <Button
           className="w-full mt-2"
           variant={isRoundExpanded ? 'outline' : 'fill'}
@@ -180,13 +144,9 @@ export default function FriendsPage() {
       <section>
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-semibold text-lg">호감 표시</h2>
-          <Button size="sm" variant="outline" className="text-xs">
-            ✏️ 편집
-          </Button>
+          <Button size="sm" variant="outline" className="text-xs">✏️ 편집</Button>
         </div>
-        {renderProfileCards(
-          likeProfiles.slice(0, isLikeExpanded ? undefined : 3)
-        )}
+        {renderProfileCards(likeProfiles.slice(0, isLikeExpanded ? undefined : 3))}
         <Button
           className="w-full mt-2"
           variant={isLikeExpanded ? 'outline' : 'fill'}
@@ -201,13 +161,9 @@ export default function FriendsPage() {
       <section>
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-semibold text-lg">커피챗 신청</h2>
-          <Button size="sm" variant="outline" className="text-xs">
-            ✏️ 편집
-          </Button>
+          <Button size="sm" variant="outline" className="text-xs">✏️ 편집</Button>
         </div>
-        {renderProfileCards(
-          coffeeChatProfiles.slice(0, isCoffeeChatExpanded ? undefined : 2)
-        )}
+        {renderProfileCards(coffeeChatProfiles.slice(0, isCoffeeChatExpanded ? undefined : 2))}
         <Button
           className="w-full mt-2"
           variant={isCoffeeChatExpanded ? 'outline' : 'fill'}
