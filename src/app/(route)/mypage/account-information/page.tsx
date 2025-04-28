@@ -10,7 +10,7 @@ import { getMyProfile } from '@/services/user';
 export default function AccountInformationPage() {
   const { mutate: logout } = useLogOutMutation();
   const { mutate: userDelete } = useUserDeleteMutation();
-  const [email, setEmail] = useState<string | null>(null); // 이메일 상태
+  const [email, setEmail] = useState<string | null>(null); // 이메일 상태 추가
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,20 +21,18 @@ export default function AccountInformationPage() {
   }, []);
 
   const handleDeleteAccount = () => {
-    localStorage.removeItem('hiddenUserIds'); // 탈퇴 시도 시 초기화
     userDelete();
   };
 
   const handleClickLogout = () => {
-    localStorage.removeItem('hiddenUserIds'); // 로그아웃 시 초기화
     logout();
   };
 
   return (
-    <div className="w-full min-h-full flex flex-col justify-between gap-10 px-16 py-10">
+    <div className="w-full min-h-full flex flex-col justify-between gap-10 px-16  py-10">
       <div>
         <h1 className="text-3xl mb-3">계정</h1>
-        <div className="mb-10 w-full px-5 py-4 border border-black rounded-2xl flex gap-6 items-center">
+        <div className="mb-10  w-full px-5 py-4 border border-black rounded-2xl flex gap-6  items-center">
           <span>이메일</span>
           <span className="text-gray-400">{email ?? '로딩 중...'}</span>
         </div>
@@ -59,4 +57,4 @@ export default function AccountInformationPage() {
       </Button>
     </div>
   );
-}
+} 
