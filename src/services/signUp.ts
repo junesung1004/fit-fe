@@ -92,16 +92,16 @@ export const emailVerificationRequest = async (email: string) => {
   }
 };
 
-// 이메일 인증코드 확인 api
-// export const emailVerificationSuccess = async (code: number) => {
-//   try {
-//     const response = await instance.post('/auth/verify-email', { code });
-//     return response.data;
-//   } catch (error) {
-//     const err = error as AxiosError<SignUpErrorResponse>;
-//     console.error('❌ 이메일 인증코드 확인 발송 에러');
-//     console.error('📍 상태 코드:', err.response?.status);
-//     console.error('📍 메시지:', err.response?.data?.message);
-//     throw new Error(err.response?.data?.message || '이메일 인증코드 확인 실패');
-//   }
-//};
+//이메일 인증코드 확인 api
+export const emailVerificationSuccess = async (code: number) => {
+  try {
+    const response = await instance.post('/auth/verify-email', { code });
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 이메일 인증코드 확인 발송 에러');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+    throw new Error(err.response?.data?.message || '이메일 인증코드 확인 실패');
+  }
+};
