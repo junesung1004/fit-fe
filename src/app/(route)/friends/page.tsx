@@ -42,6 +42,7 @@ export default function FriendsPage() {
   const [isCoffeeChatExpanded, setIsCoffeeChatExpanded] = useState(false);
 
   const { mutate: successDating } = useTodayDatingSuccess();
+  console.log('successDating : ', successDating);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,8 +100,14 @@ export default function FriendsPage() {
   };
 
   const handleAccept = (id: string) => {
-    successDating(id);
-    router.push(`/chats/${id}`);
+    successDating(id, {
+      onSuccess: () => {
+        router.push(`/chats/${id}`);
+      },
+      onError: (error) => {
+        console.error('❌ 성공 API 실패: ', error);
+      },
+    });
   };
 
   const handleReject = (id: string) => {
