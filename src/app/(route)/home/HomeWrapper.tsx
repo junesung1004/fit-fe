@@ -171,7 +171,7 @@ export default function HomeWrapper() {
       {/* 홈 화면에서 선택되지 않은 프로필만 보여줌 */}
       {allProfilesSelected ? (
         <div className="mt-6 text-center text-lg font-semibold text-green-500">
-          오늘 주어진 이성을 모두 선택하셨습니다!
+          오늘 주어진 이성을 모두 선택하셨습니다💓
         </div>
       ) : (
         <>

@@ -7,8 +7,8 @@ import Mbti from '@/components/common/Mbti';
 import Button from '@/components/common/Button';
 import { UserDataType } from '@/types/homePage.type';
 import {
-  selectMatchUser,
   selectAllMatchUser,
+  selectMatchUser,
 } from '@/services/todayDatingMatch';
 
 interface FirstProps {
@@ -41,7 +41,6 @@ export default function HomeFirstProfileCardList({
   const handleSelect = async (selectedId: number) => {
     if (!firstUser.matchId) return;
     try {
-      // selectMatchUser를 사용하여 선택된 유저를 서버에 반영
       await selectMatchUser({
         matchId: firstUser.matchId,
         selectedUserId: selectedId.toString(),
