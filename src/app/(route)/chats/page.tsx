@@ -7,17 +7,23 @@ import { useGetChatRoomQuery } from '@/hooks/query/useGetChatRoomQuery';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface ChatRoomType {
-  id: number;
+interface PartnerType {
+  id: string;
   name: string;
   age: number;
   height: number;
-  imgUrl: string;
+  profileImage: string;
+}
+
+interface ChatRoomType {
+  id: string;
+  name: string;
+  partner: PartnerType;
 }
 
 export default function ChatsPage() {
   const { data, isError, isPending } = useGetChatRoomQuery();
-  console.log('chatlist-data : ', data);
+  console.log('chatlist-data.. : ', data);
 
   if (isError) {
     return <div>error...</div>;
@@ -45,13 +51,13 @@ export default function ChatsPage() {
     <div className="w-full min-h-full flex flex-col gap-10 items-center py-6 px-5">
       {data.map((chatRoom: ChatRoomType) => (
         <div
-          key={chatRoom.id}
+          key={chatRoom.partner?.id}
           className="px-5 py-5 w-full h-auto border border-rose-500 rounded-lg flex gap-9 justify-center items-center"
         >
           {/* 프로필 이미지 */}
           <div className="relative w-[120px] h-[120px]">
             <Image
-              src={chatRoom.imgUrl || '/default-profile.png'} // 데이터에 이미지 없으면 기본 이미지
+              src={chatRoom.partner?.profileImage || '/default-profile.png'} // 데이터에 이미지 없으면 기본 이미지
               alt="프로필이미지"
               fill
               className="object-cover rounded-md"
@@ -60,9 +66,9 @@ export default function ChatsPage() {
           {/* 유저 정보 */}
           <div className="flex">
             <div className="flex flex-col gap-2">
-              <TagBadge>이름: {chatRoom.name}</TagBadge>
-              <TagBadge>나이: {chatRoom.age}</TagBadge>
-              <TagBadge>키: {chatRoom.height}</TagBadge>
+              <TagBadge>이름: {chatRoom.partner?.name}</TagBadge>
+              <TagBadge>나이: {chatRoom.partner?.age}</TagBadge>
+              <TagBadge>키: {chatRoom.partner?.height}</TagBadge>
             </div>
           </div>
           {/* 대화하러 가기 */}
