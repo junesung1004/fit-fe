@@ -12,14 +12,13 @@ export const useLoginMutation = () => {
   return useMutation({
     mutationFn: async (data: LoginProps) => await login(data),
     onSuccess: (res) => {
-      const accessToken = res.accessToken;
       const user = res.user;
       if (!user) {
         toast.error('유저 정보가 없습니다.');
         return;
       }
 
-      setAuth(accessToken, {
+      setAuth({
         id: user.id,
         nickname: user.nickname,
       });

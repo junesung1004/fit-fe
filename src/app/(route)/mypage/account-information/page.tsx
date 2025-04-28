@@ -1,14 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/common/Button';
 import { useLogOutMutation } from '@/hooks/mutation/useLogOutMutation';
 import { useUserDeleteMutation } from '@/hooks/mutation/useUserDeleteMutation';
+import { getMyProfile } from '@/services/user';
 
 export default function AccountInformationPage() {
   const { mutate: logout } = useLogOutMutation();
   const { mutate: userDelete } = useUserDeleteMutation();
+  const [email, setEmail] = useState<string | null>(null); // 이메일 상태 추가
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const data = await getMyProfile();
+      if (data) setEmail(data.email); // 이메일 저장
+    };
+    fetchUser();
+  }, []);
 
   const handleDeleteAccount = () => {
     userDelete();
@@ -24,7 +34,7 @@ export default function AccountInformationPage() {
         <h1 className="text-3xl mb-3">계정</h1>
         <div className="mb-10  w-full px-5 py-4 border border-black rounded-2xl flex gap-6  items-center">
           <span>이메일</span>
-          <span className="text-gray-400">test@test.com</span>
+          <span className="text-gray-400">{email ?? '로딩 중...'}</span>
         </div>
 
         <h1 className="text-3xl mb-3">계정 관리</h1>
