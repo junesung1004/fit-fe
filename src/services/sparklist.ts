@@ -9,7 +9,6 @@ export interface MatchItem {
   profileImage: string;
 }
 
-
 export interface LikeUser {
   likeUserid: string;
   nickname: string;
@@ -19,9 +18,18 @@ export interface LikeUser {
   profileImage: string;
 }
 
+export interface CoffeeChatUser {
+  CoffeeChatUserid: string;
+  nickname: string;
+  likeCount: number;
+  age: number;
+  region: string;
+  profileImage: string;
+}
+
 export interface SparkListResponse {
   likeList: LikeUser[];
-  // coffeeChatList: RawUser[];
+  coffeeChatList: CoffeeChatUser[];
   matchList: MatchItem[];
 }
 
