@@ -85,7 +85,9 @@ export default function FriendsPage() {
   const handleReject = async (id: string) => {
     try {
       const response = await passMatchRequest(id);
+      console.log('거절 응답:', response.data);
       const { isSuccess } = response.data;
+      console.log('isSuccess 값:', isSuccess);
 
       // ✅ 매칭 결과 페이지로 이동하면서 쿼리 전달
       router.push(`/matching-result?success=${isSuccess}`);
