@@ -2,6 +2,7 @@ import instance from '@/lib/axios';
 
 interface UserProfileResponse {
   id: string;
+  email: string;
   nickname: string;
   profile: {
     profileImage: { imageUrl: string; isMain: boolean }[];
@@ -18,6 +19,7 @@ interface UserProfileResponse {
 
 export const getMyProfile = async (): Promise<{
   id: string;
+  email: string;
   nickname: string;
   profileImage: string;
   job: string;
@@ -31,7 +33,7 @@ export const getMyProfile = async (): Promise<{
 } | null> => {
   try {
     const res = await instance.get<UserProfileResponse>('/user/me');
-    const { id, nickname, profile, job, height, birthday, likeCount } = res.data;
+    const { id, email, nickname, profile, job, height, birthday, likeCount } = res.data;
     const profileImage = profile.profileImage[0]?.imageUrl || '/default.png';
     const mbti = profile.mbti.mbti;
     const interestCategory = profile.interestCategory.map((item) => item.interestCategory.name);
@@ -40,6 +42,7 @@ export const getMyProfile = async (): Promise<{
 
     return {
       id,
+      email,
       nickname,
       profileImage,
       job,
