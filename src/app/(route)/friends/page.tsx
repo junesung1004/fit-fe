@@ -102,6 +102,7 @@ export default function FriendsPage() {
   const handleAccept = (id: string) => {
     successDating(id, {
       onSuccess: () => {
+        setRoundProfiles((prev) => prev.filter((p) => p.id !== id));
         router.push(`/chats/${id}`);
       },
       onError: (error) => {
