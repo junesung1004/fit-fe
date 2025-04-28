@@ -4,14 +4,14 @@ import { FieldError, useForm } from 'react-hook-form';
 import InputField from '@/components/common/InputField';
 import GenderSelector from '@/components/common/GenderSelector';
 import RegionSelector from '@/components/common/RegionSelector';
-import Button from '@/components/common/Button';
+// import Button from '@/components/common/Button';
 import MultiToggleButtonGroup from '@/components/common/MultiToggleButtonGroup';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import {
-  useEmailCheckMutation,
-  useEmailSuccessMutation,
-  useEmailVerificationMutation,
+  // useEmailCheckMutation,
+  // useEmailSuccessMutation,
+  // useEmailVerificationMutation,
   useSignUpMutation,
   useUploadImageMutataion,
 } from '@/hooks/mutation/useSignUpMutation';
@@ -39,7 +39,7 @@ export default function SignUpPage() {
 
   const password = watch('password');
   const selectedGender = watch('gender');
-  const [emailSuccessCode, setEmailSuccessCode] = useState('');
+  // const [emailSuccessCode, setEmailSuccessCode] = useState('');
   const [images, setImages] = useState<(File | null)[]>(Array(6).fill(null));
   const [previews, setPreviews] = useState<(string | null)[]>(
     Array(6).fill(null)
@@ -50,16 +50,16 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null);
   const [isImageValid, setIsImageValid] = useState(false);
   const { mutate, isPending } = useSignUpMutation();
-  const [isEmailCode, setIsEmailCode] = useState(false);
+  // const [isEmailCode, setIsEmailCode] = useState(false);
 
-  const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
-  const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
-    if (isAvailable) {
-      setIsEmailCode(true); // 인증코드 입력창 열기
-      sendVerificationEmail(watch('email')); // ✅ 인증코드 발송
-    }
-  });
-  const { mutate: successEmail } = useEmailSuccessMutation();
+  // // const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
+  // const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
+  //   if (isAvailable) {
+  //     setIsEmailCode(true); // 인증코드 입력창 열기
+  //     sendVerificationEmail(watch('email')); // ✅ 인증코드 발송
+  //   }
+  // });
+  // const { mutate: successEmail } = useEmailSuccessMutation();
   const { mutate: uploadImage } = useUploadImageMutataion();
 
   const validateImages = () => {
@@ -101,17 +101,17 @@ export default function SignUpPage() {
     });
   };
 
-  // 이메일 중복확인 함수
-  const checkEmailDuplicate = async () => {
-    const currentEmail = watch('email');
+  // // 이메일 중복확인 함수
+  // const checkEmailDuplicate = async () => {
+  //   const currentEmail = watch('email');
 
-    if (!currentEmail) {
-      alert('이메일을 입력해주세요');
-      return;
-    }
+  //   if (!currentEmail) {
+  //     alert('이메일을 입력해주세요');
+  //     return;
+  //   }
 
-    checkEmail(currentEmail);
-  };
+  //   checkEmail(currentEmail);
+  // };
 
   // 유저 생성 함수
   const handleCreateUserSubmit = async (data: SignUpFormValues) => {
@@ -142,15 +142,15 @@ export default function SignUpPage() {
     }
   };
 
-  //이메일 인증코드 확인
-  const handleClickEmailSuccess = (emailSuccessCode: string) => {
-    successEmail(Number(emailSuccessCode));
-    setIsEmailCode(false);
-  };
+  // //이메일 인증코드 확인
+  // const handleClickEmailSuccess = (emailSuccessCode: string) => {
+  //   successEmail(Number(emailSuccessCode));
+  //   setIsEmailCode(false);
+  // };
 
-  const handleChangeEmailCode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmailSuccessCode(e.target.value);
-  };
+  // const handleChangeEmailCode = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setEmailSuccessCode(e.target.value);
+  // };
 
   useEffect(() => {
     validateImages();
@@ -180,16 +180,16 @@ export default function SignUpPage() {
           error={errors.email as FieldError}
           isDirty={dirtyFields.email}
         />
-        <Button
+        {/* <Button
           type="button"
           size="full"
           rounded="full"
           onClick={checkEmailDuplicate}
         >
           이메일 중복 확인
-        </Button>
+        </Button> */}
 
-        {/* 인증코드 필드 */}
+        {/* 인증코드 필드
         {isEmailCode && (
           <div className="flex items-center gap-3">
             <input
@@ -198,19 +198,19 @@ export default function SignUpPage() {
               id="email-code"
               type="text"
               placeholder="6자리 인증코드를 입력해주세요."
-              onChange={handleChangeEmailCode}
+              // onChange={handleChangeEmailCode}
             />
             <Button
               type="button"
               rounded="full"
               variant="outline"
               size="full"
-              onClick={() => handleClickEmailSuccess(emailSuccessCode)}
+              // onClick={() => handleClickEmailSuccess(emailSuccessCode)}
             >
               인증 확인
             </Button>
           </div>
-        )}
+        )} */}
 
         {/* 비밀번호 필드 */}
         <InputField

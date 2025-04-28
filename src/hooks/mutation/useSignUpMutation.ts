@@ -4,8 +4,8 @@ import { SignUpFormValues } from '@/types/signUp.type';
 import { toast } from 'react-toastify';
 import {
   emailCheck,
-  emailVerificationRequest,
-  emailVerificationSuccess,
+  // emailVerificationRequest,
+  // emailVerificationSuccess,
   signUp,
   signUpImageUpload,
 } from '@/services/signUp';
@@ -61,30 +61,30 @@ export const useEmailCheckMutation = (
   });
 };
 
-//이메일 인증메일 발송 mutation
-export const useEmailVerificationMutation = () => {
-  return useMutation({
-    mutationFn: async (email: string) => await emailVerificationRequest(email),
-    onSuccess: () => {
-      toast.success('인증 코드가 이메일로 전송되었습니다.');
-    },
-    onError: (error) => {
-      toast.error(error.message || '이메일 인증 코드 요청이 실패했습니다.');
-    },
-  });
-};
+// //이메일 인증메일 발송 mutation
+// export const useEmailVerificationMutation = () => {
+//   return useMutation({
+//     mutationFn: async (email: string) => await emailVerificationRequest(email),
+//     onSuccess: () => {
+//       toast.success('인증 코드가 이메일로 전송되었습니다.');
+//     },
+//     onError: (error) => {
+//       toast.error(error.message || '이메일 인증 코드 요청이 실패했습니다.');
+//     },
+//   });
+// };
 
-//이메일 인증코드 확인 mutation
-export const useEmailSuccessMutation = () => {
-  return useMutation({
-    mutationFn: async (data: number) => await emailVerificationSuccess(data),
-    onSuccess: () => {
-      toast.success('인증 코드가 확인되었습니다.');
-    },
-    onError: (error) => {
-      toast.error(
-        error.message || '이메일 인증 코드 확인 요청이 실패했습니다.'
-      );
-    },
-  });
-};
+// //이메일 인증코드 확인 mutation
+// export const useEmailSuccessMutation = () => {
+//   return useMutation({
+//     mutationFn: async (data: number) => await emailVerificationSuccess(data),
+//     onSuccess: () => {
+//       toast.success('인증 코드가 확인되었습니다.');
+//     },
+//     onError: (error) => {
+//       toast.error(
+//         error.message || '이메일 인증 코드 확인 요청이 실패했습니다.'
+//       );
+//     },
+//   });
+// };
