@@ -58,3 +58,18 @@ export const getMyProfile = async (): Promise<{
     return null;
   }
 };
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string
+): Promise<boolean> => {
+  try {
+    await instance.patch('/api/v1/user/change-password', {
+      oldPassword,
+      newPassword,
+    });
+    return true; // 성공
+  } catch (error) {
+    console.error('비밀번호 변경 실패:', error);
+    return false; // 실패
+  }
+};

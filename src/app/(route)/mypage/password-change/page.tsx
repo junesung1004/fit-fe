@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/common/Button';
 import { EyeIcon } from '@heroicons/react/24/solid';
+import { changePassword } from '@/services/user'; // ✅ API 함수 import
 
 export default function PasswordChangePage() {
   const [passwords, setPasswords] = useState({
@@ -22,17 +23,33 @@ export default function PasswordChangePage() {
     key: 'current' | 'new' | 'confirm'
   ) => {
     e.preventDefault();
-
     setPasswords((prev) => ({
       ...prev,
       [key]: e.target.value,
     }));
   };
 
-  const handleChangePasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChangePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log('입력한 비밀번호 값 : ', passwords);
+    if (passwords.new !== passwords.confirm) {
+      alert('신규 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    const success = await changePassword(passwords.current, passwords.new);
+
+    if (success) {
+      alert('비밀번호가 성공적으로 변경되었습니다.');
+      // 변경 후 비밀번호 초기화
+      setPasswords({
+        current: '',
+        new: '',
+        confirm: '',
+      });
+    } else {
+      alert('비밀번호 변경에 실패했습니다.');
+    }
   };
 
   return (
@@ -43,10 +60,7 @@ export default function PasswordChangePage() {
       >
         {/* 현재 비밀번호 */}
         <div>
-          <label
-            htmlFor="password-origin"
-            className="text-3xl mb-3 cursor-pointer"
-          >
+          <label htmlFor="password-origin" className="text-3xl mb-3 cursor-pointer">
             현재 비밀번호
           </label>
           <div className="flex justify-between items-center py-3 px-7 border border-black rounded-xl">
@@ -73,10 +87,7 @@ export default function PasswordChangePage() {
 
         {/* 신규 비밀번호 */}
         <div>
-          <label
-            htmlFor="password-new"
-            className="text-3xl mb-3 cursor-pointer"
-          >
+          <label htmlFor="password-new" className="text-3xl mb-3 cursor-pointer">
             신규 비밀번호
           </label>
           <div className="mb-10 flex justify-between items-center py-3 px-7 border border-black rounded-xl">
