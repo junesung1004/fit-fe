@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
@@ -11,7 +11,7 @@ import { selectMatchUser } from '@/services/todayDatingMatch';
 interface FirstProps {
   firstUser: UserDataType | null;
   secondUser: UserDataType | null;
-  onSelectAll: () => void;  // ✅ 부모에서 받은 함수
+  onSelectAll: () => void;
 }
 
 export default function HomeFirstProfileCardList({
@@ -20,6 +20,9 @@ export default function HomeFirstProfileCardList({
   onSelectAll,
 }: FirstProps) {
   const router = useRouter();
+
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
   if (!firstUser || !secondUser) return null;
 
   const getKoreanAge = (birthday: number): number => {
@@ -28,7 +31,7 @@ export default function HomeFirstProfileCardList({
     return currentYear - birthYear + 1;
   };
 
-  const handleSelect = async (selectedUserId: number) => {
+  const handleSelect = async (selectedId: number) => {
     if (!firstUser.matchId) {
       console.error('matchId가 없습니다.');
       return;
@@ -36,9 +39,10 @@ export default function HomeFirstProfileCardList({
     try {
       await selectMatchUser({
         matchId: firstUser.matchId,
-        selectedUserId: selectedUserId.toString(),
+        selectedUserId: selectedId.toString(),
       });
       console.log('선택 성공');
+      setSelectedUserId(selectedId); // ✅ 선택 후 상태 업데이트
     } catch (err) {
       console.error('매칭 선택 실패:', err);
     }
@@ -56,6 +60,7 @@ export default function HomeFirstProfileCardList({
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6">
       <div className="relative flex gap-3">
+        {/* 첫 번째 카드 */}
         <HomeProfileCard
           onClick={() => moveToDetail(firstUser.id)}
           backgroundImageUrl={firstImg}
@@ -76,16 +81,21 @@ export default function HomeFirstProfileCardList({
               size="full"
               rounded="full"
               variant="outline"
+              disabled={selectedUserId !== null} // ✅ 선택 후에만 비활성화
+              className={selectedUserId === firstUser.id ? 'bg-gray-400 text-white' : ''}
               onClick={e => {
                 e.stopPropagation();
-                void handleSelect(firstUser.id);
+                if (selectedUserId === null) {
+                  void handleSelect(firstUser.id);
+                }
               }}
             >
-              선택하기
+              {selectedUserId === firstUser.id ? '이미 선택했습니다' : '선택하기'}
             </Button>
           </HomeProfileCard.Footer>
         </HomeProfileCard>
 
+        {/* VS 표시 */}
         <div className="absolute left-1/2 top-1/2 
                         -translate-x-1/2 -translate-y-1/2 
                         w-12 h-12 flex justify-center items-center 
@@ -94,6 +104,7 @@ export default function HomeFirstProfileCardList({
           V S
         </div>
 
+        {/* 두 번째 카드 */}
         <HomeProfileCard
           onClick={() => moveToDetail(secondUser.id)}
           backgroundImageUrl={secondImg}
@@ -114,12 +125,16 @@ export default function HomeFirstProfileCardList({
               size="full"
               rounded="full"
               variant="outline"
+              disabled={selectedUserId !== null}
+              className={selectedUserId === secondUser.id ? 'bg-gray-400 text-white' : ''}
               onClick={e => {
                 e.stopPropagation();
-                void handleSelect(secondUser.id);
+                if (selectedUserId === null) {
+                  void handleSelect(secondUser.id);
+                }
               }}
             >
-              선택하기
+              {selectedUserId === secondUser.id ? '이미 선택했습니다' : '선택하기'}
             </Button>
           </HomeProfileCard.Footer>
         </HomeProfileCard>
