@@ -6,7 +6,7 @@ import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
 import Button from '@/components/common/Button';
 import { UserDataType } from '@/types/homePage.type';
-import { selectMatchUser } from '@/services/todayDatingMatch';
+import { selectMatchUser, selectAllMatchUser } from '@/services/todayDatingMatch'; // ✅ 모두 선택 API도 import
 
 interface FirstProps {
   firstUser: UserDataType | null;
@@ -20,8 +20,7 @@ export default function HomeFirstProfileCardList({
   onSelectAll,
 }: FirstProps) {
   const router = useRouter();
-
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | 'all' | null>(null); // ✅ 'all' 추가
 
   if (!firstUser || !secondUser) return null;
 
@@ -32,19 +31,31 @@ export default function HomeFirstProfileCardList({
   };
 
   const handleSelect = async (selectedId: number) => {
-    if (!firstUser.matchId) {
-      console.error('matchId가 없습니다.');
-      return;
-    }
+    if (!firstUser.matchId) return;
     try {
       await selectMatchUser({
         matchId: firstUser.matchId,
         selectedUserId: selectedId.toString(),
       });
-      console.log('선택 성공');
-      setSelectedUserId(selectedId); // ✅ 선택 후 상태 업데이트
+      setSelectedUserId(selectedId); // ✅ 개별 선택
     } catch (err) {
       console.error('매칭 선택 실패:', err);
+    }
+  };
+
+  // ✅ 모두 선택 핸들러
+  const handleSelectAllLocal = async () => {
+    if (!firstUser || !secondUser || !firstUser.matchId) return;
+    try {
+      await selectAllMatchUser({
+        matchId: firstUser.matchId,
+        firstSelectedUserId: firstUser.id.toString(),
+        secondSelectedUserId: secondUser.id.toString(),
+      });
+      setSelectedUserId('all'); // ✅ 모두 선택 시 상태 변경
+      onSelectAll(); // 원래 부모 콜백 호출
+    } catch (err) {
+      console.error('모두 선택 실패:', err);
     }
   };
 
@@ -58,7 +69,7 @@ export default function HomeFirstProfileCardList({
     ?? '/default.png';
 
   return (
-    <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6">
+    <div className={`flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 ${selectedUserId !== null ? 'bg-rose-100' : ''}`}>
       <div className="relative flex gap-3">
         {/* 첫 번째 카드 */}
         <HomeProfileCard
@@ -81,8 +92,7 @@ export default function HomeFirstProfileCardList({
               size="full"
               rounded="full"
               variant="outline"
-              disabled={selectedUserId !== null} // ✅ 선택 후에만 비활성화
-              className={selectedUserId === firstUser.id ? 'bg-gray-400 text-white' : ''}
+              disabled={selectedUserId !== null}
               onClick={e => {
                 e.stopPropagation();
                 if (selectedUserId === null) {
@@ -90,7 +100,7 @@ export default function HomeFirstProfileCardList({
                 }
               }}
             >
-              {selectedUserId === firstUser.id ? '이미 선택했습니다' : '선택하기'}
+              {selectedUserId === firstUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
             </Button>
           </HomeProfileCard.Footer>
         </HomeProfileCard>
@@ -126,7 +136,6 @@ export default function HomeFirstProfileCardList({
               rounded="full"
               variant="outline"
               disabled={selectedUserId !== null}
-              className={selectedUserId === secondUser.id ? 'bg-gray-400 text-white' : ''}
               onClick={e => {
                 e.stopPropagation();
                 if (selectedUserId === null) {
@@ -134,7 +143,7 @@ export default function HomeFirstProfileCardList({
                 }
               }}
             >
-              {selectedUserId === secondUser.id ? '이미 선택했습니다' : '선택하기'}
+              {selectedUserId === secondUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
             </Button>
           </HomeProfileCard.Footer>
         </HomeProfileCard>
@@ -145,7 +154,7 @@ export default function HomeFirstProfileCardList({
         <Button rounded="full" variant="outline" onClick={() => console.log('취소')}>
           X
         </Button>
-        <Button rounded="full" size="full" onClick={onSelectAll}>
+        <Button rounded="full" size="full" onClick={handleSelectAllLocal}>
           모두 선택
         </Button>
       </div>
