@@ -71,8 +71,8 @@ export default function MemberDetailPage() {
 
   if (!member) return <div>로딩 중...</div>;
 
-  const mainImage = member.profile.profileImage[0]?.imageUrl ?? '/default.png';
-  const koreanAge = new Date().getFullYear() - new Date(member.birthday).getFullYear() + 1;
+  const mainImage = member.profileImage ?? '/default.png';
+  const koreanAge = member.age;
 
   return (
     <div className="w-full min-h-full flex flex-col gap-10 px-2 xs:px-20 py-5">
@@ -90,8 +90,8 @@ export default function MemberDetailPage() {
           <p>직업 : {member.job}</p>
           <p>키 : {member.height ?? '-'}cm</p>
           <p>나이 : {koreanAge}세</p>
-          <p>MBTI : {member.profile.mbti.mbti}</p>
-          <p>관심사 : {member.profile.interestCategory.map(cat => cat).join(', ')}</p>
+          <p>MBTI : {member.mbti.mbti}</p>
+          <p>관심사 : {member.interestCategory.join(', ')}</p>
         </MemberProfileDetailCard.Information>
 
         <MemberProfileDetailCard.LikeCountBadge>
@@ -131,19 +131,18 @@ export default function MemberDetailPage() {
         <div className="flex flex-col">
           <h1 className="text-violet-500 mb-3">이런 얘기 많이 들어요</h1>
           <div className="flex flex-wrap gap-3 mb-10">
-            {member.profile.userFeedbacks?.map((fb) => (
-              <TagBadge key={fb.id}>{fb.id}</TagBadge>
+            {member.userFeedbacks?.map((fb, index) => (
+              <TagBadge key={index}>{fb}</TagBadge>
             ))}
           </div>
 
           <h1 className="text-violet-500 mb-3">저는 이런 사람이에요</h1>
           <div className="flex flex-wrap gap-3 mb-10">
-            {member.profile.userIntroductions?.map((intro) => (
-              <TagBadge key={intro.id}>{intro.id}</TagBadge>
-           ))}
-         </div>
-      </div>
-
+            {member.userIntroductions?.map((intro, index) => (
+              <TagBadge key={index}>{intro}</TagBadge>
+            ))}
+          </div>
+        </div>
       </MemberProfileDetailCard.AboutMe>
     </div>
   );
