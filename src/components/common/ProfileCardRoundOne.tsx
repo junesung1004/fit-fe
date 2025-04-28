@@ -7,9 +7,9 @@ type ProfileCardRoundOneProps = {
   region: string;
   likes?: number;
   profileImageUrl: string;
-  onAccept: () => void; 
-  onReject: () => void; 
-  onClick: () => void;  
+  onAccept: () => void;
+  onReject: () => void;
+  onClick: () => void;
 };
 
 const ProfileCardRoundOne = ({
@@ -24,8 +24,8 @@ const ProfileCardRoundOne = ({
 }: ProfileCardRoundOneProps) => {
   return (
     <div
-      className="w-[120px] p-4 bg-white rounded-lg shadow-md cursor-pointer" // 
-      onClick={onClick} 
+      className="w-[120px] p-4 bg-white rounded-lg shadow-md cursor-pointer" //
+      onClick={onClick}
     >
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-4">
@@ -58,8 +58,8 @@ const ProfileCardRoundOne = ({
       <div className="flex justify-between mt-2 space-x-2">
         <button
           className="w-1/2 py-1 text-xs bg-violet-500 text-white rounded-full"
-          onClick={(e) => { 
-            e.stopPropagation(); 
+          onClick={(e) => {
+            e.stopPropagation();
             onReject();
           }}
         >
@@ -67,7 +67,7 @@ const ProfileCardRoundOne = ({
         </button>
         <button
           className="w-1/2 py-1 text-xs bg-rose-500 text-white rounded-full"
-          onClick={(e) => { 
+          onClick={(e) => {
             e.stopPropagation(); // 이벤트 버블링 방지
             onAccept();
           }}
