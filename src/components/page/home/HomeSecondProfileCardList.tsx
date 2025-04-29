@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
@@ -20,6 +20,8 @@ export default function HomeSecondProfileCardList({
   onSelectAll,
 }: SecondProps) {
   const router = useRouter();
+  const [selectedUserId, setSelectedUserId] = useState<number | 'all' | null>(null); // ✅ 선택 여부 상태
+
   if (!thirdUser || !fourUser) return null;
 
   const getKoreanAge = (birthday: number): number => {
@@ -39,6 +41,7 @@ export default function HomeSecondProfileCardList({
         selectedUserId: selectedUserId.toString(),
       });
       console.log('선택 성공');
+      setSelectedUserId(selectedUserId); // ✅ 선택 처리
     } catch (err) {
       console.error('매칭 선택 실패:', err);
     }
@@ -56,36 +59,52 @@ export default function HomeSecondProfileCardList({
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6">
       <div className="relative flex gap-3">
-        <HomeProfileCard
-          onClick={() => moveToDetail(thirdUser.id)}
-          backgroundImageUrl={thirdImg}
-        >
-          <HomeProfileCard.Header>
-            <Mbti>{thirdUser.profile.mbti.mbti}</Mbti>
-          </HomeProfileCard.Header>
-          <HomeProfileCard.Body>
-            <p className="text-cyan-200">{thirdUser.nickname}</p>
-            <div className="flex gap-1 text-cyan-200 text-xs">
-              <p>{getKoreanAge(thirdUser.birthday)}세</p>
-              <p>● {thirdUser.region}</p>
-              <p>● {thirdUser.height}cm</p>
-            </div>
-          </HomeProfileCard.Body>
-          <HomeProfileCard.Footer>
-            <Button
-              size="full"
-              rounded="full"
-              variant="outline"
-              onClick={e => {
-                e.stopPropagation();
-                void handleSelect(thirdUser.id);
-              }}
-            >
-              선택하기
-            </Button>
-          </HomeProfileCard.Footer>
-        </HomeProfileCard>
+        {/* 첫 번째 카드 */}
+        <div className="relative w-full">
+          <HomeProfileCard
+            onClick={() => {
+              if (selectedUserId === null) moveToDetail(thirdUser.id);
+            }}
+            backgroundImageUrl={thirdImg}
+          >
+            <HomeProfileCard.Header>
+              <Mbti>{thirdUser.profile.mbti.mbti}</Mbti>
+            </HomeProfileCard.Header>
+            <HomeProfileCard.Body>
+              <p className="text-cyan-200">{thirdUser.nickname}</p>
+              <div className="flex gap-1 text-cyan-200 text-xs">
+                <p>{getKoreanAge(thirdUser.birthday)}세</p>
+                <p>● {thirdUser.region}</p>
+                <p>● {thirdUser.height}cm</p>
+              </div>
+            </HomeProfileCard.Body>
+            <HomeProfileCard.Footer>
+              <Button
+                size="full"
+                rounded="full"
+                variant="outline"
+                disabled={selectedUserId !== null}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (selectedUserId === null) {
+                    void handleSelect(thirdUser.id);
+                  }
+                }}
+              >
+                {selectedUserId === thirdUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
+              </Button>
+            </HomeProfileCard.Footer>
+          </HomeProfileCard>
 
+          {/* ✅ 선택 완료 오버레이 */}
+          {selectedUserId !== null && (
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl">
+              <p className="text-white text-2xl font-bold">선택 완료</p>
+            </div>
+          )}
+        </div>
+
+        {/* VS 표시 */}
         <div className="absolute left-1/2 top-1/2 
                         -translate-x-1/2 -translate-y-1/2 
                         w-12 h-12 flex justify-center items-center 
@@ -94,35 +113,50 @@ export default function HomeSecondProfileCardList({
           V S
         </div>
 
-        <HomeProfileCard
-          onClick={() => moveToDetail(fourUser.id)}
-          backgroundImageUrl={fourImg}
-        >
-          <HomeProfileCard.Header>
-            <Mbti>{fourUser.profile.mbti.mbti}</Mbti>
-          </HomeProfileCard.Header>
-          <HomeProfileCard.Body>
-            <p className="text-cyan-200">{fourUser.nickname}</p>
-            <div className="flex gap-1 text-cyan-200 text-xs">
-              <p>{getKoreanAge(fourUser.birthday)}세</p>
-              <p>● {fourUser.region}</p>
-              <p>● {fourUser.height}cm</p>
+        {/* 두 번째 카드 */}
+        <div className="relative w-full">
+          <HomeProfileCard
+            onClick={() => {
+              if (selectedUserId === null) moveToDetail(fourUser.id);
+            }}
+            backgroundImageUrl={fourImg}
+          >
+            <HomeProfileCard.Header>
+              <Mbti>{fourUser.profile.mbti.mbti}</Mbti>
+            </HomeProfileCard.Header>
+            <HomeProfileCard.Body>
+              <p className="text-cyan-200">{fourUser.nickname}</p>
+              <div className="flex gap-1 text-cyan-200 text-xs">
+                <p>{getKoreanAge(fourUser.birthday)}세</p>
+                <p>● {fourUser.region}</p>
+                <p>● {fourUser.height}cm</p>
+              </div>
+            </HomeProfileCard.Body>
+            <HomeProfileCard.Footer>
+              <Button
+                size="full"
+                rounded="full"
+                variant="outline"
+                disabled={selectedUserId !== null}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (selectedUserId === null) {
+                    void handleSelect(fourUser.id);
+                  }
+                }}
+              >
+                {selectedUserId === fourUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
+              </Button>
+            </HomeProfileCard.Footer>
+          </HomeProfileCard>
+
+          {/* ✅ 선택 완료 오버레이 */}
+          {selectedUserId !== null && (
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl">
+              <p className="text-white text-2xl font-bold">선택 완료</p>
             </div>
-          </HomeProfileCard.Body>
-          <HomeProfileCard.Footer>
-            <Button
-              size="full"
-              rounded="full"
-              variant="outline"
-              onClick={e => {
-                e.stopPropagation();
-                void handleSelect(fourUser.id);
-              }}
-            >
-              선택하기
-            </Button>
-          </HomeProfileCard.Footer>
-        </HomeProfileCard>
+          )}
+        </div>
       </div>
 
       {/* 하단 버튼 */}
