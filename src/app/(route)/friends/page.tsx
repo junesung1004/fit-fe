@@ -137,6 +137,7 @@ export default function FriendsPage() {
               likes={profile.likeCount}
               isOnline={true}
               profileImageUrl={profile.profileImage}
+              onClick={() => handleClickMemberDetailMove(profile.id)}
             />
           </div>
         )

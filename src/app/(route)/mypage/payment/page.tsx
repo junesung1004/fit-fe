@@ -5,7 +5,7 @@ import Payment from '@/components/page/mypage/Payment';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { getUserCoffeeCount } from '@/services/userCoffee';
-import { getMyProfile } from '@/services/user'; // ✅ 사용자 정보 가져오기
+import { getMyProfile } from '@/services/user'; 
 
 interface PaymentDataType {
   id: number;
