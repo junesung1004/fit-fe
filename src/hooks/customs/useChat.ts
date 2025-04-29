@@ -2,25 +2,31 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import socketService from '@/lib/socket';
-import { getChatMessageData } from '@/services/chat'; // ✅ 추가
+import { getChatMessageData } from '@/services/chat';
 
 interface Message {
   content: string;
   userId: string;
   chatRoomId: string;
-  createdAt: Date;
+  createdAt: string;
+}
+
+interface Partner {
+  id: string;
+  profileImage: string;
 }
 
 export const useChat = (chatRoomId: string, userId: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [partner, setPartner] = useState<Partner | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       try {
-        // ✅ 1. 과거 메시지 가져오기
-        const previousMessages = await getChatMessageData(chatRoomId);
-        setMessages(previousMessages);
+        const { messages, partner } = await getChatMessageData(chatRoomId);
+        setMessages(messages);
+        setPartner(partner); // ✅ partner 정보도 상태로 저장
       } catch (error) {
         console.error('❌ 과거 메시지 로딩 실패', error);
       }
@@ -28,9 +34,7 @@ export const useChat = (chatRoomId: string, userId: string) => {
 
     init();
 
-    // ✅ 2. 소켓 연결
     socketService.connect();
-
     const socket = socketService.socket;
 
     if (socket) {
@@ -64,6 +68,7 @@ export const useChat = (chatRoomId: string, userId: string) => {
 
   return {
     messages,
+    partner,
     sendMessage,
     isConnected,
   };
