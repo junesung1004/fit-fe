@@ -38,6 +38,7 @@ export default function MembersPage() {
         let data: FilteredUser[] = [];
         if (isLoggedIn) {
           const filter = await fetchCurrentFilter();
+          console.log('📦 현재 필터 상태:', filter);
           setAge(filter.minAge);
           setLikes(filter.minLikeCount);
           setRegion(filter.region);
@@ -45,6 +46,7 @@ export default function MembersPage() {
         } else {
           data = await fetchAnonymousUsers();
         }
+        console.log('👥 받아온 유저 리스트:', data);
         setUsers(data);
       } catch (err) {
         console.error('사용자 목록 로드 실패:', err);
@@ -63,8 +65,18 @@ export default function MembersPage() {
   const applyFilter = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await saveFilterSettings({ region, minAge: age, maxAge: 60, minLikeCount: likes });
+      const filterPayload = {
+        region,
+        minAge: age,
+        maxAge: 60,
+        minLikeCount: likes,
+      };
+      console.log('🚀 보내는 필터 데이터:', filterPayload);
+      await saveFilterSettings(filterPayload);
+
       const refreshedUsers = await fetchFilteredUsersFromGet();
+      console.log('🔄 필터 적용 후 유저:', refreshedUsers);
+
       setUsers(refreshedUsers);
       toggleFilter();
     } catch (err) {
