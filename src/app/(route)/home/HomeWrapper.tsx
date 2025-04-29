@@ -38,7 +38,7 @@ export default function HomeWrapper() {
           setFirstUser({ ...user1, matchId });
           setTwoUser({ ...user2, matchId });
         }
-        if (matches.length > 1) {
+        if (matches.length > 1) { // ✅ 여기 수정 matches.length > 1
           const { matchId, user1, user2 } = matches[1];
           setThirdUser({ ...user1, matchId });
           setFourUser({ ...user2, matchId });
@@ -60,14 +60,14 @@ export default function HomeWrapper() {
           setFirstUser({ ...user1, matchId });
           setTwoUser({ ...user2, matchId });
         }
-        if (matches.length > 1) {
+        if (matches.length > 0) { // ✅ 여기 수정 matches.length > 1
           const { matchId, user1, user2 } = matches[1];
           setThirdUser({ ...user1, matchId });
           setFourUser({ ...user2, matchId });
         }
       },
       onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패 (비로그인)', err);
+        console.error('❌ 매칭 데이터 가져오기 실패 (로그인)', err);
       },
     });
   };
@@ -118,6 +118,12 @@ export default function HomeWrapper() {
         secondSelectedUserId: twoUser.id.toString(),
       });
       console.log('모두 선택 완료');
+
+      // ✅ 모두 선택 완료 후 상태 초기화 (선택 완료 화면 띄우기)
+      setFirstUser(null);
+      setTwoUser(null);
+      setThirdUser(null);
+      setFourUser(null);
     } catch (err) {
       console.error('모두 선택 실패:', err);
     }
@@ -153,4 +159,4 @@ export default function HomeWrapper() {
       )}
     </main>
   );
-}  
+}
