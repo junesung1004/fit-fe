@@ -129,17 +129,28 @@ export default function HomeWrapper() {
       <small className="text-slate-400">
         당신을 기다리는 인연이 도착합니다.
       </small>
-
-      <HomeFristProfileCardList
-        firstUser={firstUser}
-        secondUser={twoUser}
-        onSelectAll={handleSelectAll}
-      />
-      <HomeTwoProfileCardList 
-      thirdUser={thirdUser} 
-      fourUser={fourUser} 
-      onSelectAll={handleSelectAll}
-      />
+  
+      {/* 매칭이 하나도 없을 때 안내 문구 띄우기 */}
+      {(!firstUser && !twoUser && !thirdUser && !fourUser) ? (
+        <div className="flex flex-col items-center justify-center mt-10">
+          <p className="text-gray-400 text-center text-base">
+            오늘은 매칭할 사람이 없습니다.
+          </p>
+        </div>
+      ) : (
+        <>
+          <HomeFristProfileCardList
+            firstUser={firstUser}
+            secondUser={twoUser}
+            onSelectAll={handleSelectAll}
+          />
+          <HomeTwoProfileCardList 
+            thirdUser={thirdUser} 
+            fourUser={fourUser} 
+            onSelectAll={handleSelectAll}
+          />
+        </>
+      )}
     </main>
   );
-}
+}  
