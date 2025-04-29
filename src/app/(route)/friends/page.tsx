@@ -53,7 +53,7 @@ export default function FriendsPage() {
       }));
 
       const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
-        id: item.likeUserId,
+        id: item.likedUserId,
         nickname: item.nickname,
         likeCount: item.likeCount,
         birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
@@ -185,7 +185,7 @@ export default function FriendsPage() {
   {/* 호감 표시 */}
   <section>
     <div className="flex justify-between items-center mb-2">
-      <h2 className="font-semibold text-lg">호감 d표시</h2>
+      <h2 className="font-semibold text-lg">호감 표시</h2>
     </div>
     {renderProfileCards(
       likeProfiles.slice(0, isLikeExpanded ? undefined : 3)

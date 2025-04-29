@@ -11,7 +11,7 @@ export interface MatchItem {
 }
 
 export interface LikeUser {
-  likeUserId: string;
+  likedUserId: string;
   nickname: string;
   likeCount: number;
   age: number;
