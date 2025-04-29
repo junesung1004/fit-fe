@@ -17,7 +17,7 @@ export default function CommonLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* 박스: 가로는 지정 / 세로는 화면 꽉 채우기 */}
-      <div className="relative hidden md:flex flex-col justify-center items-center min-h-screen   lg:w-[800px] h-screen ">
+      <div className="relative hidden md:flex flex-col justify-center items-center min-h-screen  lg:w-[800px] h-screen pr-36 ">
         <div className="relative w-[250px] h-[250px]">
           <Image src={'/fit-date-coffee-icon.png'} alt="커피 이미지" fill />
         </div>
