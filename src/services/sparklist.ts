@@ -20,7 +20,7 @@ export interface LikeUser {
 }
 
 export interface CoffeeChatUser {
-  CoffeeChatUserId: string;
+  coffeeChatUserId: string;
   nickname: string;
   likeCount: number;
   age: number;

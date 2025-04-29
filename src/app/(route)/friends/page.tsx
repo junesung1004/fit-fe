@@ -40,6 +40,8 @@ export default function FriendsPage() {
     const fetchData = async () => {
       const data = await fetchSparkList();
 
+      console.log('🔥 전체 응답 확인', data);
+
       const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
         id: item.matchedUserId,
         nickname: item.nickname,
@@ -60,7 +62,7 @@ export default function FriendsPage() {
       }));
 
       const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map((item: CoffeeChatUser) => ({
-        id: item.CoffeeChatUserId,
+        id: item.coffeeChatUserId,
         nickname: item.nickname,
         likeCount: item.likeCount,
         birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
