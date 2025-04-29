@@ -72,38 +72,49 @@ export default function HomeFirstProfileCardList({
     <div className={`flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 ${selectedUserId !== null ? 'bg-rose-100' : ''}`}>
       <div className="relative flex gap-3">
         {/* 첫 번째 카드 */}
-        <HomeProfileCard
-          onClick={() => moveToDetail(firstUser.id)}
-          backgroundImageUrl={firstImg}
-        >
-          <HomeProfileCard.Header>
-            <Mbti>{firstUser.profile.mbti.mbti}</Mbti>
-          </HomeProfileCard.Header>
-          <HomeProfileCard.Body>
-            <p className="text-cyan-200">{firstUser.nickname}</p>
-            <div className="flex gap-1 text-cyan-200 text-xs">
-              <p>{getKoreanAge(firstUser.birthday)}세</p>
-              <p>● {firstUser.region}</p>
-              <p>● {firstUser.height}cm</p>
+        <div className="relative w-full">
+          <HomeProfileCard
+            onClick={() => {
+              if (selectedUserId === null) moveToDetail(firstUser.id); // ✅ 선택 완료 시 클릭 막기
+            }}
+            backgroundImageUrl={firstImg}
+          >
+            <HomeProfileCard.Header>
+              <Mbti>{firstUser.profile.mbti.mbti}</Mbti>
+            </HomeProfileCard.Header>
+            <HomeProfileCard.Body>
+              <p className="text-cyan-200">{firstUser.nickname}</p>
+              <div className="flex gap-1 text-cyan-200 text-xs">
+                <p>{getKoreanAge(firstUser.birthday)}세</p>
+                <p>● {firstUser.region}</p>
+                <p>● {firstUser.height}cm</p>
+              </div>
+            </HomeProfileCard.Body>
+            <HomeProfileCard.Footer>
+              <Button
+                size="full"
+                rounded="full"
+                variant="outline"
+                disabled={selectedUserId !== null}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (selectedUserId === null) {
+                    void handleSelect(firstUser.id);
+                  }
+                }}
+              >
+                {selectedUserId === firstUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
+              </Button>
+            </HomeProfileCard.Footer>
+          </HomeProfileCard>
+
+          {/* ✅ 선택 완료 오버레이 */}
+          {selectedUserId !== null && (
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl">
+              <p className="text-white text-2xl font-bold">선택 완료</p>
             </div>
-          </HomeProfileCard.Body>
-          <HomeProfileCard.Footer>
-            <Button
-              size="full"
-              rounded="full"
-              variant="outline"
-              disabled={selectedUserId !== null}
-              onClick={e => {
-                e.stopPropagation();
-                if (selectedUserId === null) {
-                  void handleSelect(firstUser.id);
-                }
-              }}
-            >
-              {selectedUserId === firstUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
-            </Button>
-          </HomeProfileCard.Footer>
-        </HomeProfileCard>
+          )}
+        </div>
 
         {/* VS 표시 */}
         <div className="absolute left-1/2 top-1/2 
@@ -115,38 +126,49 @@ export default function HomeFirstProfileCardList({
         </div>
 
         {/* 두 번째 카드 */}
-        <HomeProfileCard
-          onClick={() => moveToDetail(secondUser.id)}
-          backgroundImageUrl={secondImg}
-        >
-          <HomeProfileCard.Header>
-            <Mbti>{secondUser.profile.mbti.mbti}</Mbti>
-          </HomeProfileCard.Header>
-          <HomeProfileCard.Body>
-            <p className="text-cyan-200">{secondUser.nickname}</p>
-            <div className="flex gap-1 text-cyan-200 text-xs">
-              <p>{getKoreanAge(secondUser.birthday)}세</p>
-              <p>● {secondUser.region}</p>
-              <p>● {secondUser.height}cm</p>
+        <div className="relative w-full">
+          <HomeProfileCard
+            onClick={() => {
+              if (selectedUserId === null) moveToDetail(secondUser.id); // ✅ 선택 완료 시 클릭 막기
+            }}
+            backgroundImageUrl={secondImg}
+          >
+            <HomeProfileCard.Header>
+              <Mbti>{secondUser.profile.mbti.mbti}</Mbti>
+            </HomeProfileCard.Header>
+            <HomeProfileCard.Body>
+              <p className="text-cyan-200">{secondUser.nickname}</p>
+              <div className="flex gap-1 text-cyan-200 text-xs">
+                <p>{getKoreanAge(secondUser.birthday)}세</p>
+                <p>● {secondUser.region}</p>
+                <p>● {secondUser.height}cm</p>
+              </div>
+            </HomeProfileCard.Body>
+            <HomeProfileCard.Footer>
+              <Button
+                size="full"
+                rounded="full"
+                variant="outline"
+                disabled={selectedUserId !== null}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (selectedUserId === null) {
+                    void handleSelect(secondUser.id);
+                  }
+                }}
+              >
+                {selectedUserId === secondUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
+              </Button>
+            </HomeProfileCard.Footer>
+          </HomeProfileCard>
+
+          {/* ✅ 선택 완료 오버레이 */}
+          {selectedUserId !== null && (
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl">
+              <p className="text-white text-2xl font-bold">선택 완료</p>
             </div>
-          </HomeProfileCard.Body>
-          <HomeProfileCard.Footer>
-            <Button
-              size="full"
-              rounded="full"
-              variant="outline"
-              disabled={selectedUserId !== null}
-              onClick={e => {
-                e.stopPropagation();
-                if (selectedUserId === null) {
-                  void handleSelect(secondUser.id);
-                }
-              }}
-            >
-              {selectedUserId === secondUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
-            </Button>
-          </HomeProfileCard.Footer>
-        </HomeProfileCard>
+          )}
+        </div>
       </div>
 
       {/* 하단 버튼 */}

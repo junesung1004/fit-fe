@@ -67,7 +67,7 @@ export default function HomeWrapper() {
         }
       },
       onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패 (로그인)', err);
+        console.error('❌ 매칭 데이터 가져오기 실패 (비로그인)', err);
       },
     });
   };
