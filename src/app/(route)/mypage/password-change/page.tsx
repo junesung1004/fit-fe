@@ -37,7 +37,7 @@ export default function PasswordChangePage() {
       return;
     }
 
-    const success = await changePassword(passwords.current, passwords.new);
+    const success = await changePassword(passwords.current, passwords.new, passwords.confirm);
 
     if (success) {
       alert('비밀번호가 성공적으로 변경되었습니다.');

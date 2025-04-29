@@ -60,12 +60,14 @@ export const getMyProfile = async (): Promise<{
 };
 export const changePassword = async (
   oldPassword: string,
-  newPassword: string
+  newPassword: string,
+  confirmPassword: string
 ): Promise<boolean> => {
   try {
-    await instance.patch('/api/v1/user/change-password', {
+    await instance.patch('/auth/change-password', {
       oldPassword,
       newPassword,
+      confirmPassword,
     });
     return true; // 성공
   } catch (error) {
