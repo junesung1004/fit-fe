@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
@@ -116,34 +115,47 @@ export default function FriendsPage() {
     onReject?: (id: string) => void
   ) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
-    {profiles.map((profile) =>
-      onAccept && onReject ? (
-        <ProfileCardRoundOne
-          key={profile.id}
-          name={profile.nickname}
-          age={getKoreanAge(profile.birthday)}
-          region={profile.region}
-          likes={profile.likeCount}
-          profileImageUrl={profile.profileImage}
-          onAccept={() => onAccept(profile.id)}
-          onReject={() => onReject(profile.id)}
-          onClick={() => handleClickMemberDetailMove(profile.id)}
-        />
-      ) : (
-        <Link key={profile.id} href={`/members/${profile.id}`}>
-          <ProfileCard
+      {profiles.map((profile) => {
+        if (!profile.id) {
+          console.warn('❗️ProfileCard에서 id가 undefined인 항목:', profile);
+          return null; // id 없으면 렌더링 안 함
+        }
+  
+        return onAccept && onReject ? (
+          <ProfileCardRoundOne
+            key={profile.id}
             name={profile.nickname}
             age={getKoreanAge(profile.birthday)}
             region={profile.region}
             likes={profile.likeCount}
-            isOnline={true}
             profileImageUrl={profile.profileImage}
+            onAccept={() => onAccept(profile.id)}
+            onReject={() => onReject(profile.id)}
+            onClick={() => handleClickMemberDetailMove(profile.id)}
           />
-        </Link>
-      )
-    )}
-  </div>
-);
+        ) : (
+          <div
+            key={profile.id}
+            onClick={() => {
+              console.log('✅ ProfileCard 클릭됨, id:', profile.id);
+              handleClickMemberDetailMove(profile.id);
+            }}
+            className="cursor-pointer"
+          >
+            <ProfileCard
+              name={profile.nickname}
+              age={getKoreanAge(profile.birthday)}
+              region={profile.region}
+              likes={profile.likeCount}
+              isOnline={true}
+              profileImageUrl={profile.profileImage}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+  
 
   return (
   <main className="flex-1 px-6 space-y-10 pb-16 bg-gray-50">
@@ -171,7 +183,7 @@ export default function FriendsPage() {
   {/* 호감 표시 */}
   <section>
     <div className="flex justify-between items-center mb-2">
-      <h2 className="font-semibold text-lg">호감 표시</h2>
+      <h2 className="font-semibold text-lg">호감 d표시</h2>
     </div>
     {renderProfileCards(
       likeProfiles.slice(0, isLikeExpanded ? undefined : 3)
