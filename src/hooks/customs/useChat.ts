@@ -13,20 +13,33 @@ interface Message {
 
 export const useChat = (chatRoomId: string, userId: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     socketService.connect();
-    socketService.joinRoom(chatRoomId, userId);
 
-    const unsubscribe = socketService.onMessage((message: Message) => {
-      setMessages((prev) => [...prev, message]);
-    });
+    const socket = socketService.socket;
 
-    return () => {
-      unsubscribe();
-      socketService.disconnect();
-    };
+    if (socket) {
+      const handleConnect = () => setIsConnected(true);
+      const handleDisconnect = () => setIsConnected(false);
+
+      socket.on('connect', handleConnect);
+      socket.on('disconnect', handleDisconnect);
+
+      socketService.joinRoom(chatRoomId, userId);
+
+      const unsubscribe = socketService.onMessage((message: Message) => {
+        setMessages((prev) => [...prev, message]);
+      });
+
+      return () => {
+        unsubscribe();
+        socket.off('connect', handleConnect); // ✅ clean-up 추가
+        socket.off('disconnect', handleDisconnect); // ✅ clean-up 추가
+        socketService.disconnect();
+      };
+    }
   }, [chatRoomId, userId]);
 
   const sendMessage = useCallback(
