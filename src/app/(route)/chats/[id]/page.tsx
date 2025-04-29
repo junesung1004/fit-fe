@@ -21,9 +21,8 @@ export default function ChatPage() {
 
   useEffect(() => {
     const accessToken = Cookies.get('accessToken');
-    if (!accessToken) {
-      return;
-    }
+    if (!accessToken) return;
+
     try {
       const decoded = jwtDecode<TokenPayload>(accessToken);
       setUserId(decoded.sub);
@@ -42,8 +41,7 @@ export default function ChatPage() {
 
   return (
     <div className="h-screen">
-      <ChatRoom chatRoomId={roomId} userId={userId} />{' '}
-      {/* ✅ userId도 넘겨야 함 */}
+      <ChatRoom chatRoomId={roomId} userId={userId} />
     </div>
   );
 }

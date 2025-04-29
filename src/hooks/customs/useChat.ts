@@ -1,8 +1,8 @@
 'use client';
 
-// hooks/useChat.ts
 import { useState, useEffect, useCallback } from 'react';
 import socketService from '@/lib/socket';
+import { getChatMessageData } from '@/services/chat'; // ✅ 추가
 
 interface Message {
   content: string;
@@ -16,6 +16,19 @@ export const useChat = (chatRoomId: string, userId: string) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    const init = async () => {
+      try {
+        // ✅ 1. 과거 메시지 가져오기
+        const previousMessages = await getChatMessageData(chatRoomId);
+        setMessages(previousMessages);
+      } catch (error) {
+        console.error('❌ 과거 메시지 로딩 실패', error);
+      }
+    };
+
+    init();
+
+    // ✅ 2. 소켓 연결
     socketService.connect();
 
     const socket = socketService.socket;
@@ -35,8 +48,8 @@ export const useChat = (chatRoomId: string, userId: string) => {
 
       return () => {
         unsubscribe();
-        socket.off('connect', handleConnect); // ✅ clean-up 추가
-        socket.off('disconnect', handleDisconnect); // ✅ clean-up 추가
+        socket.off('connect', handleConnect);
+        socket.off('disconnect', handleDisconnect);
         socketService.disconnect();
       };
     }
