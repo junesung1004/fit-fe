@@ -14,6 +14,7 @@ import {
   fetchFilteredUsersFromGet,
   fetchAnonymousUsers,
   saveFilterSettings,
+  fetchCurrentFilter,
   FilteredUser,
 } from '@/services/memeber';
 import { useAuthStore } from '@/store/authStore';
@@ -26,7 +27,6 @@ const REGION = [
 export default function MembersPage() {
   const [isShowFilter, setIsShowFilter] = useState(false);
   const [users, setUsers] = useState<FilteredUser[]>([]);
-  // const [distance, setDistance] = useState(0); // 일단 사용 안함
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
   const [region, setRegion] = useState('');
@@ -37,6 +37,10 @@ export default function MembersPage() {
       try {
         let data: FilteredUser[] = [];
         if (isLoggedIn) {
+          const filter = await fetchCurrentFilter();
+          setAge(filter.minAge);
+          setLikes(filter.minLikeCount);
+          setRegion(filter.region);
           data = await fetchFilteredUsersFromGet();
         } else {
           data = await fetchAnonymousUsers();
@@ -51,7 +55,6 @@ export default function MembersPage() {
 
   const toggleFilter = () => setIsShowFilter((v) => !v);
   const resetFilter = () => {
-    // setDistance(0);
     setAge(20);
     setLikes(0);
     setRegion('');
@@ -104,18 +107,6 @@ export default function MembersPage() {
                 </select>
               </div>
 
-              {/* <RangeSlider
-                id="distance"
-                name="distance"
-                label="거리"
-                min={0}
-                max={10}
-                step={1}
-                value={distance}
-                unit="km"
-                rangeText="0km ~ 10km"
-                onChange={setDistance}
-              /> */}
               <RangeSlider
                 id="age"
                 name="age"

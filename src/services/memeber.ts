@@ -31,3 +31,14 @@ export const fetchAnonymousUsers = async (): Promise<FilteredUser[]> => {
   const res = await instance.get<{ users: FilteredUser[] }>('/user-filter/users-for-anonymous-user');
   return res.data.users;
 };
+
+// 유저 필터 조회 (현재 필터 상태 확인용)
+export const fetchCurrentFilter = async (): Promise<{
+  region: string;
+  minAge: number;
+  maxAge: number;
+  minLikeCount: number;
+}> => {
+  const res = await instance.get('/user-filter/user-filter');
+  return res.data;
+};
