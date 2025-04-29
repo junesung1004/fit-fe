@@ -7,6 +7,7 @@ import ProfileCard from '@/components/common/Profilecard';
 import ProfileCardRoundOne from '@/components/common/ProfileCardRoundOne';
 import { fetchSparkList, MatchItem, LikeUser, CoffeeChatUser } from '@/services/sparklist';
 import { passMatchRequest } from '@/services/passMatch'; // ✅ 거절 API
+import { acceptMatchRequest } from '@/services/acceptMatch';
 
 interface SparkUser {
   id: string;
@@ -46,6 +47,7 @@ export default function FriendsPage() {
         birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
         region: item.region,
         profileImage: item.profileImage ?? '/default.png',
+        isSuccess:item.isSuccess,
       }));
 
       const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
@@ -78,8 +80,17 @@ export default function FriendsPage() {
     router.push(`/members/${id}`);
   };
 
-  const handleAccept = (id: string) => {
-    router.push(`/chats/${id}`);
+  const handleAccept = async (id: string) => {
+    try {
+      const response = await acceptMatchRequest(id);
+      console.log('매칭 수락 응답:', response.data);
+      const { isSuccess } = response.data;
+      console.log('isSuccess 값:', isSuccess);
+
+      router.push(`/chats/${id}`);
+    } catch (error) {
+      console.error('매칭 수락 실패:', error);
+    }
   };
 
   const handleReject = async (id: string) => {

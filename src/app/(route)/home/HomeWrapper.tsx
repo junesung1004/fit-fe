@@ -131,7 +131,7 @@ export default function HomeWrapper() {
       {isAllSelected && (
         <div className="flex flex-col items-center justify-center mt-5 mb-5">
           <p className="text-violet-500 font-semibold text-lg">
-            오늘의 모든 인연을 선택하셨습니다 🎉
+            오늘의 인연을 모두 선택하셨습니다 🎉
           </p>
         </div>
       )}
