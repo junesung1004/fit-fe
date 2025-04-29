@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import ChatRoom from '@/components/page/chats/ChatRoom';
 import { getChatMessageData } from '@/services/chat';
+import { useParams } from 'next/navigation';
 
 interface Message {
   content: string;
@@ -16,21 +17,21 @@ interface Partner {
   profileImage: string;
 }
 
-interface ChatPageProps {
-  params: string;
-}
-export default function ChatPage({ params }: ChatPageProps) {
+export default function ChatPage() {
   const [chatRoomId, setChatRoomId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const params = useParams();
+  const { roomId } = params as { roomId: string };
+
   useEffect(() => {
     const fetchChatData = async () => {
       try {
         const { chatRoomId, partner, messages } =
-          await getChatMessageData(params);
+          await getChatMessageData(roomId);
         setChatRoomId(chatRoomId);
         setUserId(partner.id); // ✅ 서버가 나 말고 상대를 partner로 주는 경우엔 따로 처리해야 함
         setPartner(partner);
@@ -43,7 +44,7 @@ export default function ChatPage({ params }: ChatPageProps) {
     };
 
     fetchChatData();
-  }, [params]);
+  }, []);
 
   if (loading) {
     return (
