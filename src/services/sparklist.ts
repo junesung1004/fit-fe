@@ -7,6 +7,7 @@ export interface MatchItem {
   age: number;
   region: string;
   profileImage: string;
+  isSuccess: boolean;
 }
 
 export interface LikeUser {
