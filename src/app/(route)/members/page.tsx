@@ -10,26 +10,36 @@ import Button from '@/components/common/Button';
 import Divider from '@/components/common/Divider';
 import RangeSlider from '@/components/page/members/RangeSlider';
 import ProfileCard from '@/components/common/Profilecard';
-import { fetchFilteredUsersFromGet, fetchAnonymousUsers, saveFilterSettings, FilteredUser } from '@/services/memeber';
+import {
+  fetchFilteredUsersFromGet,
+  fetchAnonymousUsers,
+  saveFilterSettings,
+  FilteredUser,
+} from '@/services/memeber';
 import { useAuthStore } from '@/store/authStore';
+
+const REGION = [
+  '', '서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기',
+  '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주',
+];
 
 export default function MembersPage() {
   const [isShowFilter, setIsShowFilter] = useState(false);
   const [users, setUsers] = useState<FilteredUser[]>([]);
-  const [distance, setDistance] = useState(0); // 일단 사용 안함
+  // const [distance, setDistance] = useState(0); // 일단 사용 안함
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
+  const [region, setRegion] = useState('');
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  // 유저 목록 불러오기
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         let data: FilteredUser[] = [];
         if (isLoggedIn) {
-          data = await fetchFilteredUsersFromGet(); // 로그인 후 필터 조회
+          data = await fetchFilteredUsersFromGet();
         } else {
-          data = await fetchAnonymousUsers(); // 비로그인
+          data = await fetchAnonymousUsers();
         }
         setUsers(data);
       } catch (err) {
@@ -41,23 +51,19 @@ export default function MembersPage() {
 
   const toggleFilter = () => setIsShowFilter((v) => !v);
   const resetFilter = () => {
-    setDistance(0);
+    // setDistance(0);
     setAge(20);
     setLikes(0);
+    setRegion('');
   };
 
-  // 필터 적용
   const applyFilter = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      // PATCH로 필터 저장
-      await saveFilterSettings({ minAge: age, maxAge: 60, minLikeCount: likes });
-
-      // 필터 저장 후 GET으로 유저 다시 불러오기
+      await saveFilterSettings({ region, minAge: age, maxAge: 60, minLikeCount: likes });
       const refreshedUsers = await fetchFilteredUsersFromGet();
       setUsers(refreshedUsers);
-
-      toggleFilter(); // 필터 닫기
+      toggleFilter();
     } catch (err) {
       console.error('필터 적용 실패:', err);
     }
@@ -65,7 +71,6 @@ export default function MembersPage() {
 
   return (
     <div className="relative w-full min-h-full flex flex-col gap-10">
-      {/* 필터 모달 */}
       {isShowFilter && (
         <div className="absolute z-10 w-full h-full bg-[rgba(0,0,0,0.7)] px-8 py-10">
           <div className="bg-white rounded-3xl p-6 flex flex-col gap-6">
@@ -81,7 +86,25 @@ export default function MembersPage() {
             <Divider />
 
             <form className="flex flex-col gap-7" onSubmit={applyFilter}>
-              <RangeSlider
+              <div className="flex flex-col">
+                <label htmlFor="region" className="font-medium mb-1">
+                  지역
+                </label>
+                <select
+                  id="region"
+                  className="border px-4 py-2 rounded-md"
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                >
+                  {REGION.map((r) => (
+                    <option key={r} value={r} disabled={!r}>
+                      {r || '지역 선택'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* <RangeSlider
                 id="distance"
                 name="distance"
                 label="거리"
@@ -92,7 +115,7 @@ export default function MembersPage() {
                 unit="km"
                 rangeText="0km ~ 10km"
                 onChange={setDistance}
-              />
+              /> */}
               <RangeSlider
                 id="age"
                 name="age"
@@ -137,7 +160,6 @@ export default function MembersPage() {
         </div>
       )}
 
-      {/* 사용자 리스트 */}
       <div className="w-full py-10 px-8 flex flex-col">
         <div className="flex justify-between items-center">
           <h1 className="font-semibold">접속 중인 이성</h1>
@@ -148,7 +170,7 @@ export default function MembersPage() {
             onClick={toggleFilter}
           />
         </div>
-        <p className="text-gray-400 text-sm">새로운 인연을 찾아 보세요</p>
+        <p className="text-gray-400 text-sm">새로운 인연을 찾아 보세요!</p>
 
         <div className="flex flex-wrap justify-center items-center pt-5 gap-7">
           {users.map((u) => (

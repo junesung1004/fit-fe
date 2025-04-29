@@ -16,7 +16,7 @@ interface FilteredUsersResponse {
 }
 
 // 로그인 유저 - 필터 저장 (PATCH)
-export const saveFilterSettings = async (filter: { minAge: number; maxAge: number; minLikeCount: number }): Promise<void> => {
+export const saveFilterSettings = async (filter: { region: string; minAge: number; maxAge: number; minLikeCount: number }): Promise<void> => {
   await instance.patch('/user-filter/user-filter', filter);
 };
 
