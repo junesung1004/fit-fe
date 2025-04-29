@@ -7,7 +7,7 @@ import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
 import ProfileCardRoundOne from '@/components/common/ProfileCardRoundOne';
 import { fetchSparkList, MatchItem, LikeUser, CoffeeChatUser } from '@/services/sparklist';
-import { passMatchRequest } from '@/services/passMatch'; // ✅ 거절 API
+import { passMatchRequest } from '@/services/passMatch'; 
 import { acceptMatchRequest } from '@/services/acceptMatch';
 
 interface SparkUser {
@@ -116,36 +116,34 @@ export default function FriendsPage() {
     onReject?: (id: string) => void
   ) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
-      {profiles.map((profile) =>
-        onAccept && onReject ? (
-          <ProfileCardRoundOne
-            key={profile.id}
+    {profiles.map((profile) =>
+      onAccept && onReject ? (
+        <ProfileCardRoundOne
+          key={profile.id}
+          name={profile.nickname}
+          age={getKoreanAge(profile.birthday)}
+          region={profile.region}
+          likes={profile.likeCount}
+          profileImageUrl={profile.profileImage}
+          onAccept={() => onAccept(profile.id)}
+          onReject={() => onReject(profile.id)}
+          onClick={() => handleClickMemberDetailMove(profile.id)}
+        />
+      ) : (
+        <Link key={profile.id} href={`/members/${profile.id}`}>
+          <ProfileCard
             name={profile.nickname}
             age={getKoreanAge(profile.birthday)}
             region={profile.region}
             likes={profile.likeCount}
+            isOnline={true}
             profileImageUrl={profile.profileImage}
-            onAccept={() => onAccept(profile.id)}
-            onReject={() => onReject(profile.id)}
-            onClick={() => handleClickMemberDetailMove(profile.id)}
           />
-        ) : (
-          <div key={profile.id} onClick={() => handleClickMemberDetailMove(profile.id)}>
-            <Link key={profile.id} href={`/members/${profile.id}`}>
-              <ProfileCard
-                name={profile.nickname}
-                age={getKoreanAge(profile.birthday)}
-                region={profile.region}
-                likes={profile.likeCount}
-                isOnline={true}
-                profileImageUrl={profile.profileImage}
-                />
-            </Link>
-          </div>
-        )
-      )}
-    </div>
-  );
+        </Link>
+      )
+    )}
+  </div>
+);
 
   return (
   <main className="flex-1 px-6 space-y-10 pb-16 bg-gray-50">
