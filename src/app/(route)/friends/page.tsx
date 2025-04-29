@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
@@ -130,15 +131,16 @@ export default function FriendsPage() {
           />
         ) : (
           <div key={profile.id} onClick={() => handleClickMemberDetailMove(profile.id)}>
-            <ProfileCard
-              name={profile.nickname}
-              age={getKoreanAge(profile.birthday)}
-              region={profile.region}
-              likes={profile.likeCount}
-              isOnline={true}
-              profileImageUrl={profile.profileImage}
-              onClick={() => handleClickMemberDetailMove(profile.id)}
-            />
+            <Link key={profile.id} href={`/members/${profile.id}`}>
+              <ProfileCard
+                name={profile.nickname}
+                age={getKoreanAge(profile.birthday)}
+                region={profile.region}
+                likes={profile.likeCount}
+                isOnline={true}
+                profileImageUrl={profile.profileImage}
+                />
+            </Link>
           </div>
         )
       )}
