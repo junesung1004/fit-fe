@@ -51,7 +51,7 @@ export default function FriendsPage() {
       }));
 
       const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
-        id: item.likeUserid,
+        id: item.likeUserId,
         nickname: item.nickname,
         likeCount: item.likeCount,
         birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
@@ -60,7 +60,7 @@ export default function FriendsPage() {
       }));
 
       const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map((item: CoffeeChatUser) => ({
-        id: item.CoffeeChatUserid,
+        id: item.CoffeeChatUserId,
         nickname: item.nickname,
         likeCount: item.likeCount,
         birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
