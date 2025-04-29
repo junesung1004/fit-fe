@@ -6,7 +6,7 @@ import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
 import Button from '@/components/common/Button';
 import { UserDataType } from '@/types/homePage.type';
-import { selectMatchUser, selectAllMatchUser } from '@/services/todayDatingMatch'; // ✅ 모두 선택 API도 import
+import { selectMatchUser, selectAllMatchUser } from '@/services/todayDatingMatch';
 
 interface FirstProps {
   firstUser: UserDataType | null;
@@ -20,7 +20,9 @@ export default function HomeFirstProfileCardList({
   onSelectAll,
 }: FirstProps) {
   const router = useRouter();
-  const [selectedUserId, setSelectedUserId] = useState<number | 'all' | null>(null); // ✅ 'all' 추가
+  const [selectedFirst, setSelectedFirst] = useState(false);
+  const [selectedSecond, setSelectedSecond] = useState(false);
+  const [isListSelected, setIsListSelected] = useState(false);
 
   if (!firstUser || !secondUser) return null;
 
@@ -30,20 +32,27 @@ export default function HomeFirstProfileCardList({
     return currentYear - birthYear + 1;
   };
 
-  const handleSelect = async (selectedId: number) => {
+  const handleSelect = async (selectedId: number, type: 'first' | 'second') => {
     if (!firstUser.matchId) return;
     try {
       await selectMatchUser({
         matchId: firstUser.matchId,
         selectedUserId: selectedId.toString(),
       });
-      setSelectedUserId(selectedId); // ✅ 개별 선택
+
+      if (type === 'first') {
+        setSelectedFirst(true);
+      } else {
+        setSelectedSecond(true);
+      }
+
+      setIsListSelected(true);
+      onSelectAll();
     } catch (err) {
       console.error('매칭 선택 실패:', err);
     }
   };
 
-  // ✅ 모두 선택 핸들러
   const handleSelectAllLocal = async () => {
     if (!firstUser || !secondUser || !firstUser.matchId) return;
     try {
@@ -52,15 +61,19 @@ export default function HomeFirstProfileCardList({
         firstSelectedUserId: firstUser.id.toString(),
         secondSelectedUserId: secondUser.id.toString(),
       });
-      setSelectedUserId('all'); // ✅ 모두 선택 시 상태 변경
-      onSelectAll(); // 원래 부모 콜백 호출
+      setSelectedFirst(true);
+      setSelectedSecond(true);
+      setIsListSelected(true);
+      onSelectAll();
     } catch (err) {
       console.error('모두 선택 실패:', err);
     }
   };
 
   const moveToDetail = (id: number) => {
-    router.push(`/members/${id}`);
+    if (!isListSelected) {
+      router.push(`/members/${id}`);
+    }
   };
 
   const firstImg = firstUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
@@ -69,16 +82,18 @@ export default function HomeFirstProfileCardList({
     ?? '/default.png';
 
   return (
-    <div className={`flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 ${selectedUserId !== null ? 'bg-rose-100' : ''}`}>
-      <div className="relative flex gap-3">
+    <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
+      {/* ✅ 리스트 전체 오버레이 */}
+      {isListSelected && (
+        <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl z-20">
+          <p className="text-white text-2xl font-bold">선택 완료</p>
+        </div>
+      )}
+
+      <div className="relative flex gap-3 z-10">
         {/* 첫 번째 카드 */}
         <div className="relative w-full">
-          <HomeProfileCard
-            onClick={() => {
-              if (selectedUserId === null) moveToDetail(firstUser.id); // ✅ 선택 완료 시 클릭 막기
-            }}
-            backgroundImageUrl={firstImg}
-          >
+          <HomeProfileCard onClick={() => moveToDetail(firstUser.id)} backgroundImageUrl={firstImg}>
             <HomeProfileCard.Header>
               <Mbti>{firstUser.profile.mbti.mbti}</Mbti>
             </HomeProfileCard.Header>
@@ -95,44 +110,28 @@ export default function HomeFirstProfileCardList({
                 size="full"
                 rounded="full"
                 variant="outline"
-                disabled={selectedUserId !== null}
-                onClick={e => {
+                disabled={isListSelected}
+                onClick={(e) => {
                   e.stopPropagation();
-                  if (selectedUserId === null) {
-                    void handleSelect(firstUser.id);
+                  if (!isListSelected) {
+                    void handleSelect(firstUser.id, 'first');
                   }
                 }}
               >
-                {selectedUserId === firstUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
+                {selectedFirst ? '선택함' : '선택하기'}
               </Button>
             </HomeProfileCard.Footer>
           </HomeProfileCard>
-
-          {/* ✅ 선택 완료 오버레이 */}
-          {selectedUserId !== null && (
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl">
-              <p className="text-white text-2xl font-bold">선택 완료</p>
-            </div>
-          )}
         </div>
 
         {/* VS 표시 */}
-        <div className="absolute left-1/2 top-1/2 
-                        -translate-x-1/2 -translate-y-1/2 
-                        w-12 h-12 flex justify-center items-center 
-                        shadow-xl bg-white rounded-full border 
-                        text-rose-500 font-bold z-10">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 flex justify-center items-center shadow-xl bg-white rounded-full border text-rose-500 font-bold z-20">
           V S
         </div>
 
         {/* 두 번째 카드 */}
         <div className="relative w-full">
-          <HomeProfileCard
-            onClick={() => {
-              if (selectedUserId === null) moveToDetail(secondUser.id); // ✅ 선택 완료 시 클릭 막기
-            }}
-            backgroundImageUrl={secondImg}
-          >
+          <HomeProfileCard onClick={() => moveToDetail(secondUser.id)} backgroundImageUrl={secondImg}>
             <HomeProfileCard.Header>
               <Mbti>{secondUser.profile.mbti.mbti}</Mbti>
             </HomeProfileCard.Header>
@@ -149,34 +148,27 @@ export default function HomeFirstProfileCardList({
                 size="full"
                 rounded="full"
                 variant="outline"
-                disabled={selectedUserId !== null}
-                onClick={e => {
+                disabled={isListSelected}
+                onClick={(e) => {
                   e.stopPropagation();
-                  if (selectedUserId === null) {
-                    void handleSelect(secondUser.id);
+                  if (!isListSelected) {
+                    void handleSelect(secondUser.id, 'second');
                   }
                 }}
               >
-                {selectedUserId === secondUser.id || selectedUserId === 'all' ? '선택함' : '선택하기'}
+                {selectedSecond ? '선택함' : '선택하기'}
               </Button>
             </HomeProfileCard.Footer>
           </HomeProfileCard>
-
-          {/* ✅ 선택 완료 오버레이 */}
-          {selectedUserId !== null && (
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl">
-              <p className="text-white text-2xl font-bold">선택 완료</p>
-            </div>
-          )}
         </div>
       </div>
 
       {/* 하단 버튼 */}
-      <div className="flex justify-center items-center gap-3">
-        <Button rounded="full" variant="outline" onClick={() => console.log('취소')}>
+      <div className="flex justify-center items-center gap-3 mt-4 z-10">
+        <Button rounded="full" variant="outline" onClick={() => console.log('취소')} disabled={isListSelected}>
           X
         </Button>
-        <Button rounded="full" size="full" onClick={handleSelectAllLocal}>
+        <Button rounded="full" size="full" onClick={handleSelectAllLocal} disabled={isListSelected}>
           모두 선택
         </Button>
       </div>

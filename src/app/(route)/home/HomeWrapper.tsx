@@ -21,14 +21,14 @@ export default function HomeWrapper() {
   const [firstUser, setFirstUser] = useState<UserDataType | null>(null);
   const [twoUser, setTwoUser] = useState<UserDataType | null>(null);
   const [thirdUser, setThirdUser] = useState<UserDataType | null>(null);
-  console.log('thirdUser : ', thirdUser);
   const [fourUser, setFourUser] = useState<UserDataType | null>(null);
-  console.log('fourUser : ', fourUser);
+  const [firstSelected, setFirstSelected] = useState(false);
+  const [secondSelected, setSecondSelected] = useState(false);
+
   const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
   const {} = useAuthStore();
 
-  // 🌐 비로그인 유저용 API 호출 함수
   const getPublicTodayDatingUserMatch = () => {
     publicTodayDatingUser(undefined, {
       onSuccess: (data: { matches: MatchItem[] }) => {
@@ -38,7 +38,7 @@ export default function HomeWrapper() {
           setFirstUser({ ...user1, matchId });
           setTwoUser({ ...user2, matchId });
         }
-        if (matches.length > 1) { // ✅ 여기 수정 matches.length > 1
+        if (matches.length > 1) {
           const { matchId, user1, user2 } = matches[1];
           setThirdUser({ ...user1, matchId });
           setFourUser({ ...user2, matchId });
@@ -50,7 +50,6 @@ export default function HomeWrapper() {
     });
   };
 
-  // 🔐 로그인 유저용 API 호출 함수
   const getTodayDatingUserMatch = () => {
     todayDatingUser(undefined, {
       onSuccess: (data: { matches: MatchItem[] }) => {
@@ -60,45 +59,38 @@ export default function HomeWrapper() {
           setFirstUser({ ...user1, matchId });
           setTwoUser({ ...user2, matchId });
         }
-        if (matches.length > 0) { // ✅ 여기 수정 matches.length > 1
+        if (matches.length > 1) {
           const { matchId, user1, user2 } = matches[1];
           setThirdUser({ ...user1, matchId });
           setFourUser({ ...user2, matchId });
         }
       },
       onError: (err) => {
-        console.error('❌ 매칭 데이터 가져오기 실패 (비로그인)', err);
+        console.error('❌ 매칭 데이터 가져오기 실패 (로그인)', err);
       },
     });
   };
 
-  // Zustand subscribe를 사용하여 로그인 상태 변경 감지
   useEffect(() => {
     const unsubscribe = useAuthStore.subscribe((state) => {
       const currentIsLoggedIn = state.isLoggedIn;
       if (currentIsLoggedIn === null) return;
 
-      // 이미 API가 호출되었는지 확인
       const hasApiBeenCalled = firstUser !== null || twoUser !== null;
       if (hasApiBeenCalled) return;
 
       if (currentIsLoggedIn) {
-        console.log('로그인 유저 매칭 데이터 가져오기');
         getTodayDatingUserMatch();
       } else {
-        console.log('비로그인 유저 매칭 데이터 가져오기');
         getPublicTodayDatingUserMatch();
       }
     });
 
-    // 초기 상태에 대한 처리
     const currentIsLoggedIn = useAuthStore.getState().isLoggedIn;
     if (currentIsLoggedIn !== null) {
       if (currentIsLoggedIn) {
-        console.log('초기 로그인 유저 매칭 데이터 가져오기');
         getTodayDatingUserMatch();
       } else {
-        console.log('초기 비로그인 유저 매칭 데이터 가져오기');
         getPublicTodayDatingUserMatch();
       }
     }
@@ -108,26 +100,25 @@ export default function HomeWrapper() {
     };
   }, []);
 
-  const handleSelectAll = async () => {
+  const handleSelectAllFirst = async () => {
     if (!firstUser || !twoUser || !firstUser.matchId) return;
-
     try {
       await selectAllMatchUser({
         matchId: firstUser.matchId,
         firstSelectedUserId: firstUser.id.toString(),
         secondSelectedUserId: twoUser.id.toString(),
       });
-      console.log('모두 선택 완료');
-
-      // ✅ 모두 선택 완료 후 상태 초기화 (선택 완료 화면 띄우기)
-      setFirstUser(null);
-      setTwoUser(null);
-      setThirdUser(null);
-      setFourUser(null);
+      setFirstSelected(true);
     } catch (err) {
-      console.error('모두 선택 실패:', err);
+      console.error('첫 번째 매칭 모두 선택 실패:', err);
     }
   };
+
+  const handleSelectAllSecond = () => {
+    setSecondSelected(true);
+  };
+
+  const isAllSelected = firstSelected && secondSelected;
 
   return (
     <main className="p-3">
@@ -135,28 +126,33 @@ export default function HomeWrapper() {
       <small className="text-slate-400">
         당신을 기다리는 인연이 도착합니다.
       </small>
-  
-      {/* 매칭이 하나도 없을 때 안내 문구 띄우기 */}
-      {(!firstUser && !twoUser && !thirdUser && !fourUser) ? (
-        <div className="flex flex-col items-center justify-center mt-10">
-          <p className="text-gray-400 text-center text-base">
-            오늘은 매칭할 사람이 없습니다.
+
+      {/* ✅ 선택 완료 메시지는 띄우되, 카드 리스트는 유지 */}
+      {isAllSelected && (
+        <div className="flex flex-col items-center justify-center mt-5 mb-5">
+          <p className="text-violet-500 font-semibold text-lg">
+            오늘의 모든 인연을 선택하셨습니다 🎉
           </p>
         </div>
-      ) : (
-        <>
+      )}
+
+      {/* ✅ 카드 리스트는 항상 보여줌 */}
+      <div className="flex flex-col gap-6">
+        {firstUser && twoUser && (
           <HomeFristProfileCardList
             firstUser={firstUser}
             secondUser={twoUser}
-            onSelectAll={handleSelectAll}
+            onSelectAll={handleSelectAllFirst}
           />
-          <HomeTwoProfileCardList 
-            thirdUser={thirdUser} 
-            fourUser={fourUser} 
-            onSelectAll={handleSelectAll}
+        )}
+        {thirdUser && fourUser && (
+          <HomeTwoProfileCardList
+            thirdUser={thirdUser}
+            fourUser={fourUser}
+            onSelectAll={handleSelectAllSecond}
           />
-        </>
-      )}
+        )}
+      </div>
     </main>
   );
 }
