@@ -5,7 +5,7 @@ import { fetchMatchResults, MatchResult } from '@/services/matchResult';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logofit from '@/assets/1.png';
 
@@ -13,8 +13,8 @@ export default function MatchingResultsPage() {
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFalse, setIsFalse] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<MatchResult | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const loadMatchResults = async () => {
@@ -24,22 +24,34 @@ export default function MatchingResultsPage() {
     loadMatchResults();
   }, []);
 
-  // ✅ URL 쿼리로 success 값 받아서 팝업 상태 설정
+  // URL 쿼리로 success 값 받아서 팝업 상태 설정
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
     const successParam = searchParams.get('success');
     if (successParam === 'true') {
       setIsSuccess(true);
     } else if (successParam === 'false') {
       setIsFalse(true);
     }
-  }, [searchParams]);
+  }, []);
 
   const handleClickChattingMove = () => {
-    router.push('/chats/1');
+    if (selectedMatch) {
+      router.push(`/chats/${selectedMatch.currentUser.id}`);
+    }
   };
 
   const handleClickMembersMove = () => {
     router.push('/members');
+  };
+
+  const handleShowResult = (match: MatchResult) => {
+    setSelectedMatch(match);
+    if (match.matched) {
+      setIsSuccess(true);
+    } else {
+      setIsFalse(true);
+    }
   };
 
   return (
@@ -49,13 +61,14 @@ export default function MatchingResultsPage() {
         <div className="absolute z-10 w-full h-full bg-[rgba(0,0,0,0.7)] px-2 xs:px-8 py-10">
           <div className="bg-white w-full h-auto rounded-3xl flex flex-col mt-40 py-10 px-5">
             <h1 className="text-xs xs:text-xl text-center mb-5">
-              “매칭 성공! 🎊 새로운 인연이 시작됐어요.”
+              &ldquo;매칭 성공! 🎊 새로운 인연이 시작됐어요.&ldquo;
             </h1>
             <div className="flex justify-between items-center">
               <div className="text-rose-300 text-xs xs:text-base">
                 <p>두 분 모두 서로를 좋아했어요.</p>
                 <p>
-                  지금 바로 <span className="text-violet-500">커피챗</span>을 신청해보세요!
+                  지금 바로 <span className="text-violet-500">커피챗</span>을
+                  신청해보세요!
                 </p>
               </div>
               <Button
@@ -76,7 +89,7 @@ export default function MatchingResultsPage() {
         <div className="absolute z-10 w-full h-full bg-[rgba(0,0,0,0.7)] px-2 xs:px-8 py-10">
           <div className="bg-white w-full h-auto rounded-3xl flex flex-col mt-40 py-10 px-5">
             <h1 className="text-xs xs:text-xl text-center mb-5">
-              “매칭 실패! 🙊 인연이 아니었습니다.”
+              &ldquo;매칭 실패! 🙊 인연이 아니었습니다.&rdquo;
             </h1>
             <div className="flex justify-between items-center">
               <div className="text-rose-300 text-xs xs:text-base">
@@ -120,10 +133,7 @@ export default function MatchingResultsPage() {
               <Button
                 rounded="md"
                 size="sm"
-                onClick={() => {
-                  if (group.matched) setIsSuccess(true);
-                  else setIsFalse(true);
-                }}
+                onClick={() => handleShowResult(group)}
               >
                 결과 보기
               </Button>
