@@ -18,6 +18,8 @@ export default function ChatPage() {
   const params = useParams();
   const { roomId } = params as { roomId: string };
   const [userId, setUserId] = useState<string | null>(null);
+  console.log('roomId:', roomId);
+  console.log('userId:', userId);
 
   useEffect(() => {
     const accessToken = Cookies.get('accessToken');
@@ -26,6 +28,8 @@ export default function ChatPage() {
     try {
       const decoded = jwtDecode<TokenPayload>(accessToken);
       setUserId(decoded.sub);
+      console.log('roomId:', roomId);
+      console.log('userId:', userId);
     } catch (error) {
       console.error('JWT 디코딩 실패:', error);
     }
