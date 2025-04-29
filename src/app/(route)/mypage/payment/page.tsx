@@ -1,7 +1,11 @@
+'use client';
+
 import NavItem from '@/components/page/mypage/NavItem';
 import Payment from '@/components/page/mypage/Payment';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getUserCoffeeCount } from '@/services/userCoffee';
+import { getMyProfile } from '@/services/user'; // ✅ 사용자 정보 가져오기
 
 interface PaymentDataType {
   id: number;
@@ -18,6 +22,19 @@ const PAYMENT_DATA: PaymentDataType[] = [
 ];
 
 export default function PaymentPage() {
+  const [coffeeCount, setCoffeeCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchCoffee = async () => {
+      const user = await getMyProfile();
+      if (user) {
+        const count = await getUserCoffeeCount(user.id);
+        setCoffeeCount(count);
+      }
+    };
+    fetchCoffee();
+  }, []);
+
   return (
     <div className="w-full min-h-full flex flex-col gap-10 items-center justify-center">
       <div className="flex flex-col gap-6 w-full px-14">
@@ -25,7 +42,12 @@ export default function PaymentPage() {
         <NavItem>
           <div className="flex justify-between items-center px-7">
             <p className="text-xl">나의 보유 커피</p>
-            <p className="text-xl">☕ 32개</p>
+            <div className="flex items-center gap-2">
+              <div className="relative w-[24px] h-[24px]">
+                <Image src={'/coffee-beans.png'} alt="커피이미지" fill />
+              </div>
+              <div className="text-xl">{coffeeCount}</div>
+            </div>
           </div>
         </NavItem>
 
