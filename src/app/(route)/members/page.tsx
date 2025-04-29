@@ -14,7 +14,6 @@ import {
   fetchFilteredUsersFromGet,
   fetchAnonymousUsers,
   saveFilterSettings,
-  fetchCurrentFilter,
   FilteredUser,
 } from '@/services/memeber';
 import { useAuthStore } from '@/store/authStore';
@@ -27,6 +26,7 @@ const REGION = [
 export default function MembersPage() {
   const [isShowFilter, setIsShowFilter] = useState(false);
   const [users, setUsers] = useState<FilteredUser[]>([]);
+  // const [distance, setDistance] = useState(0); // 일단 사용 안함
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
   const [region, setRegion] = useState('');
@@ -37,16 +37,10 @@ export default function MembersPage() {
       try {
         let data: FilteredUser[] = [];
         if (isLoggedIn) {
-          const filter = await fetchCurrentFilter();
-          console.log('📦 현재 필터 상태:', filter);
-          setAge(filter.minAge);
-          setLikes(filter.minLikeCount);
-          setRegion(filter.region);
           data = await fetchFilteredUsersFromGet();
         } else {
           data = await fetchAnonymousUsers();
         }
-        console.log('👥 받아온 유저 리스트:', data);
         setUsers(data);
       } catch (err) {
         console.error('사용자 목록 로드 실패:', err);
@@ -57,6 +51,7 @@ export default function MembersPage() {
 
   const toggleFilter = () => setIsShowFilter((v) => !v);
   const resetFilter = () => {
+    // setDistance(0);
     setAge(20);
     setLikes(0);
     setRegion('');
@@ -65,18 +60,8 @@ export default function MembersPage() {
   const applyFilter = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const filterPayload = {
-        region,
-        minAge: age,
-        maxAge: 60,
-        minLikeCount: likes,
-      };
-      console.log('🚀 보내는 필터 데이터:', filterPayload);
-      await saveFilterSettings(filterPayload);
-
+      await saveFilterSettings({ region, minAge: age, maxAge: 60, minLikeCount: likes });
       const refreshedUsers = await fetchFilteredUsersFromGet();
-      console.log('🔄 필터 적용 후 유저:', refreshedUsers);
-
       setUsers(refreshedUsers);
       toggleFilter();
     } catch (err) {
@@ -119,6 +104,18 @@ export default function MembersPage() {
                 </select>
               </div>
 
+              {/* <RangeSlider
+                id="distance"
+                name="distance"
+                label="거리"
+                min={0}
+                max={10}
+                step={1}
+                value={distance}
+                unit="km"
+                rangeText="0km ~ 10km"
+                onChange={setDistance}
+              /> */}
               <RangeSlider
                 id="age"
                 name="age"
