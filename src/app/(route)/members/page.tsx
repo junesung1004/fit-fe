@@ -74,7 +74,7 @@ export default function MembersPage() {
               <XMarkIcon
                 width={24}
                 height={24}
-                className="absolute right-6 cursor-pointer"
+                className="absolute right-14 cursor-pointer"
                 onClick={toggleFilter}
               />
             </div>

@@ -57,7 +57,7 @@ export default function HomeSecondProfileCardList({
     ?? '/default.png';
 
   return (
-    <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6">
+    <div className={`flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 ${selectedUserId !== null ? 'bg-rose-100' : ''}`}>
       <div className="relative flex gap-3">
         {/* 첫 번째 카드 */}
         <div className="relative w-full">
