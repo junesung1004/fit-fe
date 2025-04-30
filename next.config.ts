@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     domains: [
       'fit-aws-bucket.s3.ap-northeast-2.amazonaws.com',
       'www.fit-date.co.kr',
+      'd22i603q3n4pzb.cloudfront.net',
     ],
     remotePatterns: [
       {
@@ -16,6 +17,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'www.fit-date.co.kr',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'd22i603q3n4pzb.cloudfront.net',
         port: '',
         pathname: '/**',
       },

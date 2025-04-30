@@ -12,6 +12,7 @@ interface Partner {
 }
 
 interface Message {
+  id: string;
   content: string;
   userId: string;
   chatRoomId: string;
