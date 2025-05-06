@@ -38,7 +38,7 @@ export default function ProfileEdit() {
   // 비로그인 상태일 때
   if (!user) {
     return (
-      <div className="flex-1 flex flex-col justify-center items-center">
+      <div className="w-full h-full flex flex-col justify-center items-center">
         <p className="text-xl mb-4">로그인이 필요합니다.</p>
         <Button
           onClick={() => router.push('/login')}
@@ -58,7 +58,7 @@ export default function ProfileEdit() {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <div className="relative w-[130px] h-[130px] rounded-full overflow-hidden">
+      <div className="relative w-[130px] h-[130px] rounded-full overflow-hidden cursor-pointer">
         <Image
           src={displayedImage}
           alt="프로필 이미지"

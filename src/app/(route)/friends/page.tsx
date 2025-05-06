@@ -5,8 +5,13 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
 import ProfileCardRoundOne from '@/components/common/ProfileCardRoundOne';
-import { fetchSparkList, MatchItem, LikeUser, CoffeeChatUser } from '@/services/sparklist';
-import { passMatchRequest } from '@/services/passMatch'; 
+import {
+  fetchSparkList,
+  MatchItem,
+  LikeUser,
+  CoffeeChatUser,
+} from '@/services/sparklist';
+import { passMatchRequest } from '@/services/passMatch';
 import { acceptMatchRequest } from '@/services/acceptMatch';
 
 interface SparkUser {
@@ -42,33 +47,45 @@ export default function FriendsPage() {
 
       console.log('🔥 전체 응답 확인', data);
 
-      const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
-        id: item.matchedUserId,
-        nickname: item.nickname,
-        likeCount: item.likeCount,
-        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
-        region: item.region,
-        profileImage: item.profileImage ?? '/default.png',
-        isSuccess:item.isSuccess,
-      }));
+      const simplifiedMatchList: SparkUser[] = data.matchList.map(
+        (item: MatchItem) => ({
+          id: item.matchedUserId,
+          nickname: item.nickname,
+          likeCount: item.likeCount,
+          birthday: item.age
+            ? `${new Date().getFullYear() - item.age + 1}-01-01`
+            : null,
+          region: item.region,
+          profileImage: item.profileImage ?? '/default.png',
+          isSuccess: item.isSuccess,
+        })
+      );
 
-      const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
-        id: item.likedUserId,
-        nickname: item.nickname,
-        likeCount: item.likeCount,
-        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
-        region: item.region,
-        profileImage: item.profileImage ?? '/default.png',
-      }));
+      const simplifiedLikeList: SparkUser[] = data.likeList.map(
+        (item: LikeUser) => ({
+          id: item.likedUserId,
+          nickname: item.nickname,
+          likeCount: item.likeCount,
+          birthday: item.age
+            ? `${new Date().getFullYear() - item.age + 1}-01-01`
+            : null,
+          region: item.region,
+          profileImage: item.profileImage ?? '/default.png',
+        })
+      );
 
-      const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map((item: CoffeeChatUser) => ({
-        id: item.coffeeChatUserId,
-        nickname: item.nickname,
-        likeCount: item.likeCount,
-        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
-        region: item.region,
-        profileImage: item.profileImage ?? '/default.png',
-      }));
+      const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map(
+        (item: CoffeeChatUser) => ({
+          id: item.coffeeChatUserId,
+          nickname: item.nickname,
+          likeCount: item.likeCount,
+          birthday: item.age
+            ? `${new Date().getFullYear() - item.age + 1}-01-01`
+            : null,
+          region: item.region,
+          profileImage: item.profileImage ?? '/default.png',
+        })
+      );
 
       setRoundProfiles(simplifiedMatchList);
       setLikeProfiles(simplifiedLikeList);
@@ -122,7 +139,7 @@ export default function FriendsPage() {
           console.warn('❗️ProfileCard에서 id가 undefined인 항목:', profile);
           return null; // id 없으면 렌더링 안 함
         }
-  
+
         return onAccept && onReject ? (
           <ProfileCardRoundOne
             key={profile.id}
@@ -157,70 +174,73 @@ export default function FriendsPage() {
       })}
     </div>
   );
-  
 
   return (
-  <main className="flex-1 px-6 space-y-10 pb-16 bg-gray-50">
-  {/* 월드컵 */}
-  <section className="pt-10">
-    <div className="flex justify-between items-center mb-2">
-      <h2 className="font-semibold text-lg">월드컵</h2>
-    </div>
-    {renderProfileCards(
-      roundProfiles.slice(0, isRoundExpanded ? undefined : 3),
-      handleAccept,
-      handleReject
-    )}
-    {roundProfiles.length >= 4 && (
-      <Button
-        className="w-full mt-2"
-        variant={isRoundExpanded ? 'outline' : 'fill'}
-        onClick={() => setIsRoundExpanded(!isRoundExpanded)}
-      >
-        {isRoundExpanded ? '접기' : '+ 전체 보기'}
-      </Button>
-    )}
-  </section>
+    <main className="flex-1 px-6 space-y-10 pb-16 bg-gray-50">
+      {/* 월드컵 */}
+      <section className="pt-10">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">월드컵</h2>
+        </div>
+        {renderProfileCards(
+          roundProfiles.slice(0, isRoundExpanded ? undefined : 3),
+          handleAccept,
+          handleReject
+        )}
+        {roundProfiles.length >= 4 && (
+          <Button
+            className="w-full mt-2"
+            rounded="lg"
+            variant={isRoundExpanded ? 'outline' : 'fill'}
+            color="violet"
+            onClick={() => setIsRoundExpanded(!isRoundExpanded)}
+          >
+            {isRoundExpanded ? '접기' : '+ 전체 보기'}
+          </Button>
+        )}
+      </section>
 
-  {/* 호감 표시 */}
-  <section>
-    <div className="flex justify-between items-center mb-2">
-      <h2 className="font-semibold text-lg">호감 표시</h2>
-    </div>
-    {renderProfileCards(
-      likeProfiles.slice(0, isLikeExpanded ? undefined : 3)
-    )}
-    {likeProfiles.length >= 4 && (
-      <Button
-        className="w-full mt-2"
-        variant={isLikeExpanded ? 'outline' : 'fill'}
-        color="violet"
-        onClick={() => setIsLikeExpanded(!isLikeExpanded)}
-      >
-        {isLikeExpanded ? '접기' : '+ 전체 보기'}
-      </Button>
-    )}
-  </section>
+      {/* 호감 표시 */}
+      <section>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">호감 표시</h2>
+        </div>
+        {renderProfileCards(
+          likeProfiles.slice(0, isLikeExpanded ? undefined : 3)
+        )}
+        {likeProfiles.length >= 4 && (
+          <Button
+            className="w-full mt-2"
+            rounded="lg"
+            variant={isLikeExpanded ? 'outline' : 'fill'}
+            color="violet"
+            onClick={() => setIsLikeExpanded(!isLikeExpanded)}
+          >
+            {isLikeExpanded ? '접기' : '+ 전체 보기'}
+          </Button>
+        )}
+      </section>
 
-  {/* 커피챗 신청 */}
-  <section>
-    <div className="flex justify-between items-center mb-2">
-      <h2 className="font-semibold text-lg">커피챗 신청</h2>
-    </div>
-    {renderProfileCards(
-      coffeeChatProfiles.slice(0, isCoffeeChatExpanded ? undefined : 2)
-    )}
-    {coffeeChatProfiles.length >= 4 && (
-      <Button
-        className="w-full mt-2"
-        variant={isCoffeeChatExpanded ? 'outline' : 'fill'}
-        onClick={() => setIsCoffeeChatExpanded(!isCoffeeChatExpanded)}
-      >
-        {isCoffeeChatExpanded ? '접기' : '+ 전체 보기'}
-      </Button>
-    )}
-  </section>
-</main>
-
+      {/* 커피챗 신청 */}
+      <section>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">커피챗 신청</h2>
+        </div>
+        {renderProfileCards(
+          coffeeChatProfiles.slice(0, isCoffeeChatExpanded ? undefined : 2)
+        )}
+        {coffeeChatProfiles.length >= 4 && (
+          <Button
+            className="w-full mt-2"
+            rounded="lg"
+            variant={isCoffeeChatExpanded ? 'outline' : 'fill'}
+            color="violet"
+            onClick={() => setIsCoffeeChatExpanded(!isCoffeeChatExpanded)}
+          >
+            {isCoffeeChatExpanded ? '접기' : '+ 전체 보기'}
+          </Button>
+        )}
+      </section>
+    </main>
   );
 }
