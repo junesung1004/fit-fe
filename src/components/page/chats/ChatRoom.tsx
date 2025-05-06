@@ -37,6 +37,14 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       });
     });
 
+    socket.on('connect_error', (err) => {
+      console.error('❌ 소켓 연결 에러:', err.message);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.warn('⚠️ 소켓 연결 해제됨:', reason);
+    });
+
     socket.on('message', (message: Message) => {
       setMessages((prev) => [...prev, message]);
     });
