@@ -6,7 +6,10 @@ import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
 import Button from '@/components/common/Button';
 import { UserDataType } from '@/types/homePage.type';
-import { selectMatchUser, selectAllMatchUser } from '@/services/todayDatingMatch';
+import {
+  selectMatchUser,
+  selectAllMatchUser,
+} from '@/services/todayDatingMatch';
 
 interface SecondProps {
   thirdUser: UserDataType | null;
@@ -79,10 +82,12 @@ export default function HomeSecondProfileCardList({
     }
   };
 
-  const thirdImg = thirdUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
-  const fourImg = fourUser.profile.profileImage?.[1]?.imageUrl
-    ?? fourUser.profile.profileImage?.[0]?.imageUrl
-    ?? '/default.png';
+  const thirdImg =
+    thirdUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
+  const fourImg =
+    fourUser.profile.profileImage?.[1]?.imageUrl ??
+    fourUser.profile.profileImage?.[0]?.imageUrl ??
+    '/default.png';
 
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
@@ -113,7 +118,7 @@ export default function HomeSecondProfileCardList({
             </HomeProfileCard.Body>
             <HomeProfileCard.Footer>
               <Button
-                size="full"
+                size="md-full"
                 rounded="full"
                 variant="outline"
                 disabled={isListSelected}
@@ -154,7 +159,7 @@ export default function HomeSecondProfileCardList({
             </HomeProfileCard.Body>
             <HomeProfileCard.Footer>
               <Button
-                size="full"
+                size="md-full"
                 rounded="full"
                 variant="outline"
                 disabled={isListSelected}
@@ -174,10 +179,20 @@ export default function HomeSecondProfileCardList({
 
       {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3 mt-4 z-10">
-        <Button rounded="full" variant="outline" onClick={() => console.log('취소')} disabled={isListSelected}>
+        <Button
+          rounded="full"
+          variant="outline"
+          onClick={() => console.log('취소')}
+          disabled={isListSelected}
+        >
           X
         </Button>
-        <Button rounded="full" size="full" onClick={handleSelectAllLocal} disabled={isListSelected}>
+        <Button
+          rounded="full"
+          size="md-full"
+          onClick={handleSelectAllLocal}
+          disabled={isListSelected}
+        >
           모두 선택
         </Button>
       </div>

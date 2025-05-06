@@ -31,7 +31,7 @@ export default function Header() {
   }, [user]);
 
   return isLoggedIn ? (
-    <header className="relative flex items-center justify-between border-b px-4 py-4">
+    <header className="relative flex items-center justify-between h-20 border-b px-4">
       {/* left nav */}
       <div>
         <nav>
@@ -98,10 +98,7 @@ export default function Header() {
       </div>
     </header>
   ) : (
-    <header className="relative flex items-center justify-between h-20 border-b px-4">
-      {/* left nav */}
-      <div></div>
-
+    <header className="relative flex items-center justify-center h-20 border-b px-4">
       {/* middle container */}
       <div className="relative w-12 h-12">
         <Link href={'/home'}>
@@ -115,7 +112,7 @@ export default function Header() {
       </div>
 
       {/* right container */}
-      <div className="flex">
+      <div className="absolute right-4">
         <Button rounded="md" onClick={() => router.push('/login')}>
           로그인
         </Button>

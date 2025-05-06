@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
+      <body className="select-none [&_img]:drag-none">
         <ReactQueryProvider>{children}</ReactQueryProvider>
         <ToastContainer
           position="top-center"

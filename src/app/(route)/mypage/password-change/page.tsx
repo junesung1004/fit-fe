@@ -29,7 +29,9 @@ export default function PasswordChangePage() {
     }));
   };
 
-  const handleChangePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChangePasswordSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     if (passwords.new !== passwords.confirm) {
@@ -37,7 +39,11 @@ export default function PasswordChangePage() {
       return;
     }
 
-    const success = await changePassword(passwords.current, passwords.new, passwords.confirm);
+    const success = await changePassword(
+      passwords.current,
+      passwords.new,
+      passwords.confirm
+    );
 
     if (success) {
       alert('비밀번호가 성공적으로 변경되었습니다.');
@@ -53,98 +59,106 @@ export default function PasswordChangePage() {
   };
 
   return (
-    <div className="w-full min-h-full flex flex-col justify-between gap-10 px-16 py-10">
-      <form
-        className="flex flex-col justify-between gap-16"
-        onSubmit={handleChangePasswordSubmit}
-      >
-        {/* 현재 비밀번호 */}
-        <div>
-          <label htmlFor="password-origin" className="text-3xl mb-3 cursor-pointer">
-            현재 비밀번호
-          </label>
-          <div className="flex justify-between items-center py-3 px-7 border border-black rounded-xl">
-            <input
-              className="w-3/4 h-8"
-              id="password-origin"
-              name="password-origin"
-              type={showPassword.current ? 'text' : 'password'}
-              placeholder="현재 비밀번호 입력"
-              value={passwords.current}
-              onChange={(e) => handleChangePasswordState(e, 'current')}
-            />
-            <EyeIcon
-              className="w-6 h-6 cursor-pointer"
-              onClick={() =>
-                setShowPassword((prev) => ({
-                  ...prev,
-                  current: !prev.current,
-                }))
-              }
-            />
-          </div>
-        </div>
-
-        {/* 신규 비밀번호 */}
-        <div>
-          <label htmlFor="password-new" className="text-3xl mb-3 cursor-pointer">
-            신규 비밀번호
-          </label>
-          <div className="mb-10 flex justify-between items-center py-3 px-7 border border-black rounded-xl">
-            <input
-              className="w-3/4 h-8"
-              id="password-new"
-              name="password-new"
-              type={showPassword.new ? 'text' : 'password'}
-              placeholder="신규 비밀번호 입력"
-              value={passwords.new}
-              onChange={(e) => handleChangePasswordState(e, 'new')}
-            />
-            <EyeIcon
-              className="w-6 h-6 cursor-pointer"
-              onClick={() =>
-                setShowPassword((prev) => ({
-                  ...prev,
-                  new: !prev.new,
-                }))
-              }
-            />
+    <main className="w-full min-h-[calc(100vh-144px)] py-8 px-4 md:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
+        <form
+          className="flex flex-col gap-8 md:gap-12"
+          onSubmit={handleChangePasswordSubmit}
+        >
+          {/* 현재 비밀번호 */}
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="password-origin"
+              className="text-2xl md:text-3xl cursor-pointer"
+            >
+              현재 비밀번호
+            </label>
+            <div className="flex justify-between items-center py-3 px-4 md:px-7 border border-black rounded-xl">
+              <input
+                className="w-3/4 h-8"
+                id="password-origin"
+                name="password-origin"
+                type={showPassword.current ? 'text' : 'password'}
+                placeholder="현재 비밀번호 입력"
+                value={passwords.current}
+                onChange={(e) => handleChangePasswordState(e, 'current')}
+              />
+              <EyeIcon
+                className="w-6 h-6 cursor-pointer"
+                onClick={() =>
+                  setShowPassword((prev) => ({
+                    ...prev,
+                    current: !prev.current,
+                  }))
+                }
+              />
+            </div>
           </div>
 
-          <div className="flex justify-between items-center py-3 px-7 border border-black rounded-xl">
-            <input
-              className="w-3/4 h-8"
-              id="password-new-confirm"
-              name="password-new-confirm"
-              type={showPassword.confirm ? 'text' : 'password'}
-              placeholder="신규 비밀번호 확인"
-              value={passwords.confirm}
-              onChange={(e) => handleChangePasswordState(e, 'confirm')}
-            />
-            <EyeIcon
-              className="w-6 h-6 cursor-pointer"
-              onClick={() =>
-                setShowPassword((prev) => ({
-                  ...prev,
-                  confirm: !prev.confirm,
-                }))
-              }
-            />
-          </div>
-        </div>
+          {/* 신규 비밀번호 */}
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="password-new"
+              className="text-2xl md:text-3xl cursor-pointer"
+            >
+              신규 비밀번호
+            </label>
+            <div className="flex justify-between items-center py-3 px-4 md:px-7 border border-black rounded-xl">
+              <input
+                className="w-3/4 h-8"
+                id="password-new"
+                name="password-new"
+                type={showPassword.new ? 'text' : 'password'}
+                placeholder="신규 비밀번호 입력"
+                value={passwords.new}
+                onChange={(e) => handleChangePasswordState(e, 'new')}
+              />
+              <EyeIcon
+                className="w-6 h-6 cursor-pointer"
+                onClick={() =>
+                  setShowPassword((prev) => ({
+                    ...prev,
+                    new: !prev.new,
+                  }))
+                }
+              />
+            </div>
 
-        <div>
-          <Button
-            rounded="lg"
-            variant="outline"
-            size="full"
-            color="violet"
-            type="submit"
-          >
-            비밀번호 변경
-          </Button>
-        </div>
-      </form>
-    </div>
+            <div className="flex justify-between items-center py-3 px-4 md:px-7 border border-black rounded-xl">
+              <input
+                className="w-3/4 h-8"
+                id="password-new-confirm"
+                name="password-new-confirm"
+                type={showPassword.confirm ? 'text' : 'password'}
+                placeholder="신규 비밀번호 확인"
+                value={passwords.confirm}
+                onChange={(e) => handleChangePasswordState(e, 'confirm')}
+              />
+              <EyeIcon
+                className="w-6 h-6 cursor-pointer"
+                onClick={() =>
+                  setShowPassword((prev) => ({
+                    ...prev,
+                    confirm: !prev.confirm,
+                  }))
+                }
+              />
+            </div>
+          </div>
+
+          <div>
+            <Button
+              rounded="lg"
+              variant="outline"
+              size="full"
+              color="violet"
+              type="submit"
+            >
+              비밀번호 변경
+            </Button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 }

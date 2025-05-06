@@ -4,6 +4,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getMyProfile } from '@/services/user';
+import Button from '@/components/common/Button';
 
 interface UserProfile {
   nickname: string;
@@ -37,14 +38,17 @@ export default function ProfileEdit() {
   // 비로그인 상태일 때
   if (!user) {
     return (
-      <div className="flex flex-col justify-center items-center mt-20">
+      <div className="flex-1 flex flex-col justify-center items-center">
         <p className="text-xl mb-4">로그인이 필요합니다.</p>
-        <button
+        <Button
           onClick={() => router.push('/login')}
-          className="px-4 py-2 bg-violet-500 text-white rounded"
+          size="md"
+          variant="fill"
+          color="violet"
+          rounded="md"
         >
           로그인 하러 가기
-        </button>
+        </Button>
       </div>
     );
   }

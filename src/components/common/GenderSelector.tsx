@@ -20,7 +20,7 @@ export default function GenderSelector({
 }: GenderSelectorProps) {
   return (
     <div className="flex flex-col gap-2 mb-4">
-      <label className="text-sm font-medium text-gray-400">
+      <label className="text-sm font-medium text-zinc-900">
         성별
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>

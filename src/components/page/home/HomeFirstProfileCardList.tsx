@@ -6,7 +6,10 @@ import HomeProfileCard from './HomeProfileCard';
 import Mbti from '@/components/common/Mbti';
 import Button from '@/components/common/Button';
 import { UserDataType } from '@/types/homePage.type';
-import { selectMatchUser, selectAllMatchUser } from '@/services/todayDatingMatch';
+import {
+  selectMatchUser,
+  selectAllMatchUser,
+} from '@/services/todayDatingMatch';
 
 interface FirstProps {
   firstUser: UserDataType | null;
@@ -76,10 +79,12 @@ export default function HomeFirstProfileCardList({
     }
   };
 
-  const firstImg = firstUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
-  const secondImg = secondUser.profile.profileImage?.[1]?.imageUrl
-    ?? secondUser.profile.profileImage?.[0]?.imageUrl
-    ?? '/default.png';
+  const firstImg =
+    firstUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
+  const secondImg =
+    secondUser.profile.profileImage?.[1]?.imageUrl ??
+    secondUser.profile.profileImage?.[0]?.imageUrl ??
+    '/default.png';
 
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
@@ -93,7 +98,10 @@ export default function HomeFirstProfileCardList({
       <div className="relative flex gap-3 z-10">
         {/* 첫 번째 카드 */}
         <div className="relative w-full">
-          <HomeProfileCard onClick={() => moveToDetail(firstUser.id)} backgroundImageUrl={firstImg}>
+          <HomeProfileCard
+            onClick={() => moveToDetail(firstUser.id)}
+            backgroundImageUrl={firstImg}
+          >
             <HomeProfileCard.Header>
               <Mbti>{firstUser.profile.mbti.mbti}</Mbti>
             </HomeProfileCard.Header>
@@ -107,7 +115,7 @@ export default function HomeFirstProfileCardList({
             </HomeProfileCard.Body>
             <HomeProfileCard.Footer>
               <Button
-                size="full"
+                size="md-full"
                 rounded="full"
                 variant="outline"
                 disabled={isListSelected}
@@ -131,7 +139,10 @@ export default function HomeFirstProfileCardList({
 
         {/* 두 번째 카드 */}
         <div className="relative w-full">
-          <HomeProfileCard onClick={() => moveToDetail(secondUser.id)} backgroundImageUrl={secondImg}>
+          <HomeProfileCard
+            onClick={() => moveToDetail(secondUser.id)}
+            backgroundImageUrl={secondImg}
+          >
             <HomeProfileCard.Header>
               <Mbti>{secondUser.profile.mbti.mbti}</Mbti>
             </HomeProfileCard.Header>
@@ -145,7 +156,7 @@ export default function HomeFirstProfileCardList({
             </HomeProfileCard.Body>
             <HomeProfileCard.Footer>
               <Button
-                size="full"
+                size="md-full"
                 rounded="full"
                 variant="outline"
                 disabled={isListSelected}
@@ -165,10 +176,20 @@ export default function HomeFirstProfileCardList({
 
       {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3 mt-4 z-10">
-        <Button rounded="full" variant="outline" onClick={() => console.log('취소')} disabled={isListSelected}>
+        <Button
+          rounded="full"
+          variant="outline"
+          onClick={() => console.log('취소')}
+          disabled={isListSelected}
+        >
           X
         </Button>
-        <Button rounded="full" size="full" onClick={handleSelectAllLocal} disabled={isListSelected}>
+        <Button
+          rounded="full"
+          size="md-full"
+          onClick={handleSelectAllLocal}
+          disabled={isListSelected}
+        >
           모두 선택
         </Button>
       </div>

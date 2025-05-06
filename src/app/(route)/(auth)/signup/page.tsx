@@ -180,14 +180,15 @@ export default function SignUpPage() {
           error={errors.email as FieldError}
           isDirty={dirtyFields.email}
         />
-         <Button
+        <Button
           type="button"
-          size="full"
+          size="md-full"
           rounded="full"
           onClick={checkEmailDuplicate}
+          className="mb-4"
         >
           이메일 중복 확인
-        </Button> 
+        </Button>
 
         {/*인증코드 필드*/}
         {isEmailCode && (
@@ -198,7 +199,7 @@ export default function SignUpPage() {
               id="email-code"
               type="text"
               placeholder="6자리 인증코드를 입력해주세요."
-             onChange={handleChangeEmailCode}
+              onChange={handleChangeEmailCode}
             />
             <Button
               type="button"
@@ -228,6 +229,7 @@ export default function SignUpPage() {
           })}
           error={errors.password as FieldError}
           isDirty={dirtyFields.password}
+          className="mb-4"
         />
 
         {/* 비밀번호 확인 필드 */}
@@ -244,6 +246,7 @@ export default function SignUpPage() {
           })}
           error={errors.confirmPassword as FieldError}
           isDirty={dirtyFields.confirmPassword}
+          className="mb-4"
         />
 
         {/* 이름 필드 */}
@@ -262,6 +265,7 @@ export default function SignUpPage() {
           })}
           error={errors.name as FieldError}
           isDirty={dirtyFields.name}
+          className="mb-4"
         />
 
         {/* 키 필드 */}
@@ -284,6 +288,7 @@ export default function SignUpPage() {
           })}
           error={errors.height as FieldError}
           isDirty={dirtyFields.height}
+          className="mb-4"
         />
 
         {/* 닉네임 필드 */}
@@ -302,6 +307,7 @@ export default function SignUpPage() {
           })}
           error={errors.nickname as FieldError}
           isDirty={dirtyFields.nickname}
+          className="mb-4"
         />
 
         {/* 직업 필드 */}
@@ -320,6 +326,7 @@ export default function SignUpPage() {
           })}
           error={errors.job as FieldError}
           isDirty={dirtyFields.job}
+          className="mb-4"
         />
 
         {/* 성별 필드 */}
@@ -346,6 +353,7 @@ export default function SignUpPage() {
           })}
           error={errors.birthday as FieldError}
           isDirty={dirtyFields.birthday}
+          className="mb-4"
         />
 
         {/* 지역 필드 */}
@@ -369,6 +377,7 @@ export default function SignUpPage() {
           })}
           error={errors.phone as FieldError}
           isDirty={dirtyFields.phone}
+          className="mb-4"
         />
 
         {/* MBTI 필드 */}
@@ -428,8 +437,8 @@ export default function SignUpPage() {
         />
 
         {/* 프로필 이미지 필드 */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">
+        <div className="flex flex-col gap-2 pb-2">
+          <label className="text-sm font-medium text-zinc-900">
             프로필 사진 <span className="text-red-500">*</span>
           </label>
           <div className="flex flex-wrap justify-center gap-6">
@@ -475,17 +484,18 @@ export default function SignUpPage() {
         </div>
 
         {/* 폼 제출 버튼 */}
-        <button
+        <Button
           type="submit"
+          size="full"
+          variant="fill"
+          color="rose"
+          rounded="full"
           disabled={!isValid || !isImageValid || isPending}
-          className="w-full p-4 rounded-full text-white bg-rose-500
-            hover:bg-rose-600
-            disabled:bg-gray-300
-            disabled:cursor-not-allowed
-            disabled:opacity-50"
+          isLoading={isPending}
+          className="p-4"
         >
-          {isPending ? '가입 중...' : '가입완료'}
-        </button>
+          가입완료
+        </Button>
       </form>
     </div>
   );

@@ -57,10 +57,10 @@ export default function MultiToggleButtonGroup({
   }, [selected]);
 
   return (
-    <div className="flex flex-col gap-2 m-2">
-      <label className="text-sm font-medium text-gray-400">
+    <div className="flex flex-col gap-2 my-2">
+      <label className="text-sm font-medium text-zinc-900">
         {label}{' '}
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-zinc-900">
           ({min}~{limit}개 선택)
         </span>
         {required && <span className="text-red-500 ml-1">*</span>}

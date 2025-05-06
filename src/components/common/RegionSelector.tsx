@@ -39,7 +39,7 @@ export default function RegionSelector({
 }: RegionSelectorProps) {
   return (
     <div className="flex flex-col gap-1 mb-4">
-      <label htmlFor="region" className="text-sm font-medium text-gray-400">
+      <label htmlFor="region" className="text-sm font-medium text-zinc-900">
         지역
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>

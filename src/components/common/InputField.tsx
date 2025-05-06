@@ -13,6 +13,7 @@ interface InputFieldProps {
   error?: FieldError;
   isDirty?: boolean;
   required?: boolean;
+  className?: string;
 }
 
 export default function InputField({
@@ -24,10 +25,11 @@ export default function InputField({
   error,
   required,
   isDirty,
+  className,
 }: InputFieldProps) {
   return (
-    <div className="flex flex-col gap-1 mb-4">
-      <label htmlFor={id} className="text-sm font-medium text-gray-400">
+    <div className={clsx('flex flex-col gap-1', className)}>
+      <label htmlFor={id} className="text-sm font-medium text-zinc-900">
         {label}
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>
@@ -38,7 +40,7 @@ export default function InputField({
         {...register}
         aria-invalid={error ? 'true' : 'false'}
         className={clsx(
-          'px-5 py-2 rounded-full border transition-all duration-200 outline-none',
+          'px-5 py-2 rounded-full border transition-all duration-200 outline-none text-sm',
           {
             'border-red-400 focus:border-red-500': error,
             'border-green-500 focus:border-green-600': !error && isDirty,
