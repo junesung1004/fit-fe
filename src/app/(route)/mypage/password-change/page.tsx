@@ -59,8 +59,8 @@ export default function PasswordChangePage() {
   };
 
   return (
-    <main className="w-full min-h-[calc(100vh-144px)] py-8 px-4 md:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+    <main className="w-full h-[calc(100vh-144px)] py-8 px-8 md:px-6 lg:px-8 flex items-center">
+      <div className="max-w-2xl mx-auto w-full">
         <form
           className="flex flex-col gap-8 md:gap-12"
           onSubmit={handleChangePasswordSubmit}
