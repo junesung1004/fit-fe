@@ -38,7 +38,7 @@ export default function ProfileEdit() {
   // 비로그인 상태일 때
   if (!user) {
     return (
-      <div className="w-full h-full flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <p className="text-xl mb-4">로그인이 필요합니다.</p>
         <Button
           onClick={() => router.push('/login')}

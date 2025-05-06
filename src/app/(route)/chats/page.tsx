@@ -59,7 +59,7 @@ export default function ChatsPage() {
 
   if (isPending) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="w-full h-[calc(100vh-160px)] flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
