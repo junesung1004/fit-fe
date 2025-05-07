@@ -39,6 +39,8 @@ export default function SignUpPage() {
 
   const password = watch('password');
   const selectedGender = watch('gender');
+  // const phone = watch('phone');
+  // const birthday = watch('birthday');
   const [emailSuccessCode, setEmailSuccessCode] = useState('');
   const [images, setImages] = useState<(File | null)[]>(Array(6).fill(null));
   const [previews, setPreviews] = useState<(string | null)[]>(
@@ -46,7 +48,7 @@ export default function SignUpPage() {
   );
   const [uploadImageUrl, setUploadImageUrl] = useState<(string | null)[]>(
     Array(6).fill(null)
-  ); // 이미지 같이 업로드해야함
+  );
   const [error, setError] = useState<string | null>(null);
   const [isImageValid, setIsImageValid] = useState(false);
   const { mutate, isPending } = useSignUpMutation();
@@ -55,8 +57,8 @@ export default function SignUpPage() {
   const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
   const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
     if (isAvailable) {
-      setIsEmailCode(true); // 인증코드 입력창 열기
-      sendVerificationEmail(watch('email')); // ✅ 인증코드 발송
+      setIsEmailCode(true);
+      sendVerificationEmail(watch('email'));
     }
   });
   const { mutate: successEmail } = useEmailSuccessMutation();
@@ -69,7 +71,41 @@ export default function SignUpPage() {
     setError(valid ? null : '최소 2장의 이미지를 등록해야 합니다.');
   };
 
-  //이미지 업로드
+  const formatPhoneNumber = (value: string) => {
+    const onlyNums = value.replace(/\D/g, '');
+    if (onlyNums.length < 4) return onlyNums;
+    if (onlyNums.length < 8)
+      return `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+    return `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
+  };
+
+  const formatBirthday = (value: string) => {
+    const onlyNums = value.replace(/\D/g, '');
+    if (onlyNums.length < 5) return onlyNums;
+    if (onlyNums.length < 7)
+      return `${onlyNums.slice(0, 4)}-${onlyNums.slice(4)}`;
+    return `${onlyNums.slice(0, 4)}-${onlyNums.slice(4, 6)}-${onlyNums.slice(6, 8)}`;
+  };
+
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === 'phone' && value.phone) {
+        const formattedPhone = formatPhoneNumber(value.phone);
+        if (value.phone !== formattedPhone) {
+          setValue('phone', formattedPhone);
+        }
+      }
+      if (name === 'birthday' && value.birthday) {
+        const formattedBirthday = formatBirthday(value.birthday);
+        if (value.birthday !== formattedBirthday) {
+          setValue('birthday', formattedBirthday);
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setValue]);
+  
+
   const handleImageChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -79,70 +115,50 @@ export default function SignUpPage() {
 
     const updatedImages = [...images];
     const updatedPreviews = [...previews];
-
-    //미리보기 먼저 보여주는 코드
     updatedImages[index] = file;
     updatedPreviews[index] = URL.createObjectURL(file);
-
     setImages(updatedImages);
     setPreviews(updatedPreviews);
 
-    //s3 업로드 후 url 저장
     uploadImage(file, {
       onSuccess: (s3Url) => {
         setUploadImageUrl((prev) => {
           const newUrls = [...prev];
           newUrls[index] = s3Url;
-          console.log(`✅ ${index}번 이미지 업로드 성공:`, s3Url);
-          console.log('📦 최신 업로드 상태:', newUrls);
           return newUrls;
         });
       },
     });
   };
 
-  // 이메일 중복확인 함수
   const checkEmailDuplicate = async () => {
     const currentEmail = watch('email');
-
     if (!currentEmail) {
       alert('이메일을 입력해주세요');
       return;
     }
-
     checkEmail(currentEmail);
   };
 
-  // 유저 생성 함수
   const handleCreateUserSubmit = async (data: SignUpFormValues) => {
     try {
-      // ✅ 1. 업로드된 S3 URL 중 null이 아닌 것만 필터링
       const validImageUrls = uploadImageUrl.filter(
         (url): url is string => url !== null && url !== undefined
       );
-
-      console.log('✅ 필터링된 유효한 이미지 URL:', validImageUrls);
-
-      // ✅ 2. 최소 2장 이상인지 검증
       if (validImageUrls.length < 2) {
         toast.error('최소 2장의 이미지를 업로드해주세요.');
         return;
       }
-
-      // ✅ 3. 회원가입 요청
       const payload = {
         ...data,
         images: validImageUrls,
       };
-      console.log('회원가입 최종 전송 데이터:', payload);
-
       mutate(payload);
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
     }
   };
 
-  //이메일 인증코드 확인
   const handleClickEmailSuccess = (emailSuccessCode: string) => {
     successEmail(Number(emailSuccessCode));
     setIsEmailCode(false);
