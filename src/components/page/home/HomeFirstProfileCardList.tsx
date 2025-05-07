@@ -10,6 +10,7 @@ import {
   selectMatchUser,
   selectAllMatchUser,
 } from '@/services/todayDatingMatch';
+import { useAuthStore } from '@/store/authStore';
 
 interface FirstProps {
   firstUser: UserDataType | null;
@@ -23,6 +24,8 @@ export default function HomeFirstProfileCardList({
   onSelectAll,
 }: FirstProps) {
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore();
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [selectedFirst, setSelectedFirst] = useState(false);
   const [selectedSecond, setSelectedSecond] = useState(false);
   const [isListSelected, setIsListSelected] = useState(false);
@@ -36,7 +39,13 @@ export default function HomeFirstProfileCardList({
   };
 
   const handleSelect = async (selectedId: number, type: 'first' | 'second') => {
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
+    }
+
     if (!firstUser.matchId) return;
+
     try {
       await selectMatchUser({
         matchId: firstUser.matchId,
@@ -57,13 +66,20 @@ export default function HomeFirstProfileCardList({
   };
 
   const handleSelectAllLocal = async () => {
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
+    }
+
     if (!firstUser || !secondUser || !firstUser.matchId) return;
+
     try {
       await selectAllMatchUser({
         matchId: firstUser.matchId,
         firstSelectedUserId: firstUser.id.toString(),
         secondSelectedUserId: secondUser.id.toString(),
       });
+
       setSelectedFirst(true);
       setSelectedSecond(true);
       setIsListSelected(true);
@@ -88,7 +104,6 @@ export default function HomeFirstProfileCardList({
 
   return (
     <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
-      {/* ✅ 리스트 전체 오버레이 */}
       {isListSelected && (
         <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl z-20">
           <p className="text-white text-2xl font-bold">선택 완료</p>
@@ -176,14 +191,21 @@ export default function HomeFirstProfileCardList({
 
       {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3 mt-4 z-10">
-        <Button
-          rounded="full"
-          variant="outline"
-          onClick={() => console.log('취소')}
-          disabled={isListSelected}
+      <Button
+        rounded="full"
+        variant="outline"
+        onClick={() => {
+          if (!isLoggedIn) {
+            setShowLoginAlert(true);
+            return;
+          }
+          console.log('취소');
+         }}
+         disabled={isListSelected}
         >
           X
         </Button>
+
         <Button
           rounded="full"
           size="md-full"
@@ -193,6 +215,38 @@ export default function HomeFirstProfileCardList({
           모두 선택
         </Button>
       </div>
+
+      {/* ✅ 로그인 필요 팝업 */}
+      {showLoginAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-md w-[260px] text-center">
+            <p className="text-lg font-semibold mb-6">로그인이 필요합니다</p>
+            <div className="flex justify-center gap-4">
+              <Button
+                size="sm"
+                variant="outline"
+                color="rose"
+                rounded="md"
+                onClick={() => setShowLoginAlert(false)}
+             >
+              닫기
+            </Button>
+            <Button
+              size="md"
+              variant="fill"
+              color="rose"
+              rounded="md"
+              onClick={() => {
+                setShowLoginAlert(false);
+                router.push('/login');
+              }}
+            >
+              로그인
+            </Button>
+          </div>
+        </div>
+      </div>
+      )}
     </div>
   );
 }
