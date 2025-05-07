@@ -108,7 +108,16 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                   {message.name || '알 수 없음'}
                 </span>
               )}
-              <div className="flex flex-col">
+              <div className="flex items-end gap-2">
+                {message.userId === userId && (
+                  <span className="text-xs text-gray-500">
+                    {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    })}
+                  </span>
+                )}
                 <div
                   className={`rounded-lg p-3 ${
                     message.userId === userId
@@ -118,17 +127,15 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                 >
                   {message.content}
                 </div>
-                <span
-                  className={`text-xs text-gray-500 mt-1 ${
-                    message.userId === userId ? 'text-left' : 'text-right'
-                  }`}
-                >
-                  {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true,
-                  })}
-                </span>
+                {message.userId !== userId && (
+                  <span className="text-xs text-gray-500">
+                    {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    })}
+                  </span>
+                )}
               </div>
             </div>
           </div>
