@@ -1,7 +1,7 @@
 // components/ChatRoom.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { socket } from '@/lib/socket';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/components/common/Button';
@@ -27,6 +27,15 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     if (!userId) return;
@@ -119,7 +128,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                   </span>
                 )}
                 <div
-                  className={`rounded-lg p-3 ${
+                  className={`rounded-lg px-3 py-2 ${
                     message.userId === userId
                       ? 'bg-violet-500 text-white'
                       : 'bg-white'
@@ -140,6 +149,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* 메시지 입력 */}
