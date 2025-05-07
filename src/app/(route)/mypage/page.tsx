@@ -3,7 +3,7 @@ import ProfileEdit from '@/components/page/mypage/ProfileImageEdit';
 
 export default function MyPage() {
   return (
-    <main className="w-full h-[calc(100vh-160px)] flex items-center justify-center">
+    <main className="w-full min-h-[calc(100vh-160px)] py-8 md:py-12 flex items-center justify-center">
       <div className="w-full max-w-4xl px-8 md:px-6 lg:px-8">
         <div className="flex flex-col gap-8 md:gap-12">
           {/* 프로필 상단 */}

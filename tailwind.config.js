@@ -37,7 +37,6 @@ module.exports = {
           '-moz-user-drag': 'none',
           '-o-user-drag': 'none',
           'user-drag': 'none',
-          'pointer-events': 'none',
         },
       };
       addUtilities(newUtilities);
