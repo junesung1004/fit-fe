@@ -96,9 +96,9 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                 <Image
                   src={message.profileImage || '/default-profile.png'}
                   alt="프로필"
-                  width={32}
-                  height={32}
-                  className="rounded-full object-cover"
+                  width={50}
+                  height={50}
+                  className="rounded-full object-cover w-12 h-12"
                 />
               </div>
             )}
