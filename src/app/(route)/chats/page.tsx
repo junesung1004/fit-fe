@@ -131,14 +131,17 @@ export default function ChatsPage() {
           </div>
 
           {/* 대화하러 가기 */}
-          <button
-            className="bg-slate-400 px-6 py-4 rounded-2xl text-white transition-all duration-300 hover:bg-slate-600 active:bg-slate-800"
+          <Button
+            size="lg"
+            color="violet"
+            rounded="lg"
+            className="py-4"
             onClick={() =>
               handleEnterChatRoom(chatRoom.partner?.id, chatRoom.userId)
             }
           >
             대화방 👀
-          </button>
+          </Button>
         </div>
       ))}
     </div>

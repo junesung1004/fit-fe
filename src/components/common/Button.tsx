@@ -2,9 +2,9 @@ import clsx from 'clsx';
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  size?: 'sm' | 'md' | 'md-full' | 'lg' | 'full';
+  size?: 'sm' | 'md' | 'md-full' | 'lg' | 'lg-full' | 'full';
   variant?: 'fill' | 'outline';
-  color?: 'rose' | 'violet';
+  color?: 'rose' | 'violet' | 'cyan';
   rounded?: 'sm' | 'md' | 'lg' | 'full';
   isLoading?: boolean;
   loadingText?: string;
@@ -34,11 +34,12 @@ export default function Button({
         rounded === 'full' && 'rounded-full',
 
         //사이즈
-        size === 'sm' && 'w-[70px] h-10 text-sm px-3',
-        size === 'md' && 'w-[150px] h-10 text-sm px-4',
-        size === 'md-full' && 'w-full h-10 text-sm px-4',
-        size === 'lg' && 'w-[300px] h-12 text-base px-6',
-        size === 'full' && 'w-full h-12 text-lg px-6',
+        size === 'sm' && 'w-[70px] h-10 text-sm',
+        size === 'md' && 'w-[150px] h-10 text-sm',
+        size === 'md-full' && 'w-full h-10 text-sm',
+        size === 'lg' && 'w-[300px] h-12 text-base',
+        size === 'lg-full' && 'w-full h-12 text-base',
+        size === 'full' && 'w-full h-12 text-lg',
 
         // 스타일 및 컬러
         variant === 'fill' &&
@@ -47,6 +48,9 @@ export default function Button({
         variant === 'fill' &&
           color === 'violet' &&
           'bg-violet-500 text-white hover:bg-violet-600 active:bg-violet-700',
+        variant === 'fill' &&
+          color === 'cyan' &&
+          'bg-cyan-500 text-white hover:bg-cyan-600 active:bg-cyan-700',
         variant === 'outline' &&
           color === 'rose' &&
           'border border-rose-500 text-rose-500 bg-[rgba(255,255,255,0.1)] hover:bg-rose-600 hover:text-white active:bg-rose-700',

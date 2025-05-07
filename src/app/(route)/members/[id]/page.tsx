@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { HeartIcon } from '@heroicons/react/24/solid';
 import TagBadge from '@/components/common/TagBadge';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
+import Button from '@/components/common/Button';
 import { sendNotification } from '@/services/notification';
 import { likeMember } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
@@ -75,7 +76,7 @@ export default function MemberDetailPage() {
   const koreanAge = member.age;
 
   return (
-    <div className="w-full min-h-full flex flex-col gap-10 px-2 xs:px-20 py-5">
+    <div className="w-full min-h-full flex flex-col gap-4 px-2 xs:px-20 py-5">
       <MemberProfileDetailCard>
         <MemberProfileDetailCard.Image>
           <Image
@@ -100,7 +101,10 @@ export default function MemberDetailPage() {
             onClick={handleLikeToggle}
             animate={
               isClicked
-                ? { scale: [1, 1.4, 1], color: ['#f43f5e', '#be123c', '#f43f5e'] }
+                ? {
+                    scale: [1, 1.4, 1],
+                    color: ['#f43f5e', '#be123c', '#f43f5e'],
+                  }
                 : {}
             }
             transition={{ duration: 0.4 }}
@@ -121,12 +125,15 @@ export default function MemberDetailPage() {
       </MemberProfileDetailCard>
 
       <MemberProfileDetailCard.AboutMe>
-        <button
+        <Button
           onClick={handleDatingChatRequest}
-          className="text-white bg-cyan-500 py-5 rounded-2xl hover:bg-cyan-300 active:bg-cyan-400"
+          size="lg-full"
+          color="cyan"
+          rounded="lg"
+          className="py-8"
         >
           ☕ 커피챗을 신청해보세요.
-        </button>
+        </Button>
 
         <div className="flex flex-col">
           <h1 className="text-violet-500 mb-3">이런 얘기 많이 들어요</h1>
