@@ -78,7 +78,16 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !userId || !userData) return;
+    console.log('메시지 전송 시도:', { inputMessage, userId, userData });
+
+    if (!inputMessage.trim() || !userId || !userData) {
+      console.log('메시지 전송 실패:', {
+        hasInput: !!inputMessage.trim(),
+        hasUserId: !!userId,
+        hasUserData: !!userData,
+      });
+      return;
+    }
 
     const messageData = {
       content: inputMessage,
@@ -88,6 +97,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       name: userData.name,
     };
 
+    console.log('전송할 메시지 데이터:', messageData);
     socket.emit('message', messageData);
     setInputMessage('');
   };
