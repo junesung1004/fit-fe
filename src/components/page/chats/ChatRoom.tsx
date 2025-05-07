@@ -8,8 +8,6 @@ import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
 import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
-import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
-import { useGetUserQuery } from '@/hooks/queries/useGetUserQuery';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -19,31 +17,14 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: chatRoomData, isLoading: isMessagesLoading } =
-    useGetChatMessagesQuery(chatRoomId, userId);
-
-  const { data: userData, isLoading: isUserLoading } = useGetUserQuery({
-    userId,
-  });
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 채팅방 메시지 조회
-  useEffect(() => {
-    if (chatRoomData?.messages) {
-      setMessages(chatRoomData.messages);
-      scrollToBottom();
-    }
-  }, [chatRoomData]);
-
-  // 스크롤 이동
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // 소켓 연결
   useEffect(() => {
     if (!userId) return;
 
@@ -51,6 +32,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
     socket.on('connect', () => {
       setIsConnected(true);
+      // 채팅방 참여
       socket.emit('join', {
         chatRoomId,
         userId,
@@ -67,8 +49,6 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
     socket.on('message', (message: MessageType) => {
       setMessages((prev) => [...prev, message]);
-      // 새 메시지 수신 시 스크롤 이동
-      scrollToBottom();
     });
 
     return () => {
@@ -78,31 +58,20 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('메시지 전송 시도:', { inputMessage, userId, userData });
+    if (!inputMessage.trim() || !userId) return;
 
-    if (!inputMessage.trim() || !userId || !userData) {
-      console.log('메시지 전송 실패:', {
-        hasInput: !!inputMessage.trim(),
-        hasUserId: !!userId,
-        hasUserData: !!userData,
-      });
-      return;
-    }
-
-    const messageData = {
+    socket.emit('message', {
       content: inputMessage,
       userId,
       chatRoomId,
-      profileImage: userData.profileImage,
-      name: userData.name,
-    };
+      profileImage: '/default-profile.png',
+      name: '사용자',
+    });
 
-    console.log('전송할 메시지 데이터:', messageData);
-    socket.emit('message', messageData);
     setInputMessage('');
   };
 
-  if (!isConnected || isMessagesLoading || isUserLoading) {
+  if (!isConnected) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
         <Spinner size="lg" color="primary" />
