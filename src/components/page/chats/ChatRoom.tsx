@@ -9,6 +9,7 @@ import Spinner from '@/components/common/Spinner';
 import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
 import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
+import { useGetUserQuery } from '@/hooks/queries/useGetUserQuery';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -18,16 +19,28 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  console.log('ChatRoom params:', { chatRoomId, userId });
+  const { data: chatRoomData, isLoading: isMessagesLoading } =
+    useGetChatMessagesQuery(chatRoomId, userId);
 
-  const { data: chatRoomData, isLoading } = useGetChatMessagesQuery(
-    chatRoomId,
-    userId
-  );
+  const { data: userData, isLoading: isUserLoading } = useGetUserQuery({
+    userId,
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // 채팅방 메시지 조회
+  useEffect(() => {
+    if (chatRoomData?.messages) {
+      setMessages(chatRoomData.messages);
+    }
+  }, [chatRoomData]);
+
+  // 스크롤 이동
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // 소켓 연결
   useEffect(() => {
@@ -53,6 +66,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
     socket.on('message', (message: MessageType) => {
       setMessages((prev) => [...prev, message]);
+      scrollToBottom();
     });
 
     return () => {
@@ -60,35 +74,25 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     };
   }, [chatRoomId, userId]);
 
-  // 채팅방 메시지 조회
-  useEffect(() => {
-    console.log('chatRoomData:', chatRoomData);
-    if (chatRoomData?.messages) {
-      setMessages(chatRoomData.messages);
-    }
-  }, [chatRoomData]);
-
-  // 스크롤 이동
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !userId) return;
+    if (!inputMessage.trim() || !userId || !userData || !chatRoomData) return;
 
-    socket.emit('message', {
+    const messageData = {
       content: inputMessage,
       userId,
       chatRoomId,
-      profileImage: '/default-profile.png',
-      name: '사용자',
-    });
+      profileImage: userData.profileImage,
+      name: userData.name,
+      partnerProfileImage: chatRoomData.partner.profileImage,
+      partnerName: chatRoomData.partner.name,
+    };
 
+    socket.emit('message', messageData);
     setInputMessage('');
   };
 
-  if (!isConnected || isLoading) {
+  if (!isConnected || isMessagesLoading || isUserLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
         <Spinner size="lg" color="primary" />
