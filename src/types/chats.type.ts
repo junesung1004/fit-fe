@@ -18,6 +18,7 @@ export interface ChatRoomResponse {
   name: string;
   partner: PartnerType;
   userId: string;
+  messages: Message[];
 }
 
 export interface Message {
@@ -27,6 +28,7 @@ export interface Message {
   createdAt: string;
   profileImage?: string;
   name?: string;
+  isMine: boolean;
 }
 
 export interface ChatRoomProps {

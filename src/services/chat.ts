@@ -1,28 +1,10 @@
 import instance from '@/lib/axios';
 import { AxiosError } from 'axios';
+import { ChatRoomResponse } from '@/types/chats.type';
 
 interface TodayDatingMatch {
   message: string;
   errorCode?: string;
-}
-
-interface Partner {
-  id: string;
-  profileImage: string;
-}
-
-interface Message {
-  id: string;
-  content: string;
-  userId: string;
-  chatRoomId: string;
-  createdAt: string; // ISO string
-}
-
-interface ChatRoomResponse {
-  chatRoomId: string;
-  partner: Partner;
-  messages: Message[];
 }
 
 export const getDatingChat = async () => {
@@ -51,17 +33,21 @@ export const getChatRoomData = async (partnerId: string) => {
   }
 };
 
-export const getChatMessageData = async (
-  chatRoomId: string
+export const getChatMessages = async (
+  chatRoomId: string,
+  userId: string
 ): Promise<ChatRoomResponse> => {
   try {
-    const response = await instance.get(
-      `/chat/chatRooms/${chatRoomId}/messages`
+    const response = await instance.get<ChatRoomResponse>(
+      `/chat/chatRooms/${chatRoomId}/messages`,
+      {
+        params: { userId },
+      }
     );
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
-    console.error('❌ 채팅방 메시지 가져오기 실패:', err);
+    console.error('❌ 채팅방 메시지 조회 실패:', err);
     throw err;
   }
 };

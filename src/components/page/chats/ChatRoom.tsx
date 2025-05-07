@@ -8,6 +8,7 @@ import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
 import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
+import { useChatMessages } from '@/hooks/queries/useChatMessages';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -17,14 +18,13 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const { data: chatRoomData, isLoading } = useChatMessages(chatRoomId, userId);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
+  // 소켓 연결
   useEffect(() => {
     if (!userId) return;
 
@@ -32,7 +32,6 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
     socket.on('connect', () => {
       setIsConnected(true);
-      // 채팅방 참여
       socket.emit('join', {
         chatRoomId,
         userId,
@@ -56,6 +55,18 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     };
   }, [chatRoomId, userId]);
 
+  // 채팅방 메시지 조회
+  useEffect(() => {
+    if (chatRoomData?.messages) {
+      setMessages(chatRoomData.messages);
+    }
+  }, [chatRoomData]);
+
+  // 스크롤 이동
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !userId) return;
@@ -71,7 +82,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     setInputMessage('');
   };
 
-  if (!isConnected) {
+  if (!isConnected || isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
         <Spinner size="lg" color="primary" />
