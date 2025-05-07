@@ -83,7 +83,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
+    <div className="flex flex-col h-[calc(100vh-160px)] bg-violet-100">
       {/* 메시지 목록 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-violet-100">
         {messages.map((message) => (
@@ -108,22 +108,28 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                   {message.name || '알 수 없음'}
                 </span>
               )}
-              <div
-                className={`rounded-lg p-3 ${
-                  message.userId === userId
-                    ? 'bg-violet-500 text-white'
-                    : 'bg-white'
-                }`}
-              >
-                {message.content}
+              <div className="relative">
+                <div
+                  className={`rounded-lg p-3 ${
+                    message.userId === userId
+                      ? 'bg-violet-500 text-white'
+                      : 'bg-white'
+                  }`}
+                >
+                  {message.content}
+                </div>
+                <span
+                  className={`text-xs text-gray-500 mt-1 absolute bottom-0 ${
+                    message.userId === userId ? 'left-0' : 'right-0'
+                  }`}
+                >
+                  {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                  })}
+                </span>
               </div>
-              <span className="text-xs text-gray-500 mt-1">
-                {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                })}
-              </span>
             </div>
           </div>
         ))}
