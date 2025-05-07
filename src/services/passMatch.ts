@@ -11,3 +11,12 @@ export const passMatchRequest = async (passedUserId: string) => {
     throw error; // 호출한 쪽에서 에러 처리 가능하게 던짐
   }
 };
+
+
+
+export const passBothUsers = async (userId1: string, userId2: string) => {
+  return instance.post('/pass/both', {
+    passedUserId1: userId1,
+    passedUserId2: userId2,
+  });
+};

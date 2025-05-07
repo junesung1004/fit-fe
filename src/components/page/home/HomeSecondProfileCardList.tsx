@@ -12,6 +12,7 @@ import {
 } from '@/services/todayDatingMatch';
 import { useAuthStore } from '@/store/authStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
+import { passBothUsers } from '@/services/passMatch';
 
 interface SecondProps {
   thirdUser: UserDataType | null;
@@ -92,6 +93,21 @@ export default function HomeSecondProfileCardList({
     }
   };
 
+  const handlePassBoth = async () => {
+      if (!isLoggedIn) {
+        setShowLoginAlert(true);
+        return;
+      }
+    
+      try {
+        await passBothUsers(thirdUser.id.toString(), fourUser.id.toString());
+        
+        setIsListSelected(true);
+      } catch (err) {
+        console.error('모두 패스 실패:', err);
+      }
+    };
+
   const moveToDetail = (id: number) => {
     if (!isListSelected) {
       router.push(`/members/${id}`);
@@ -105,14 +121,15 @@ export default function HomeSecondProfileCardList({
     fourUser.profile.profileImage?.[0]?.imageUrl ??
     '/default.png';
 
-  return (
-    <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
-      {isListSelected && (
+    return (
+      <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
+        {isListSelected && (
         <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl z-20">
-          <p className="text-white text-2xl font-bold">선택 완료</p>
+          <p className="text-white text-2xl font-bold">
+          {selectedThird || selectedFourth ? '선택 완료' : '패스'}
+          </p>
         </div>
       )}
-
       <div className="relative flex gap-3 z-10">
         {/* 세 번째 카드 */}
         <div className="relative w-full">
@@ -194,20 +211,14 @@ export default function HomeSecondProfileCardList({
 
       {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3 mt-4 z-10">
-        <Button
-          rounded="full"
-          variant="outline"
-          onClick={() => {
-            if (!isLoggedIn) {
-              setShowLoginAlert(true);
-              return;
-            }
-            console.log('취소');
-          }}
-          disabled={isListSelected}
-        >
-          X
-        </Button>
+      <Button
+        rounded="full"
+        variant="outline"
+        onClick={handlePassBoth}
+        disabled={isListSelected}
+      >
+        X
+      </Button>
 
         <Button
           rounded="full"
