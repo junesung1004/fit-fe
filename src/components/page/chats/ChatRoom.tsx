@@ -8,7 +8,7 @@ import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
 import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
-import { useChatMessages } from '@/hooks/queries/useChatMessages';
+import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -18,7 +18,12 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: chatRoomData, isLoading } = useChatMessages(chatRoomId, userId);
+  console.log('ChatRoom params:', { chatRoomId, userId });
+
+  const { data: chatRoomData, isLoading } = useGetChatMessagesQuery(
+    chatRoomId,
+    userId
+  );
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -57,6 +62,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
   // 채팅방 메시지 조회
   useEffect(() => {
+    console.log('chatRoomData:', chatRoomData);
     if (chatRoomData?.messages) {
       setMessages(chatRoomData.messages);
     }
