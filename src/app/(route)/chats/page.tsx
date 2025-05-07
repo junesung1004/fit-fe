@@ -108,7 +108,7 @@ export default function ChatsPage() {
       {data.map((chatRoom: ChatRoomType) => (
         <div
           key={chatRoom.partner?.id}
-          className="px-5 py-5 w-full h-auto border border-rose-500 rounded-lg flex gap-9 justify-center items-center"
+          className="px-5 py-5 w-full h-auto border border-rose-500 rounded-lg flex gap-10 justify-center items-center"
         >
           {/* 프로필 이미지 */}
           <div className="relative w-[120px] h-[120px]">
@@ -132,7 +132,7 @@ export default function ChatsPage() {
 
           {/* 대화하러 가기 */}
           <Button
-            size="lg"
+            size="lg-24"
             color="violet"
             rounded="lg"
             className="py-4"
