@@ -8,28 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Spinner from '@/components/common/Spinner';
 import { useState } from 'react';
-
-interface PartnerType {
-  id: string;
-  name: string;
-  age: number;
-  height: number;
-  profileImage: string;
-}
-
-interface ChatRoomType {
-  id: string;
-  name: string;
-  partner: PartnerType;
-  userId: string;
-}
-
-interface ChatRoomResponse {
-  id: string;
-  name: string;
-  partner: PartnerType;
-  userId: string;
-}
+import { ChatRoomType, ChatRoomResponse } from '@/types/chats.type';
 
 export default function ChatsPage() {
   const { data, isError, isPending } = useGetChatRoomQuery();

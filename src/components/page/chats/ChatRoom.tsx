@@ -5,24 +5,12 @@ import { useEffect, useState, useRef } from 'react';
 import { socket } from '@/lib/socket';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/components/common/Button';
-import Image from 'next/image';
 import Spinner from '@/components/common/Spinner';
-
-interface Message {
-  id: string;
-  content: string;
-  userId: string;
-  createdAt: string;
-  profileImage?: string;
-  name?: string;
-}
-
-interface ChatRoomProps {
-  chatRoomId: string;
-}
+import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
+import { Message as MessageComponent } from '@/components/page/chats/Message';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const searchParams = useSearchParams();
@@ -59,7 +47,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       console.warn('⚠️ 소켓 연결 해제됨:', reason);
     });
 
-    socket.on('message', (message: Message) => {
+    socket.on('message', (message: MessageType) => {
       setMessages((prev) => [...prev, message]);
     });
 
@@ -96,65 +84,18 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       {/* 메시지 목록 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-violet-100">
         {messages.map((message) => (
-          <div
+          <MessageComponent
             key={message.id}
-            className={`flex ${message.userId === userId ? 'justify-end' : 'justify-start'}`}
-          >
-            {message.userId !== userId && (
-              <div className="flex items-end mr-2">
-                <Image
-                  src={message.profileImage || '/default-profile.png'}
-                  alt="프로필"
-                  width={50}
-                  height={50}
-                  className="rounded-full object-cover w-12 h-12"
-                />
-              </div>
-            )}
-            <div className="flex flex-col max-w-[70%]">
-              {message.userId !== userId && (
-                <span className="text-sm text-gray-600 mb-1">
-                  {message.name || '알 수 없음'}
-                </span>
-              )}
-              <div className="flex items-end gap-2">
-                {message.userId === userId && (
-                  <span className="text-xs text-gray-500">
-                    {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true,
-                    })}
-                  </span>
-                )}
-                <div
-                  className={`rounded-lg px-3 py-2 ${
-                    message.userId === userId
-                      ? 'bg-violet-500 text-white'
-                      : 'bg-white'
-                  }`}
-                >
-                  {message.content}
-                </div>
-                {message.userId !== userId && (
-                  <span className="text-xs text-gray-500">
-                    {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true,
-                    })}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+            message={message}
+            isMine={message.userId === userId}
+          />
         ))}
         <div ref={messagesEndRef} />
       </div>
 
       {/* 메시지 입력 */}
       <form onSubmit={sendMessage} className="p-4 rounded-t-lg bg-violet-300">
-        <div className="flex gap-2">
+        <div className="flex gap-2 h-10">
           <input
             type="text"
             value={inputMessage}
