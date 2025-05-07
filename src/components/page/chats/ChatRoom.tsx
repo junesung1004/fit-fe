@@ -34,6 +34,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   useEffect(() => {
     if (chatRoomData?.messages) {
       setMessages(chatRoomData.messages);
+      scrollToBottom();
     }
   }, [chatRoomData]);
 
@@ -66,6 +67,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
     socket.on('message', (message: MessageType) => {
       setMessages((prev) => [...prev, message]);
+      // 새 메시지 수신 시 스크롤 이동
       scrollToBottom();
     });
 
@@ -76,7 +78,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !userId || !userData || !chatRoomData) return;
+    if (!inputMessage.trim() || !userId || !userData) return;
 
     const messageData = {
       content: inputMessage,
@@ -84,8 +86,6 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       chatRoomId,
       profileImage: userData.profileImage,
       name: userData.name,
-      partnerProfileImage: chatRoomData.partner.profileImage,
-      partnerName: chatRoomData.partner.name,
     };
 
     socket.emit('message', messageData);
