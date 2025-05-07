@@ -11,6 +11,7 @@ import {
   selectAllMatchUser,
 } from '@/services/todayDatingMatch';
 import { useAuthStore } from '@/store/authStore';
+import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 
 interface FirstProps {
   firstUser: UserDataType | null;
@@ -191,17 +192,17 @@ export default function HomeFirstProfileCardList({
 
       {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3 mt-4 z-10">
-      <Button
-        rounded="full"
-        variant="outline"
-        onClick={() => {
-          if (!isLoggedIn) {
-            setShowLoginAlert(true);
-            return;
-          }
-          console.log('취소');
-         }}
-         disabled={isListSelected}
+        <Button
+          rounded="full"
+          variant="outline"
+          onClick={() => {
+            if (!isLoggedIn) {
+              setShowLoginAlert(true);
+              return;
+            }
+            console.log('취소');
+          }}
+          disabled={isListSelected}
         >
           X
         </Button>
@@ -216,36 +217,9 @@ export default function HomeFirstProfileCardList({
         </Button>
       </div>
 
-      {/* ✅ 로그인 필요 팝업 */}
+      {/* ✅ 공통 로그인 모달 */}
       {showLoginAlert && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-md w-[260px] text-center">
-            <p className="text-lg font-semibold mb-6">로그인이 필요합니다</p>
-            <div className="flex justify-center gap-4">
-              <Button
-                size="sm"
-                variant="outline"
-                color="rose"
-                rounded="md"
-                onClick={() => setShowLoginAlert(false)}
-             >
-              닫기
-            </Button>
-            <Button
-              size="md"
-              variant="fill"
-              color="rose"
-              rounded="md"
-              onClick={() => {
-                setShowLoginAlert(false);
-                router.push('/login');
-              }}
-            >
-              로그인
-            </Button>
-          </div>
-        </div>
-      </div>
+        <LoginRequiredModal onClose={() => setShowLoginAlert(false)} />
       )}
     </div>
   );

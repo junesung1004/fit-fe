@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams} from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -11,11 +11,16 @@ import Button from '@/components/common/Button';
 import { sendNotification } from '@/services/notification';
 import { likeMember } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
+import { useAuthStore } from '@/store/authStore';
+import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 
 export default function MemberDetailPage() {
+ 
   const params = useParams();
   const userId = params.id as string;
 
+  const { isLoggedIn } = useAuthStore();
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [member, setMember] = useState<MemberDetailResponse | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
@@ -33,6 +38,11 @@ export default function MemberDetailPage() {
   }, [userId]);
 
   const handleLikeToggle = async () => {
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
+    }
+
     if (!userId) return alert('상대방 ID가 없습니다!');
     try {
       if (!isLiked) {
@@ -50,11 +60,15 @@ export default function MemberDetailPage() {
       setTimeout(() => setIsClicked(false), 300);
     } catch (error) {
       console.error('좋아요 알림 전송 실패:', error);
-      alert('알림 전송에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
   const handleDatingChatRequest = async () => {
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
+    }
+
     if (!userId) return alert('상대방 ID가 없습니다!');
     try {
       await sendNotification({
@@ -66,7 +80,6 @@ export default function MemberDetailPage() {
       alert('커피챗 신청 알림이 전송되었습니다!');
     } catch (error) {
       console.error('커피챗 신청 알림 전송 실패:', error);
-      alert('알림 전송에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -151,6 +164,11 @@ export default function MemberDetailPage() {
           </div>
         </div>
       </MemberProfileDetailCard.AboutMe>
+
+      {/* ✅ 로그인 모달 공통 컴포넌트 사용 */}
+      {showLoginAlert && (
+        <LoginRequiredModal onClose={() => setShowLoginAlert(false)} />
+      )}
     </div>
   );
 }
