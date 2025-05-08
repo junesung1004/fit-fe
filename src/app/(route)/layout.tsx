@@ -41,7 +41,7 @@ export default function CommonLayout({ children }: { children: ReactNode }) {
           <Header />
         </div>
         <main className="flex-1 overflow-auto scrollbar-hide w-full">
-          <div className="min-h-full flex items-center justify-center">
+          <div className="min-h-[600px] flex items-center justify-center">
             <div className="w-full max-w-3xl">{children}</div>
           </div>
         </main>
