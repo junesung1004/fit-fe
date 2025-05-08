@@ -23,6 +23,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [festivalPage, setFestivalPage] = useState(1);
   const festivalsPerPage = 2;
+  const pageButtonLimit = 5;
 
   const { data: chatRoomData, isLoading: isChatLoading } =
     useGetChatMessagesQuery(chatRoomId, userId);
@@ -168,26 +169,53 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                   ))}
               </div>
               {/* 페이지네이션 */}
-              {message.festivals.length > festivalsPerPage && (
-                <div className="flex gap-2 mt-4 justify-center">
-                  {Array.from(
-                    {
-                      length: Math.ceil(
-                        message.festivals.length / festivalsPerPage
-                      ),
-                    },
-                    (_, idx) => (
-                      <button
-                        key={idx + 1}
-                        className={`px-3 py-1 rounded ${festivalPage === idx + 1 ? 'bg-violet-500 text-white' : 'bg-gray-200'}`}
-                        onClick={() => setFestivalPage(idx + 1)}
-                      >
-                        {idx + 1}
-                      </button>
-                    )
-                  )}
-                </div>
-              )}
+              {message.festivals.length > festivalsPerPage &&
+                (() => {
+                  const totalPages = Math.ceil(
+                    message.festivals.length / festivalsPerPage
+                  );
+                  const currentGroup = Math.floor(
+                    (festivalPage - 1) / pageButtonLimit
+                  );
+                  const startPage = currentGroup * pageButtonLimit + 1;
+                  const endPage = Math.min(
+                    startPage + pageButtonLimit - 1,
+                    totalPages
+                  );
+                  const pageNumbers = [];
+                  for (let i = startPage; i <= endPage; i++) {
+                    pageNumbers.push(i);
+                  }
+                  return (
+                    <div className="flex gap-2 mt-4 justify-center">
+                      {startPage > 1 && (
+                        <button
+                          className="px-3 py-1 rounded bg-gray-200"
+                          onClick={() => setFestivalPage(startPage - 1)}
+                        >
+                          &lt;
+                        </button>
+                      )}
+                      {pageNumbers.map((num) => (
+                        <button
+                          key={num}
+                          className={`px-3 py-1 rounded ${festivalPage === num ? 'bg-violet-500 text-white' : 'bg-gray-200'}`}
+                          onClick={() => setFestivalPage(num)}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                      {endPage < totalPages && (
+                        <button
+                          className="px-3 py-1 rounded bg-gray-200"
+                          onClick={() => setFestivalPage(endPage + 1)}
+                        >
+                          &gt;
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
             </div>
           ) : (
             <MessageComponent
