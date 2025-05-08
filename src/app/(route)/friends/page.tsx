@@ -176,9 +176,9 @@ export default function FriendsPage() {
   );
 
   return (
-    <main className="flex-1 px-6 space-y-10 pb-16 bg-gray-50">
+    <main className="flex-1 space-y-10 px-8 py-10 bg-gray-50">
       {/* 월드컵 */}
-      <section className="pt-10">
+      <section>
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-semibold text-lg">월드컵</h2>
         </div>
