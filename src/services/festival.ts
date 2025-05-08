@@ -1,10 +1,12 @@
 import instance from '@/lib/axios';
 import { FestivalResponse } from '@/types/festival.type';
 
-export const getUserRegionFestivals = async (): Promise<FestivalResponse> => {
+export const getUserRegionFestivals = async (
+  userId: string
+): Promise<FestivalResponse> => {
   try {
     const response = await instance.get<FestivalResponse>(
-      '/api/v1/festival/user-request'
+      `/api/v1/festival/user-request/${userId}`
     );
     return response.data;
   } catch (error) {

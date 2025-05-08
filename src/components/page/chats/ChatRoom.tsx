@@ -20,7 +20,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
   const { data: chatRoomData, isLoading: isChatLoading } =
     useGetChatMessagesQuery(chatRoomId, userId);
-  const { data: festivalData } = useGetUserRegionFestivalsQuery();
+  const { data: festivalData } = useGetUserRegionFestivalsQuery(userId || '');
   const [messages, setMessages] = useState<Message[]>([]);
 
   // 채팅방 메시지 초기 데이터 설정 및 스크롤

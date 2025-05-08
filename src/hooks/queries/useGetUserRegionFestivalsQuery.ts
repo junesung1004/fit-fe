@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserRegionFestivals } from '@/services/festival';
 
-export const useGetUserRegionFestivalsQuery = () => {
+export const useGetUserRegionFestivalsQuery = (userId: string) => {
   return useQuery({
-    queryKey: ['userRegionFestivals'],
-    queryFn: getUserRegionFestivals,
+    queryKey: ['userRegionFestivals', userId],
+    queryFn: () => getUserRegionFestivals(userId),
     retry: false,
+    enabled: !!userId,
   });
 };

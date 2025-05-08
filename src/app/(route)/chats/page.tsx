@@ -7,14 +7,12 @@ import { useGetChatRoomQuery } from '@/hooks/queries/useGetChatRoomQuery';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Spinner from '@/components/common/Spinner';
-import { useState } from 'react';
 import { ChatRoomType, ChatRoomResponse } from '@/types/chats.type';
 
 export default function ChatsPage() {
   const { data, isError, isPending } = useGetChatRoomQuery();
   const { mutate } = useGetChatRoomDataMutation();
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
 
   if (isError) {
     return (
@@ -59,35 +57,22 @@ export default function ChatsPage() {
   }
 
   const handleEnterChatRoom = (partnerId: string, userId: string) => {
-    setError(null); // 에러 상태 초기화
     mutate(partnerId, {
       onSuccess: (data: ChatRoomResponse) => {
         router.push(`/chats/${data.id}?userId=${userId}`);
       },
       onError: (error) => {
         console.error('❌ 채팅방 입장 실패:', error);
-        setError('채팅방 입장에 실패했습니다. 다시 시도해주세요.');
       },
     });
   };
 
   return (
     <div className="w-full min-h-full flex flex-col gap-10 items-center py-6 px-5">
-      {error && (
-        <div className="w-full p-4 bg-red-100 border border-red-400 rounded-lg text-red-700 flex items-center justify-between">
-          <span>{error}</span>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-700 hover:text-red-900"
-          >
-            ✕
-          </button>
-        </div>
-      )}
       {data.map((chatRoom: ChatRoomType) => (
         <div
           key={chatRoom.partner?.id}
-          className="px-5 py-5 w-full h-auto border border-rose-500 rounded-lg flex gap-10 justify-center items-center"
+          className="px-5 py-5 w-full h-auto bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 flex gap-10 justify-center items-center"
         >
           {/* 프로필 이미지 */}
           <div className="relative w-[120px] h-[120px]">
