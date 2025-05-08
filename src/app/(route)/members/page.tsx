@@ -91,10 +91,10 @@ export default function MembersPage() {
   };
 
   return (
-    <div className="relative w-full min-h-full flex flex-col">
+    <div className="relative w-full flex flex-col">
       {isShowFilter && (
-        <div className="absolute z-10 w-full h-full bg-[rgba(0,0,0,0.7)] px-8 py-10">
-          <div className="bg-white rounded-3xl p-6 flex flex-col gap-6">
+        <div className="fixed inset-0 z-10 bg-zinc-900/50 px-8 py-10 flex items-center justify-center">
+          <div className="bg-white rounded-3xl p-6 flex flex-col gap-6 w-full max-w-md">
             <div className="flex items-center">
               <h1 className="mx-auto text-lg font-semibold">필터</h1>
               <XMarkIcon
