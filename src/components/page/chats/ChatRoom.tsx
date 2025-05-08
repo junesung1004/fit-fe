@@ -27,7 +27,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   useEffect(() => {
     console.log('메시지 초기화 useEffect 실행', {
       chatRoomDataMessages: chatRoomData?.messages?.length,
-      festivalData: festivalData?.festivals?.length,
+      festivalData: festivalData?.length,
     });
 
     if (chatRoomData?.messages) {
@@ -40,7 +40,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
         createdAt: new Date().toISOString(),
         isMine: false,
         isFestivalInfo: true,
-        festivals: festivalData?.festivals || [],
+        festivals: festivalData && festivalData.length > 0 ? festivalData : [],
       };
 
       setMessages([...chatRoomData.messages, festivalMessage]);

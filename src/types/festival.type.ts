@@ -7,7 +7,3 @@ export interface Festival {
   thumbnail: string;
   naverSearchUrl: string;
 }
-
-export interface FestivalResponse {
-  festivals: Festival[];
-}
