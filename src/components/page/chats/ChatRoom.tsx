@@ -188,31 +188,48 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                   }
                   return (
                     <div className="flex gap-2 mt-4 justify-center">
-                      {startPage > 1 && (
-                        <button
-                          className="px-3 py-1 rounded bg-gray-200"
-                          onClick={() => setFestivalPage(startPage - 1)}
-                        >
-                          &lt;
-                        </button>
-                      )}
+                      <button
+                        className={`px-3 py-1 rounded transition-colors duration-150 ${
+                          startPage === 1
+                            ? 'bg-transparent text-gray-300 cursor-not-allowed'
+                            : 'bg-transparent text-gray-500 hover:bg-violet-100 hover:text-violet-600'
+                        }`}
+                        onClick={() => {
+                          if (startPage !== 1) setFestivalPage(startPage - 1);
+                        }}
+                        disabled={startPage === 1}
+                        aria-label="이전 페이지 그룹"
+                      >
+                        &lt;
+                      </button>
                       {pageNumbers.map((num) => (
                         <button
                           key={num}
-                          className={`px-3 py-1 rounded ${festivalPage === num ? 'bg-violet-500 text-white' : 'bg-gray-200'}`}
+                          className={`px-3 py-1 rounded ${
+                            festivalPage === num
+                              ? 'bg-violet-500 text-white'
+                              : 'bg-gray-200 text-gray-700 hover:bg-violet-100 hover:text-violet-600'
+                          }`}
                           onClick={() => setFestivalPage(num)}
                         >
                           {num}
                         </button>
                       ))}
-                      {endPage < totalPages && (
-                        <button
-                          className="px-3 py-1 rounded bg-gray-200"
-                          onClick={() => setFestivalPage(endPage + 1)}
-                        >
-                          &gt;
-                        </button>
-                      )}
+                      <button
+                        className={`px-3 py-1 rounded transition-colors duration-150 ${
+                          endPage === totalPages
+                            ? 'bg-transparent text-gray-300 cursor-not-allowed'
+                            : 'bg-transparent text-gray-500 hover:bg-violet-100 hover:text-violet-600'
+                        }`}
+                        onClick={() => {
+                          if (endPage !== totalPages)
+                            setFestivalPage(endPage + 1);
+                        }}
+                        disabled={endPage === totalPages}
+                        aria-label="다음 페이지 그룹"
+                      >
+                        &gt;
+                      </button>
                     </div>
                   );
                 })()}
