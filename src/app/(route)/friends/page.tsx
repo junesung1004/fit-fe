@@ -133,7 +133,7 @@ export default function FriendsPage() {
     // eslint-disable-next-line no-unused-vars
     onReject?: (id: string) => void
   ) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
+    <div className="grid grid-cols-3 gap-2 py-2">
       {profiles.map((profile) => {
         if (!profile.id) {
           console.warn('❗️ProfileCard에서 id가 undefined인 항목:', profile);
