@@ -23,20 +23,23 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   );
   const [messages, setMessages] = useState<MessageType[]>([]);
 
+  // 채팅방 메시지 초기 데이터 설정 및 스크롤
   useEffect(() => {
     if (chatRoomData?.messages) {
       setMessages(chatRoomData.messages);
+      // 초기 메시지 로드 후 스크롤 최하단
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     }
   }, [chatRoomData]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // 새 메시지 추가 시 스크롤 최하단으로 이동
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  // 소켓 연결 및 메시지 수신 설정
   useEffect(() => {
     if (!userId) return;
 
@@ -50,14 +53,6 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       });
     });
 
-    socket.on('connect_error', (err) => {
-      console.error('❌ 소켓 연결 에러:', err.message);
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.warn('⚠️ 소켓 연결 해제됨:', reason);
-    });
-
     socket.on('message', (message: MessageType) => {
       setMessages((prev) => [...prev, message]);
     });
@@ -67,22 +62,22 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     };
   }, [chatRoomId, userId]);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !userId) return;
 
-    const newMessage: Omit<MessageType, 'id'> = {
+    socket.emit('message', {
       content: inputMessage,
       userId,
       chatRoomId,
-      createdAt: new Date().toISOString(),
-      profileImage:
-        chatRoomData?.partner?.profileImage || '/default-profile.png',
-      name: chatRoomData?.partner?.name || '사용자',
-      isMine: true,
-    };
+      profileImage: chatRoomData?.partner?.profileImage || '/default.png',
+      name: chatRoomData?.partner?.name || '알 수 없음',
+    });
 
-    socket.emit('message', newMessage);
     setInputMessage('');
   };
 
@@ -101,7 +96,13 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
         {messages.map((message) => (
           <MessageComponent
             key={message.id}
-            message={message}
+            message={{
+              ...message,
+              profileImage: !message.isMine
+                ? chatRoomData?.partner?.profileImage
+                : undefined,
+              name: !message.isMine ? chatRoomData?.partner?.name : undefined,
+            }}
             isMine={message.userId === userId}
           />
         ))}

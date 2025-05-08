@@ -37,7 +37,6 @@ export const getChatMessages = async (
   chatRoomId: string,
   userId: string
 ): Promise<ChatRoomResponse> => {
-  console.log('getChatMessages called with:', { chatRoomId, userId });
   try {
     const response = await instance.get<ChatRoomResponse>(
       `/chat/chatRooms/${chatRoomId}/messages`,
@@ -45,11 +44,9 @@ export const getChatMessages = async (
         params: { userId },
       }
     );
-    console.log('getChatMessages response:', response.data);
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
-    console.error('❌ 채팅방 메시지 조회 실패:', err);
     throw err;
   }
 };

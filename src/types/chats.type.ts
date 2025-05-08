@@ -27,8 +27,8 @@ export interface Message {
   userId: string;
   chatRoomId: string;
   createdAt: string;
-  profileImage: string;
-  name: string;
+  profileImage?: string;
+  name?: string;
   isMine: boolean;
 }
 
