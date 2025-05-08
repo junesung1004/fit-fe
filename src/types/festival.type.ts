@@ -1,12 +1,11 @@
 export interface Festival {
-  id: string;
-  name: string;
+  title: string;
   startDate: string;
   endDate: string;
-  location: string;
-  description: string;
-  imageUrl: string;
-  region: string;
+  address: string;
+  areaCode: string;
+  thumbnail: string;
+  naverSearchUrl: string;
 }
 
 export interface FestivalResponse {

@@ -1,3 +1,5 @@
+import { Festival } from './festival.type';
+
 export interface PartnerType {
   id: string;
   name: string;
@@ -31,14 +33,7 @@ export interface Message {
   name?: string;
   isMine: boolean;
   isFestivalInfo?: boolean;
-  festivals?: Array<{
-    id: string;
-    name: string;
-    description: string;
-    location: string;
-    startDate: string;
-    endDate: string;
-  }>;
+  festivals?: Festival[];
 }
 
 export interface ChatRoomProps {

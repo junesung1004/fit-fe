@@ -124,10 +124,13 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
               <h3 className="text-lg font-semibold mb-2">이 지역의 축제</h3>
               <div className="flex flex-col gap-2">
                 {message.festivals.map((festival) => (
-                  <div key={festival.id} className="p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={festival.title}
+                    className="p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex justify-between items-start">
                       <h4 className="font-medium text-violet-700">
-                        {festival.name}
+                        {festival.title}
                       </h4>
                       <span className="text-xs text-gray-500">
                         {new Date(festival.startDate).toLocaleDateString()} ~{' '}
@@ -135,11 +138,16 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
-                      {festival.location}
+                      {festival.address}
                     </p>
-                    <p className="text-sm text-gray-700 mt-2">
-                      {festival.description}
-                    </p>
+                    <a
+                      href={festival.naverSearchUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-violet-600 hover:text-violet-800 mt-2 inline-block"
+                    >
+                      네이버에서 더 알아보기
+                    </a>
                   </div>
                 ))}
               </div>

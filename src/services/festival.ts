@@ -6,7 +6,7 @@ export const getUserRegionFestivals = async (
 ): Promise<FestivalResponse> => {
   try {
     const response = await instance.get<FestivalResponse>(
-      `/api/v1/festival/user-request/${userId}`
+      `/festival/user-request/${userId}`
     );
     return response.data;
   } catch (error) {
