@@ -11,12 +11,18 @@ import { Message as MessageComponent } from '@/components/page/chats/Message';
 import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
 import { useGetUserRegionFestivalsQuery } from '@/hooks/queries/useGetUserRegionFestivalsQuery';
 
+// 날짜 포맷 변환 함수
+const formatDate = (dateStr: string) =>
+  `${dateStr.slice(0, 4)}/${dateStr.slice(4, 6)}/${dateStr.slice(6, 8)}`;
+
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [festivalPage, setFestivalPage] = useState(1);
+  const festivalsPerPage = 2;
 
   const { data: chatRoomData, isLoading: isChatLoading } =
     useGetChatMessagesQuery(chatRoomId, userId);
@@ -123,34 +129,65 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
             <div key={message.id} className="p-4 bg-white rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold mb-2">이 지역의 축제</h3>
               <div className="flex flex-col gap-2">
-                {message.festivals.map((festival) => (
-                  <div
-                    key={festival.title}
-                    className="p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-medium text-violet-700">
-                        {festival.title}
-                      </h4>
-                      <span className="text-xs text-gray-500">
-                        {new Date(festival.startDate).toLocaleDateString()} ~{' '}
-                        {new Date(festival.endDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {festival.address}
-                    </p>
-                    <a
-                      href={festival.naverSearchUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-violet-600 hover:text-violet-800 mt-2 inline-block"
+                {message.festivals
+                  .slice(
+                    (festivalPage - 1) * festivalsPerPage,
+                    festivalPage * festivalsPerPage
+                  )
+                  .map((festival) => (
+                    <div
+                      key={festival.title}
+                      className="p-3 bg-gray-50 rounded-lg"
                     >
-                      네이버에서 더 알아보기
-                    </a>
-                  </div>
-                ))}
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-medium text-violet-700">
+                          {festival.title}
+                        </h4>
+                        <span className="text-xs text-gray-500">
+                          {new Date(
+                            formatDate(festival.startDate)
+                          ).toLocaleDateString()}{' '}
+                          ~{' '}
+                          {new Date(
+                            formatDate(festival.endDate)
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {festival.address}
+                      </p>
+                      <a
+                        href={festival.naverSearchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-violet-600 hover:text-violet-800 mt-2 inline-block"
+                      >
+                        네이버에서 더 알아보기
+                      </a>
+                    </div>
+                  ))}
               </div>
+              {/* 페이지네이션 */}
+              {message.festivals.length > festivalsPerPage && (
+                <div className="flex gap-2 mt-4 justify-center">
+                  {Array.from(
+                    {
+                      length: Math.ceil(
+                        message.festivals.length / festivalsPerPage
+                      ),
+                    },
+                    (_, idx) => (
+                      <button
+                        key={idx + 1}
+                        className={`px-3 py-1 rounded ${festivalPage === idx + 1 ? 'bg-violet-500 text-white' : 'bg-gray-200'}`}
+                        onClick={() => setFestivalPage(idx + 1)}
+                      >
+                        {idx + 1}
+                      </button>
+                    )
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <MessageComponent
