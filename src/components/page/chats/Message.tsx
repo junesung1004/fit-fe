@@ -7,7 +7,7 @@ export const Message = ({ message, isMine }: MessageProps) => {
       {!isMine && (
         <div className="flex items-end mr-2">
           <Image
-            src={message.profileImage || '/default-profile.png'}
+            src={message.profileImage || '/default.png'}
             alt="프로필"
             width={50}
             height={50}

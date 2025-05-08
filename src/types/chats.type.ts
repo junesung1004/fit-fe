@@ -25,9 +25,10 @@ export interface Message {
   id: string;
   content: string;
   userId: string;
+  chatRoomId: string;
   createdAt: string;
-  profileImage?: string;
-  name?: string;
+  profileImage: string;
+  name: string;
   isMine: boolean;
 }
 

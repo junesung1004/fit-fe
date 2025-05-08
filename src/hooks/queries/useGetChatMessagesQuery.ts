@@ -10,9 +10,13 @@ export const useGetChatMessagesQuery = (
   return useQuery({
     queryKey: ['chatMessages', chatRoomId, userId],
     queryFn: () => {
-      console.log('Fetching chat messages...');
-      return getChatMessages(chatRoomId, userId!);
+      if (!userId) {
+        throw new Error('사용자 ID가 필요합니다.');
+      }
+      console.log('채팅 메시지 조회 중...');
+      return getChatMessages(chatRoomId, userId);
     },
     enabled: Boolean(chatRoomId) && Boolean(userId),
+    retry: false,
   });
 };

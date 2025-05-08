@@ -8,14 +8,26 @@ import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
 import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
+import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
-  const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { data: chatRoomData, isLoading } = useGetChatMessagesQuery(
+    chatRoomId,
+    userId
+  );
+  const [messages, setMessages] = useState<MessageType[]>([]);
+
+  useEffect(() => {
+    if (chatRoomData?.messages) {
+      setMessages(chatRoomData.messages);
+    }
+  }, [chatRoomData]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,7 +44,6 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
 
     socket.on('connect', () => {
       setIsConnected(true);
-      // 채팅방 참여
       socket.emit('join', {
         chatRoomId,
         userId,
@@ -60,18 +71,22 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     e.preventDefault();
     if (!inputMessage.trim() || !userId) return;
 
-    socket.emit('message', {
+    const newMessage: Omit<MessageType, 'id'> = {
       content: inputMessage,
       userId,
       chatRoomId,
-      profileImage: '/default-profile.png',
-      name: '사용자',
-    });
+      createdAt: new Date().toISOString(),
+      profileImage:
+        chatRoomData?.partner?.profileImage || '/default-profile.png',
+      name: chatRoomData?.partner?.name || '사용자',
+      isMine: true,
+    };
 
+    socket.emit('message', newMessage);
     setInputMessage('');
   };
 
-  if (!isConnected) {
+  if (isLoading || !isConnected) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
         <Spinner size="lg" color="primary" />
