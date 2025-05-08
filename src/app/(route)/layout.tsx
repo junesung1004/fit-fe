@@ -2,12 +2,8 @@ import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
 import Image from 'next/image';
 import React, { ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
 
 export default function CommonLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const isMembersPage = pathname?.includes('/members');
-
   return (
     <div className="w-full min-h-screen relative flex items-stretch justify-center">
       {/* 배경 이미지 */}
@@ -45,12 +41,8 @@ export default function CommonLayout({ children }: { children: ReactNode }) {
           <Header />
         </div>
         <main className="flex-1 overflow-auto scrollbar-hide w-full">
-          <div
-            className={`min-h-full ${!isMembersPage ? 'flex items-center justify-center' : ''}`}
-          >
-            <div className={`w-full ${!isMembersPage ? 'max-w-3xl' : ''}`}>
-              {children}
-            </div>
+          <div className="flex min-h-full items-center justify-center">
+            <div className="w-full h-full max-w-3xl">{children}</div>
           </div>
         </main>
         <div className="h-[80px]">
