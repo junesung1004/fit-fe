@@ -30,6 +30,15 @@ export interface Message {
   profileImage?: string;
   name?: string;
   isMine: boolean;
+  isFestivalInfo?: boolean;
+  festivals?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+  }>;
 }
 
 export interface ChatRoomProps {

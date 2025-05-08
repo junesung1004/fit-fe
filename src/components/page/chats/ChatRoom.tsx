@@ -6,9 +6,10 @@ import { socket } from '@/lib/socket';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
-import { Message as MessageType, ChatRoomProps } from '@/types/chats.type';
+import { Message, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
 import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
+import { useGetUserRegionFestivalsQuery } from '@/hooks/queries/useGetUserRegionFestivalsQuery';
 
 export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -17,35 +18,57 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const userId = searchParams.get('userId');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: chatRoomData, isLoading } = useGetChatMessagesQuery(
-    chatRoomId,
-    userId
-  );
-  const [messages, setMessages] = useState<MessageType[]>([]);
+  const { data: chatRoomData, isLoading: isChatLoading } =
+    useGetChatMessagesQuery(chatRoomId, userId);
+  const { data: festivalData } = useGetUserRegionFestivalsQuery();
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // 채팅방 메시지 초기 데이터 설정 및 스크롤
   useEffect(() => {
+    console.log('메시지 초기화 useEffect 실행', {
+      chatRoomDataMessages: chatRoomData?.messages?.length,
+      festivalData: festivalData?.festivals?.length,
+    });
+
     if (chatRoomData?.messages) {
-      setMessages(chatRoomData.messages);
+      // 축제 정보를 메시지 형태로 변환
+      const festivalMessage: Message = {
+        id: 'festival-info',
+        content: '이 지역의 축제 정보',
+        userId: 'system',
+        chatRoomId,
+        createdAt: new Date().toISOString(),
+        isMine: false,
+        isFestivalInfo: true,
+        festivals: festivalData?.festivals || [],
+      };
+
+      setMessages([...chatRoomData.messages, festivalMessage]);
       // 초기 메시지 로드 후 스크롤 최하단
       setTimeout(() => {
         scrollToBottom();
       }, 100);
     }
-  }, [chatRoomData]);
+  }, [chatRoomData, festivalData]);
 
   // 새 메시지 추가 시 스크롤 최하단으로 이동
   useEffect(() => {
+    console.log('스크롤 useEffect 실행', {
+      messagesLength: messages.length,
+      lastMessage: messages[messages.length - 1]?.content,
+    });
     scrollToBottom();
   }, [messages]);
 
   // 소켓 연결 및 메시지 수신 설정
   useEffect(() => {
+    console.log('소켓 연결 useEffect 실행', { userId, chatRoomId });
     if (!userId) return;
 
     socket.connect();
 
     socket.on('connect', () => {
+      console.log('소켓 연결됨');
       setIsConnected(true);
       socket.emit('join', {
         chatRoomId,
@@ -53,11 +76,13 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       });
     });
 
-    socket.on('message', (message: MessageType) => {
+    socket.on('message', (message: Message) => {
+      console.log('새 메시지 수신', message);
       setMessages((prev) => [...prev, message]);
     });
 
     return () => {
+      console.log('소켓 연결 해제');
       socket.disconnect();
     };
   }, [chatRoomId, userId]);
@@ -81,7 +106,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     setInputMessage('');
   };
 
-  if (isLoading || !isConnected) {
+  if (isChatLoading || !isConnected) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
         <Spinner size="lg" color="primary" />
@@ -93,19 +118,46 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     <div className="flex flex-col h-[calc(100vh-160px)] bg-violet-100">
       {/* 메시지 목록 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-violet-100">
-        {messages.map((message) => (
-          <MessageComponent
-            key={message.id}
-            message={{
-              ...message,
-              profileImage: !message.isMine
-                ? chatRoomData?.partner?.profileImage
-                : undefined,
-              name: !message.isMine ? chatRoomData?.partner?.name : undefined,
-            }}
-            isMine={message.userId === userId}
-          />
-        ))}
+        {messages.map((message) =>
+          message.isFestivalInfo && message.festivals ? (
+            <div key={message.id} className="p-4 bg-white rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-2">이 지역의 축제</h3>
+              <div className="flex flex-col gap-2">
+                {message.festivals.map((festival) => (
+                  <div key={festival.id} className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-medium text-violet-700">
+                        {festival.name}
+                      </h4>
+                      <span className="text-xs text-gray-500">
+                        {new Date(festival.startDate).toLocaleDateString()} ~{' '}
+                        {new Date(festival.endDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {festival.location}
+                    </p>
+                    <p className="text-sm text-gray-700 mt-2">
+                      {festival.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <MessageComponent
+              key={message.id}
+              message={{
+                ...message,
+                profileImage: !message.isMine
+                  ? chatRoomData?.partner?.profileImage
+                  : undefined,
+                name: !message.isMine ? chatRoomData?.partner?.name : undefined,
+              }}
+              isMine={message.userId === userId}
+            />
+          )
+        )}
         <div ref={messagesEndRef} />
       </div>
 
