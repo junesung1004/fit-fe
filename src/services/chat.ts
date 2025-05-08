@@ -50,3 +50,35 @@ export const getChatMessages = async (
     throw err;
   }
 };
+
+
+//커피챗
+export interface CoffeeChatRequest {
+  title: string;
+  content: string;
+  type: string;
+  receiverId: string;
+  data: Record<string, unknown>;
+}
+
+export const sendCoffeeChat = async (payload: CoffeeChatRequest) => {
+  const response = await instance.post('/coffee-chat/send', payload);
+  return response.data;
+}
+
+
+//커피챗 수락
+export const acceptCoffeeChatRequest = async (coffeeChatId: string) => {
+  const res = await instance.post('/coffee-chat/accept', {
+    coffeeChatId,
+  });
+  return res.data;
+};
+
+//커피챗 거절
+export const rejectCoffeeChatRequest = async (passedUserId: string) => {
+  const res = await instance.post(`/pass/coffee-chat/${passedUserId}`, {
+    passedUserId,
+  });
+  return res.data;
+};

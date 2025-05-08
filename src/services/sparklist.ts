@@ -21,6 +21,7 @@ export interface LikeUser {
 
 export interface CoffeeChatUser {
   coffeeChatUserId: string;
+  coffeeChatId: string;
   nickname: string;
   likeCount: number;
   age: number;

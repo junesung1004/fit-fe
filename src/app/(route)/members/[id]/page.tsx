@@ -13,6 +13,7 @@ import { likeMember } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
+import { sendCoffeeChat} from '@/services/chat';
 
 export default function MemberDetailPage() {
  
@@ -24,6 +25,8 @@ export default function MemberDetailPage() {
   const [member, setMember] = useState<MemberDetailResponse | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+  const [, setCoffeeChatId] = useState<string | null>(null);
+
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -68,20 +71,37 @@ export default function MemberDetailPage() {
       setShowLoginAlert(true);
       return;
     }
-
+  
     if (!userId) return alert('상대방 ID가 없습니다!');
+  
     try {
+      const response = await sendCoffeeChat({
+        title: '커피챗 신청이 왔어요!',
+        content: '커피챗을 신청하셨습니다. 확인해보세요 ☕',
+        type: 'coffee_chat_request',
+        receiverId: userId,
+        data: {},
+      });
+  
+      // ✅ coffeeChatId 저장
+      setCoffeeChatId(response.coffeeChatId);
+      console.log('💡 커피챗 ID 저장됨:', response.coffeeChatId);
+  
+      // 알림은 선택
       await sendNotification({
         receiverId: userId,
         type: 'COFFEE_CHAT',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
       });
-      alert('커피챗 신청 알림이 전송되었습니다!');
+  
+      alert('커피챗 신청이 완료되었습니다!');
     } catch (error) {
-      console.error('커피챗 신청 알림 전송 실패:', error);
+      console.error('커피챗 신청 실패:', error);
+      alert('신청에 실패했습니다 😢');
     }
   };
+  
 
   if (!member) return <div>로딩 중...</div>;
 
