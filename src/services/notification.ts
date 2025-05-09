@@ -5,9 +5,9 @@ import {
 } from '@/types/notification.type';
 
 // ✅ SSE 알림 스트림 연결
-export const connectNotificationStream = (userId: string): EventSource => {
+export const connectNotificationStream = (): EventSource => {
   return new EventSource(
-    `https://api.fit-date.co.kr/api/v1/notification/stream/${userId}`,
+    `https://api.fit-date.co.kr/api/v1/notification/stream`,
     {
       withCredentials: true,
     }
