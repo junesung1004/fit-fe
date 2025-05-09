@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams} from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -13,10 +13,15 @@ import { likeMember } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
-import { sendCoffeeChat} from '@/services/chat';
+import { sendCoffeeChat } from '@/services/chat';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+
+interface ErrorResponse {
+  message: string;
+}
 
 export default function MemberDetailPage() {
- 
   const params = useParams();
   const userId = params.id as string;
 
@@ -26,7 +31,6 @@ export default function MemberDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [, setCoffeeChatId] = useState<string | null>(null);
-
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -46,7 +50,7 @@ export default function MemberDetailPage() {
       return;
     }
 
-    if (!userId) return alert('상대방 ID가 없습니다!');
+    if (!userId) return toast.error('상대방 ID가 없습니다!');
     try {
       if (!isLiked) {
         await likeMember(userId);
@@ -56,7 +60,7 @@ export default function MemberDetailPage() {
           title: '좋아요 알림',
           content: '회원님을 마음에 들어하는 사람이 있어요 💕',
         });
-        alert('좋아요 알림이 전송되었습니다!');
+        toast.success('좋아요 알림이 전송되었습니다!');
       }
       setIsLiked((prev) => !prev);
       setIsClicked(true);
@@ -71,9 +75,9 @@ export default function MemberDetailPage() {
       setShowLoginAlert(true);
       return;
     }
-  
-    if (!userId) return alert('상대방 ID가 없습니다!');
-  
+
+    if (!userId) return toast.error('상대방 ID가 없습니다!');
+
     try {
       const response = await sendCoffeeChat({
         title: '커피챗 신청이 왔어요!',
@@ -82,11 +86,11 @@ export default function MemberDetailPage() {
         receiverId: userId,
         data: {},
       });
-  
+
       // ✅ coffeeChatId 저장
       setCoffeeChatId(response.coffeeChatId);
       console.log('💡 커피챗 ID 저장됨:', response.coffeeChatId);
-  
+
       // 알림은 선택
       await sendNotification({
         receiverId: userId,
@@ -94,14 +98,24 @@ export default function MemberDetailPage() {
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
       });
-  
-      alert('커피챗 신청이 완료되었습니다!');
+
+      toast.success('커피챗 신청이 완료되었습니다!');
     } catch (error) {
-      console.error('커피챗 신청 실패:', error);
-      alert('신청에 실패했습니다 😢');
+      const err = error as AxiosError<ErrorResponse>;
+      console.error('커피챗 신청 실패:', err);
+
+      // 백엔드에서 오는 에러 메시지 확인
+      const errorMessage = err.response?.data?.message;
+
+      if (errorMessage?.includes('이미 요청된 커피챗이 존재합니다')) {
+        toast.warning(
+          '이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.'
+        );
+      } else {
+        toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
     }
   };
-  
 
   if (!member) return <div>로딩 중...</div>;
 
