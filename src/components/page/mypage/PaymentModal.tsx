@@ -15,6 +15,7 @@ interface PaymentModalProps {
   price: string;
   userName: string;
   userEmail: string;
+  userPhone: string;
 }
 
 const generateRandomString = () =>
@@ -27,6 +28,7 @@ export default function PaymentModal({
   price,
   userName,
   userEmail,
+  userPhone,
 }: PaymentModalProps) {
   const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
   const [ready, setReady] = useState(false);
@@ -81,7 +83,7 @@ export default function PaymentModal({
         orderName: `커피 ${quantity}개`,
         customerName: userName,
         customerEmail: userEmail,
-        successUrl: `${window.location.origin}/mypage/payment/success`,
+        successUrl: `${window.location.origin}/mypage/payment/success?customerName=${userName}&customerEmail=${userEmail}&customerMobilePhone=${userPhone}`,
         failUrl: `${window.location.origin}/mypage/payment/fail`,
       });
 
@@ -95,6 +97,9 @@ export default function PaymentModal({
           paymentKey: paymentResult.paymentKey,
           orderId: paymentResult.orderId,
           amount: amount.value,
+          customerEmail: userEmail,
+          customerName: userName,
+          customerMobilePhone: userPhone,
         };
         confirmPayment(confirmData);
       }

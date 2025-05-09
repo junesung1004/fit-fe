@@ -22,6 +22,9 @@ export interface PaymentConfirmRequest {
   paymentKey: string;
   orderId: string;
   amount: number;
+  customerEmail: string;
+  customerName: string;
+  customerMobilePhone: string;
 }
 
 export interface PaymentConfirmResponse {

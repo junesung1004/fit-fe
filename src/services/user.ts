@@ -5,6 +5,7 @@ interface UserProfileResponse {
   email: string;
   nickname: string;
   name: string;
+  phone: string;
   profile: {
     profileImage: { imageUrl: string; isMain: boolean }[];
     mbti: { mbti: string };
@@ -23,6 +24,7 @@ export const getMyProfile = async (): Promise<{
   email: string;
   nickname: string;
   name: string;
+  phone: string;
   profileImage: string;
   job: string;
   height: number;
@@ -40,6 +42,7 @@ export const getMyProfile = async (): Promise<{
       email,
       nickname,
       name,
+      phone,
       profile,
       job,
       height,
@@ -63,6 +66,7 @@ export const getMyProfile = async (): Promise<{
       email,
       nickname,
       name,
+      phone,
       profileImage,
       job,
       height,

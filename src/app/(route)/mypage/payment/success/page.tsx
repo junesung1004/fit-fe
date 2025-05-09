@@ -12,12 +12,29 @@ function SuccessContent() {
   const paymentKey = searchParams.get('paymentKey');
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
+  const customerEmail = searchParams.get('customerEmail');
+  const customerName = searchParams.get('customerName');
+  const customerMobilePhone = searchParams.get('customerMobilePhone');
 
-  console.log('결제 성공:', { paymentKey, orderId, amount });
+  console.log('결제 성공:', {
+    paymentKey,
+    orderId,
+    amount,
+    customerEmail,
+    customerName,
+    customerMobilePhone,
+  });
 
   const handleConfirmPayment = async () => {
     try {
-      if (!paymentKey || !orderId || !amount) {
+      if (
+        !paymentKey ||
+        !orderId ||
+        !amount ||
+        !customerEmail ||
+        !customerName ||
+        !customerMobilePhone
+      ) {
         throw new Error('필수 결제 정보가 누락되었습니다.');
       }
 
@@ -25,6 +42,9 @@ function SuccessContent() {
         paymentKey,
         orderId,
         amount: Number(amount),
+        customerEmail,
+        customerName,
+        customerMobilePhone,
       });
 
       setIsConfirmed(true);

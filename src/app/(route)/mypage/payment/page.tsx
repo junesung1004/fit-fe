@@ -23,6 +23,7 @@ export default function PaymentPage() {
   const [userInfo, setUserInfo] = useState<{
     name: string;
     email: string;
+    phone: string;
   } | null>(null);
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function PaymentPage() {
         setUserInfo({
           name: user.name,
           email: user.email,
+          phone: user.phone,
         });
       }
     };
@@ -100,6 +102,7 @@ export default function PaymentPage() {
           price={selectedPayment.price}
           userName={userInfo.name}
           userEmail={userInfo.email}
+          userPhone={userInfo.phone}
         />
       )}
     </div>
