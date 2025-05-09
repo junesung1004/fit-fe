@@ -36,7 +36,7 @@ function NotificationItem({
 
   return (
     <div
-      className="p-4 rounded-lg shadow-sm mb-3 bg-gray-50 hover:bg-violet-100 transition-colors duration-200"
+      className="p-4 rounded-lg shadow-sm mb-3 bg-gray-50 hover:bg-violet-50 transition-colors duration-200 cursor-pointer"
       onClick={handleCardClick}
     >
       <div className="flex justify-between items-center">
