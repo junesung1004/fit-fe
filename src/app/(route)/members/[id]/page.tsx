@@ -8,7 +8,7 @@ import { HeartIcon } from '@heroicons/react/24/solid';
 import TagBadge from '@/components/common/TagBadge';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
 import Button from '@/components/common/Button';
-import { sendSseNotification } from '@/services/notification'; // ✅ 변경된 import
+import { sendNotification } from '@/services/notification'; // ✅ 변경된 import
 import { likeMember } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
@@ -54,7 +54,7 @@ export default function MemberDetailPage() {
     try {
       if (!isLiked) {
         await likeMember(userId);
-        await sendSseNotification(userId, {
+        await sendNotification(userId, {
           type: 'LIKE',
           title: '좋아요 알림',
           content: '회원님을 마음에 들어하는 사람이 있어요 💕',
@@ -89,7 +89,7 @@ export default function MemberDetailPage() {
       setCoffeeChatId(response.coffeeChatId);
       console.log('💡 커피챗 ID 저장됨:', response.coffeeChatId);
 
-      await sendSseNotification(userId, {
+      await sendNotification(userId, {
         type: 'coffee_chat_request',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
@@ -101,7 +101,9 @@ export default function MemberDetailPage() {
       const errorMessage = err.response?.data?.message;
 
       if (errorMessage?.includes('이미 요청된 커피챗이 존재합니다')) {
-        toast.warning('이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.');
+        toast.warning(
+          '이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.'
+        );
       } else {
         toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Notification } from '@/services/notification';
+import { Notification } from '@/types/notification.type';
 
 /* eslint-disable no-unused-vars */
 interface NotificationState {
@@ -9,7 +9,6 @@ interface NotificationState {
   clearNewStatus: () => void;
 }
 /* eslint-enable no-unused-vars */
-
 
 export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
