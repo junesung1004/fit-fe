@@ -135,7 +135,7 @@ export default function PaymentModal({
         <div id="agreement" className="w-full mb-4" />
 
         <button
-          className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+          className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors disabled:bg-gray-400 active:bg-blue-700"
           onClick={handlePayment}
           disabled={!ready}
         >
