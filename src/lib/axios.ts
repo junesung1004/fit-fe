@@ -16,6 +16,11 @@ instance.interceptors.response.use(
       const authStore = useAuthStore.getState();
       authStore.logout();
       toast.error('로그인이 만료되었습니다. 다시 로그인해주세요.');
+
+      // 로그인 페이지로 리다이렉트
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
