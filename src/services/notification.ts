@@ -51,10 +51,9 @@ export const sendNotification = async (
   payload: Omit<CreateNotificationPayload, 'receiverId'>
 ) => {
   try {
-    const response = await instance.post(
-      `/notification/stream/${userId}`,
-      payload
-    );
+    const response = await instance.get(`/notification/stream/${userId}`, {
+      params: payload,
+    });
     return response.data;
   } catch (error) {
     console.error('실시간 알림 전송 실패:', error);
