@@ -93,7 +93,6 @@ export default function PaymentPage() {
                         <p className="text-lg font-semibold text-gray-800">
                           {el.quantity}개
                         </p>
-                        <p className="text-sm text-gray-500">커피 아이템</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
