@@ -80,34 +80,34 @@ function NotificationItem({
 export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuthStore();
+  // eslint-disable-next-line
   const userId = user?.id;
 
-  useEffect(() => {
-    if (!userId) return;
+useEffect(() => {
+  const eventSource = new EventSource(
+    `${API_BASE_URL}/api/v1/notification/stream`,
+    { withCredentials: true }
+  );
 
-    const eventSource = new EventSource(
-      `${API_BASE_URL}/api/v1/sse/connect/${userId}`
-    );
+  eventSource.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      setNotifications((prev) => [data, ...prev]);
+    } catch (err) {
+      console.error('SSE JSON 파싱 실패:', err);
+    }
+  };
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        setNotifications((prev) => [data, ...prev]);
-      } catch (err) {
-        console.error('SSE JSON 파싱 실패:', err);
-      }
-    };
+  eventSource.onerror = (err) => {
+    console.error('SSE 연결 오류:', err);
+    eventSource.close();
+  };
 
-    eventSource.onerror = (err) => {
-      console.error('SSE 연결 오류:', err);
-      eventSource.close();
-    };
+  return () => {
+    eventSource.close(); // disconnect 호출 없이 종료
+  };
+}, []);
 
-    return () => {
-      fetch(`${API_BASE_URL}/api/v1/sse/disconnect/${userId}`);
-      eventSource.close();
-    };
-  }, [userId]);
 
   const handleDelete = async (id: number) => {
     try {
