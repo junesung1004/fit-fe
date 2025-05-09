@@ -138,7 +138,7 @@ export default function NotificationPage() {
     // 초기 알림 목록 로드
     const loadNotifications = async () => {
       try {
-        const data = await fetchNotifications(userId);
+        const data = await fetchNotifications();
         setNotifications(data);
       } catch (err) {
         console.error('알림 목록 로드 실패:', err);

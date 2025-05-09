@@ -3,6 +3,7 @@ import {
   Notification,
   CreateNotificationPayload,
 } from '@/types/notification.type';
+import { AxiosError } from 'axios';
 
 // ✅ SSE 알림 스트림 연결
 export const connectNotificationStream = (userId: string): EventSource => {
@@ -20,7 +21,13 @@ export const fetchNotifications = async (): Promise<Notification[]> => {
     const response = await instance.get(`/notification`);
     return response.data;
   } catch (error) {
-    console.error('알림을 불러오는 중 오류가 발생했습니다:', error);
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      console.error(
+        '알림 API 엔드포인트를 찾을 수 없습니다. API 경로를 확인해주세요.'
+      );
+    } else {
+      console.error('알림을 불러오는 중 오류가 발생했습니다:', error);
+    }
     throw error;
   }
 };
