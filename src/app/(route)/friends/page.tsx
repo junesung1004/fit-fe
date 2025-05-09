@@ -13,7 +13,10 @@ import {
 } from '@/services/sparklist';
 import { passMatchRequest } from '@/services/passMatch';
 import { acceptMatchRequest } from '@/services/acceptMatch';
-import { acceptCoffeeChatRequest, rejectCoffeeChatRequest } from '@/services/chat';
+import {
+  acceptCoffeeChatRequest,
+  rejectCoffeeChatRequest,
+} from '@/services/chat';
 
 interface SparkUser {
   id: string;
@@ -27,8 +30,9 @@ interface SparkUser {
 }
 
 type ProfileType = 'match' | 'like' | 'coffee';
+// eslint-disable-next-line no-unused-vars
+type AcceptFn = ((id: string) => void) | ((chatId: string, userId: string) => void);
 
-// ✅ 중복 제거 유틸 함수
 const removeDuplicates = (list: SparkUser[]) => {
   const seen = new Set();
   return list.filter((item) => {
@@ -89,7 +93,6 @@ export default function FriendsPage() {
         coffeeChatId: item.coffeeChatId,
       }));
 
-      // ✅ 중복 제거 적용
       setRoundProfiles(removeDuplicates(simplifiedMatchList));
       setLikeProfiles(removeDuplicates(simplifiedLikeList));
       setCoffeeChatProfiles(removeDuplicates(simplifiedCoffeeChatList));
@@ -124,10 +127,11 @@ export default function FriendsPage() {
     }
   };
 
-  const handleCoffeeAccept = async (coffeeChatId: string) => {
+  const handleCoffeeAccept = async (coffeeChatId: string, userId: string) => {
     try {
-      await acceptCoffeeChatRequest(coffeeChatId);
-      alert('커피챗 수락 완료!');
+      const res = await acceptCoffeeChatRequest(coffeeChatId);
+      const chatRoomId = res.chatRoomId ?? userId;
+      router.push(`/chats/${chatRoomId}?userId=${userId}`);
     } catch (error) {
       console.error('커피챗 수락 실패:', error);
     }
@@ -137,6 +141,7 @@ export default function FriendsPage() {
     try {
       await rejectCoffeeChatRequest(id);
       alert('커피챗 거절 완료!');
+      setCoffeeChatProfiles((prev) => prev.filter((user) => user.id !== id));
     } catch (error) {
       console.error('커피챗 거절 실패:', error);
     }
@@ -144,8 +149,7 @@ export default function FriendsPage() {
 
   const renderProfileCards = (
     profiles: SparkUser[],
-    // eslint-disable-next-line no-unused-vars
-    onAccept?: (id: string) => void,
+    onAccept?: AcceptFn,
     // eslint-disable-next-line no-unused-vars
     onReject?: (id: string) => void,
     useRoundCard = true,
@@ -155,7 +159,7 @@ export default function FriendsPage() {
       {profiles.map((profile) =>
         useRoundCard && onAccept && onReject ? (
           <ProfileCardRoundOne
-            key={`${type}-${profile.id}`} // ✅ 섹션별 구분된 key
+            key={`${type}-${profile.id}`}
             name={profile.nickname}
             age={getKoreanAge(profile.birthday)}
             region={profile.region}
@@ -168,16 +172,18 @@ export default function FriendsPage() {
                   console.warn('⚠️ 커피챗 ID 없음:', profile);
                   return;
                 }
-                onAccept(profile.coffeeChatId);
+                // eslint-disable-next-line no-unused-vars
+                (onAccept as (chatId: string, userId: string) => void)(profile.coffeeChatId, profile.id);
               } else {
-                onAccept(profile.id);
+                // eslint-disable-next-line no-unused-vars
+                (onAccept as (id: string) => void)(profile.id);
               }
             }}
             onReject={() => onReject(profile.id)}
           />
         ) : (
           <div
-            key={`${type}-${profile.id}`} // ✅ 여기 div도 동일하게
+            key={`${type}-${profile.id}`}
             onClick={() => handleClickMemberDetailMove(profile.id)}
             className="cursor-pointer"
           >

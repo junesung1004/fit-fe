@@ -78,7 +78,7 @@ export default function MemberDetailPage() {
       const response = await sendCoffeeChat({
         title: '커피챗 신청이 왔어요!',
         content: '커피챗을 신청하셨습니다. 확인해보세요 ☕',
-        type: 'coffee_chat_request',
+        type: 'COFFEE_CHAT',
         receiverId: userId,
         data: {},
       });
@@ -90,7 +90,7 @@ export default function MemberDetailPage() {
       // 알림은 선택
       await sendNotification({
         receiverId: userId,
-        type: 'COFFEE_CHAT',
+        type: 'coffee_chat_request',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
       });
