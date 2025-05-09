@@ -180,7 +180,7 @@ export default function NotificationPage() {
 
     if (confirm('전체 알림을 삭제하시겠습니까?')) {
       try {
-        await deleteAllNotifications(userId);
+        await deleteAllNotifications();
         setNotifications([]);
       } catch (err) {
         console.error('전체 알림 삭제 실패:', err);
