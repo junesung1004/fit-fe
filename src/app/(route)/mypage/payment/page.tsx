@@ -1,28 +1,29 @@
 'use client';
 
 import NavItem from '@/components/page/mypage/NavItem';
-import Payment from '@/components/page/mypage/Payment';
+import PaymentModal from '@/components/page/mypage/PaymentModal';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { getUserCoffeeCount } from '@/services/userCoffee';
-import { getMyProfile } from '@/services/user'; 
-
-interface PaymentDataType {
-  id: number;
-  quantity: number;
-  price: string;
-}
+import { getMyProfile } from '@/services/user';
+import { PaymentDataType } from '@/types/payment.type';
 
 const PAYMENT_DATA: PaymentDataType[] = [
-  { id: 1, quantity: 32, price: '$4,900' },
-  { id: 2, quantity: 64, price: '$9,900' },
-  { id: 3, quantity: 128, price: '$17,000' },
-  { id: 4, quantity: 256, price: '$32,500' },
-  { id: 5, quantity: 512, price: '$52,900' },
+  { id: 1, quantity: 30, price: '$2,900' },
+  { id: 2, quantity: 60, price: '$5,900' },
+  { id: 3, quantity: 120, price: '$10,000' },
+  { id: 4, quantity: 240, price: '$20,000' },
+  { id: 5, quantity: 500, price: '$40,000' },
 ];
 
 export default function PaymentPage() {
   const [coffeeCount, setCoffeeCount] = useState<number>(0);
+  const [selectedPayment, setSelectedPayment] =
+    useState<PaymentDataType | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchCoffee = async () => {
@@ -30,10 +31,22 @@ export default function PaymentPage() {
       if (user) {
         const count = await getUserCoffeeCount(user.id);
         setCoffeeCount(count);
+        setUserInfo({
+          name: user.name,
+          email: user.email,
+        });
       }
     };
     fetchCoffee();
   }, []);
+
+  const handlePaymentClick = (payment: PaymentDataType) => {
+    setSelectedPayment(payment);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPayment(null);
+  };
 
   return (
     <div className="w-full min-h-full flex flex-col gap-10 items-center justify-center">
@@ -56,7 +69,11 @@ export default function PaymentPage() {
           <nav>
             <ul className="flex flex-col gap-5">
               {PAYMENT_DATA.map((el) => (
-                <Payment key={el.id}>
+                <li
+                  key={el.id}
+                  className="w-full p-5 border border-black rounded-2xl cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => handlePaymentClick(el)}
+                >
                   <div className="flex justify-between">
                     <p className="text-xl">
                       ☕ <span className="text-rose-500">{el.quantity}</span>개
@@ -68,12 +85,23 @@ export default function PaymentPage() {
                       </div>
                     </div>
                   </div>
-                </Payment>
+                </li>
               ))}
             </ul>
           </nav>
         </div>
       </div>
+
+      {selectedPayment && userInfo && (
+        <PaymentModal
+          isOpen={!!selectedPayment}
+          onClose={handleCloseModal}
+          quantity={selectedPayment.quantity}
+          price={selectedPayment.price}
+          userName={userInfo.name}
+          userEmail={userInfo.email}
+        />
+      )}
     </div>
   );
 }

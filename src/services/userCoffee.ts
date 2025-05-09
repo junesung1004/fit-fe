@@ -1,5 +1,3 @@
-// src/services/userCoffee.ts
-
 import instance from '@/lib/axios';
 
 export const getUserCoffeeCount = async (userId: string): Promise<number> => {

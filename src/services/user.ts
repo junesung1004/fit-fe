@@ -4,6 +4,7 @@ interface UserProfileResponse {
   id: string;
   email: string;
   nickname: string;
+  name: string;
   profile: {
     profileImage: { imageUrl: string; isMain: boolean }[];
     mbti: { mbti: string };
@@ -21,6 +22,7 @@ export const getMyProfile = async (): Promise<{
   id: string;
   email: string;
   nickname: string;
+  name: string;
   profileImage: string;
   job: string;
   height: number;
@@ -33,17 +35,34 @@ export const getMyProfile = async (): Promise<{
 } | null> => {
   try {
     const res = await instance.get<UserProfileResponse>('/user/me');
-    const { id, email, nickname, profile, job, height, birthday, likeCount } = res.data;
+    const {
+      id,
+      email,
+      nickname,
+      name,
+      profile,
+      job,
+      height,
+      birthday,
+      likeCount,
+    } = res.data;
     const profileImage = profile.profileImage[0]?.imageUrl || '/default.png';
     const mbti = profile.mbti.mbti;
-    const interestCategory = profile.interestCategory.map((item) => item.interestCategory.name);
-    const userIntroductions = profile.userIntroductions.map((item) => item.introduction.name);
-    const userFeedbacks = profile.userFeedbacks.map((item) => item.feedback.name);
+    const interestCategory = profile.interestCategory.map(
+      (item) => item.interestCategory.name
+    );
+    const userIntroductions = profile.userIntroductions.map(
+      (item) => item.introduction.name
+    );
+    const userFeedbacks = profile.userFeedbacks.map(
+      (item) => item.feedback.name
+    );
 
     return {
       id,
       email,
       nickname,
+      name,
       profileImage,
       job,
       height,
