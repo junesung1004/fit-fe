@@ -46,17 +46,17 @@ function SuccessContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-2xl">
         {isConfirmed ? (
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex flex-col items-center">
-              <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
+              <div className="mb-6">
                 <Image
                   src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png"
                   alt="결제 성공"
-                  width={80}
-                  height={80}
+                  width={50}
+                  height={50}
                   className="animate-bounce"
                 />
               </div>
@@ -97,7 +97,7 @@ function SuccessContent() {
         ) : (
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex flex-col items-center">
-              <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+              <div className="mb-6">
                 <Image
                   src="https://static.toss.im/lotties/loading-spot-apng.png"
                   alt="로딩중"
@@ -129,7 +129,7 @@ export default function SuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center">
           <Spinner size="lg" />
         </div>
       }

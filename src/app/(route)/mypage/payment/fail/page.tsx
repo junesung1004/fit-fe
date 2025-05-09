@@ -12,16 +12,16 @@ function FailContent() {
   const errorMessage = searchParams.get('message');
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-2xl">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6">
+            <div className="mb-6">
               <Image
                 src="https://static.toss.im/lotties/error-spot-apng.png"
                 alt="결제 실패"
-                width={80}
-                height={80}
+                width={50}
+                height={50}
                 className="animate-pulse"
               />
             </div>
@@ -68,7 +68,7 @@ export default function FailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center">
           <Spinner size="lg" />
         </div>
       }
