@@ -51,39 +51,64 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="w-full min-h-full flex flex-col gap-10 items-center justify-center">
-      <div className="flex flex-col gap-6 w-full px-14">
+    <div className="w-full min-h-full flex flex-col gap-8 items-center justify-center py-12">
+      <div className="flex flex-col gap-8 w-full max-w-2xl px-6">
         {/* 커피 아이템 개수 */}
         <NavItem>
-          <div className="flex justify-between items-center px-7">
-            <p className="text-xl">나의 보유 커피</p>
-            <div className="flex items-center gap-2">
-              <div className="relative w-[24px] h-[24px]">
+          <div className="flex justify-between items-center px-6 py-4">
+            <p className="text-xl font-semibold text-gray-800">
+              나의 보유 커피
+            </p>
+            <div className="flex items-center gap-3 bg-rose-50 px-4 py-2 rounded-full">
+              <div className="relative w-6 h-6">
                 <Image src={'/coffee-beans.png'} alt="커피이미지" fill />
               </div>
-              <div className="text-xl">{coffeeCount}</div>
+              <div className="text-xl font-bold text-rose-600">
+                {coffeeCount}
+              </div>
             </div>
           </div>
         </NavItem>
 
         {/* 커피 개수별 결제 페이지 링크 */}
-        <div className="flex flex-col gap-6 w-full p-14 border border-black rounded-3xl">
+        <div className="flex flex-col gap-6 w-full p-8 bg-white rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            커피 충전하기
+          </h2>
+          <p className="text-gray-600 mb-4">원하는 수량을 선택해주세요</p>
           <nav>
-            <ul className="flex flex-col gap-5">
+            <ul className="flex flex-col gap-4">
               {PAYMENT_DATA.map((el) => (
                 <li
                   key={el.id}
-                  className="w-full p-5 border border-black rounded-2xl cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="w-full p-6 bg-white border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-rose-200 hover:shadow-md transition-all duration-200"
                   onClick={() => handlePaymentClick(el)}
                 >
-                  <div className="flex justify-between">
-                    <p className="text-xl">
-                      ☕ <span className="text-rose-500">{el.quantity}</span>개
-                    </p>
-                    <div className="flex justify-center items-center gap-3">
-                      <span className="text-slate-400">{el.price}</span>
-                      <div className="relative w-[12px] h-[12px]">
-                        <Image src={'/icons/Vector.png'} alt="화살표" fill />
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
+                        <span className="text-rose-600 text-lg">☕</span>
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-gray-800">
+                          {el.quantity}개
+                        </p>
+                        <p className="text-sm text-gray-500">커피 아이템</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xl font-bold text-rose-600">
+                        {el.price}
+                      </span>
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                        <div className="relative w-3 h-3">
+                          <Image
+                            src={'/icons/Vector.png'}
+                            alt="화살표"
+                            fill
+                            className="opacity-50"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -64,34 +64,46 @@ export default function FriendsPage() {
     const fetchData = async () => {
       const data = await fetchSparkList();
 
-      const simplifiedMatchList: SparkUser[] = data.matchList.map((item: MatchItem) => ({
-        id: item.matchedUserId,
-        nickname: item.nickname,
-        likeCount: item.likeCount,
-        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
-        region: item.region,
-        profileImage: item.profileImage ?? '/default.png',
-        isSuccess: item.isSuccess,
-      }));
+      const simplifiedMatchList: SparkUser[] = data.matchList.map(
+        (item: MatchItem) => ({
+          id: item.matchedUserId,
+          nickname: item.nickname,
+          likeCount: item.likeCount,
+          birthday: item.age
+            ? `${new Date().getFullYear() - item.age + 1}-01-01`
+            : null,
+          region: item.region,
+          profileImage: item.profileImage ?? '/default.png',
+          isSuccess: item.isSuccess,
+        })
+      );
 
-      const simplifiedLikeList: SparkUser[] = data.likeList.map((item: LikeUser) => ({
-        id: item.likedUserId,
-        nickname: item.nickname,
-        likeCount: item.likeCount,
-        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
-        region: item.region,
-        profileImage: item.profileImage ?? '/default.png',
-      }));
+      const simplifiedLikeList: SparkUser[] = data.likeList.map(
+        (item: LikeUser) => ({
+          id: item.likedUserId,
+          nickname: item.nickname,
+          likeCount: item.likeCount,
+          birthday: item.age
+            ? `${new Date().getFullYear() - item.age + 1}-01-01`
+            : null,
+          region: item.region,
+          profileImage: item.profileImage ?? '/default.png',
+        })
+      );
 
-      const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map((item: CoffeeChatUser) => ({
-        id: item.coffeeChatUserId,
-        nickname: item.nickname,
-        likeCount: item.likeCount,
-        birthday: item.age ? `${new Date().getFullYear() - item.age + 1}-01-01` : null,
-        region: item.region,
-        profileImage: item.profileImage ?? '/default.png',
-        coffeeChatId: item.coffeeChatId,
-      }));
+      const simplifiedCoffeeChatList: SparkUser[] = data.coffeeChatList.map(
+        (item: CoffeeChatUser) => ({
+          id: item.coffeeChatUserId,
+          nickname: item.nickname,
+          likeCount: item.likeCount,
+          birthday: item.age
+            ? `${new Date().getFullYear() - item.age + 1}-01-01`
+            : null,
+          region: item.region,
+          profileImage: item.profileImage ?? '/default.png',
+          coffeeChatId: item.coffeeChatId,
+        })
+      );
 
       setRoundProfiles(removeDuplicates(simplifiedMatchList));
       setLikeProfiles(removeDuplicates(simplifiedLikeList));
@@ -202,7 +214,7 @@ export default function FriendsPage() {
   );
 
   return (
-    <main className="flex-1 px-6 space-y-10 pb-16 bg-gray-50">
+    <main className="flex-1 px-6 space-y-10 pb-16">
       {/* 월드컵 */}
       <section className="pt-10">
         <div className="flex justify-between items-center mb-2">
