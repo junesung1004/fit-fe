@@ -11,7 +11,7 @@ export const TOSS_CLIENT_KEY = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
 export const confirmPayment = async (paymentData: PaymentConfirmRequest) => {
   try {
     const response = await instance.post<PaymentConfirmResponse>(
-      '/payments/confirm',
+      '/payment/confirm',
       paymentData
     );
     return response.data;
