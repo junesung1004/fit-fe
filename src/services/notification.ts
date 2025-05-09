@@ -15,11 +15,9 @@ export const connectNotificationStream = (userId: string): EventSource => {
 };
 
 // ✅ 알림 목록 불러오기
-export const fetchNotifications = async (
-  userId: string
-): Promise<Notification[]> => {
+export const fetchNotifications = async (): Promise<Notification[]> => {
   try {
-    const response = await instance.get(`/notification/${userId}`);
+    const response = await instance.get(`/notification`);
     return response.data;
   } catch (error) {
     console.error('알림을 불러오는 중 오류가 발생했습니다:', error);
@@ -60,7 +58,7 @@ export const sendNotification = async (
 // ✅ 알림 읽음 처리
 export const markNotificationAsRead = async (id: string) => {
   try {
-    const response = await instance.patch(`/notification/${id}/read`);
+    const response = await instance.post(`/notification/${id}/read`);
     return response.data;
   } catch (error) {
     console.error('알림 읽음 처리 실패:', error);
@@ -80,9 +78,9 @@ export const deleteNotification = async (id: string) => {
 };
 
 // ✅ 전체 알림 삭제
-export const deleteAllNotifications = async (userId: string) => {
+export const deleteAllNotifications = async () => {
   try {
-    const response = await instance.delete(`/notification/${userId}/all`);
+    const response = await instance.delete(`/notification`);
     return response.data;
   } catch (error) {
     console.error('전체 알림 삭제 실패:', error);
