@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  fetchNotifications,
   deleteNotification,
   deleteAllNotifications,
   Notification,
 } from '@/services/notification';
+import { useAuthStore } from '@/store/authStore';
+
+const API_BASE_URL = 'https://api.fit-date.co.kr'; // ✅ 하드코딩된 API 주소
 
 const formatDate = (dateString: string) =>
   new Date(dateString).toLocaleString('ko-KR', {
@@ -20,7 +22,7 @@ function NotificationItem({
   onDelete,
 }: {
   notification: Notification;
-// eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   onDelete: (id: number) => void;
 }) {
   const router = useRouter();
@@ -77,15 +79,35 @@ function NotificationItem({
 
 export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { user } = useAuthStore();
+  const userId = user?.id;
 
-  // 1) 초기 알림 로드
   useEffect(() => {
-    fetchNotifications()
-      .then((data) => setNotifications(data))
-      .catch((err) => console.error('초기 알림 로드 실패:', err));
-  }, []);
+    if (!userId) return;
 
-  
+    const eventSource = new EventSource(
+      `${API_BASE_URL}/api/v1/sse/connect/${userId}`
+    );
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setNotifications((prev) => [data, ...prev]);
+      } catch (err) {
+        console.error('SSE JSON 파싱 실패:', err);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error('SSE 연결 오류:', err);
+      eventSource.close();
+    };
+
+    return () => {
+      fetch(`${API_BASE_URL}/api/v1/sse/disconnect/${userId}`);
+      eventSource.close();
+    };
+  }, [userId]);
 
   const handleDelete = async (id: number) => {
     try {

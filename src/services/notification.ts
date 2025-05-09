@@ -10,14 +10,13 @@ export interface Notification {
 }
 
 export interface NotificationPayload {
-  
   receiverId: string;
   type: string;
   title: string;
   content: string;
 }
 
-// 알림 목록 불러오기
+// ✅ 알림 목록 불러오기 (HTTP)
 export const fetchNotifications = async (): Promise<Notification[]> => {
   try {
     const response = await instance.get('/notification');
@@ -28,7 +27,7 @@ export const fetchNotifications = async (): Promise<Notification[]> => {
   }
 };
 
-// 알림 전송
+// ✅ 알림 전송 (HTTP)
 export const sendNotification = async (
   notificationPayload: NotificationPayload
 ) => {
@@ -41,7 +40,25 @@ export const sendNotification = async (
   }
 };
 
-// 알림 하나 삭제
+// ✅ 알림 전송 (SSE)
+export const sendSseNotification = async (
+  userId: string,
+  payload: {
+    type: string;
+    title: string;
+    content: string;
+  }
+) => {
+  try {
+    const response = await instance.post(`/sse/send/${userId}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('SSE 알림 전송 실패:', error);
+    throw error;
+  }
+};
+
+// ✅ 알림 하나 삭제
 export const deleteNotification = async (id: number) => {
   try {
     const response = await instance.delete(`/notification/${id}`);
@@ -52,7 +69,7 @@ export const deleteNotification = async (id: number) => {
   }
 };
 
-// 전체 알림 삭제 (Id 불필요)
+// ✅ 전체 알림 삭제
 export const deleteAllNotifications = async () => {
   try {
     const response = await instance.delete('/notification');
@@ -62,6 +79,3 @@ export const deleteAllNotifications = async () => {
     throw error;
   }
 };
-
-
-
