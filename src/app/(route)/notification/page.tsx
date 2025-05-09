@@ -7,7 +7,6 @@ import {
   deleteAllNotifications,
   fetchNotifications,
   connectNotificationStream,
-  markNotificationAsRead,
 } from '@/services/notification';
 import { useAuthStore } from '@/store/authStore';
 import { Notification } from '@/types/notification.type';
@@ -21,19 +20,13 @@ const formatDate = (dateString: string) =>
 function NotificationItem({
   notification,
   onDelete,
-  onRead,
 }: {
   notification: Notification;
   onDelete: () => void;
-  onRead: () => void;
 }) {
   const router = useRouter();
 
   const handleCardClick = () => {
-    if (!notification.isRead) {
-      onRead();
-    }
-
     const path =
       notification.type === 'like'
         ? `/members/${notification.data?.senderId}`
@@ -41,23 +34,9 @@ function NotificationItem({
     router.push(path);
   };
 
-  // 알림 타입에 따른 배경색 설정
-  const getBgColor = () => {
-    if (notification.isRead) return 'bg-gray-50';
-
-    switch (notification.type) {
-      case 'match':
-        return 'bg-rose-50';
-      case 'like':
-        return 'bg-violet-50';
-      default:
-        return 'bg-gray-50';
-    }
-  };
-
   return (
     <div
-      className={`p-2 rounded-lg shadow-sm mb-2 ${getBgColor()} cursor-pointer`}
+      className="p-4 rounded-lg shadow-sm mb-3 bg-gray-50 hover:bg-violet-100 transition-colors duration-200"
       onClick={handleCardClick}
     >
       <div className="flex justify-between items-center">
@@ -75,15 +54,11 @@ function NotificationItem({
         </button>
       </div>
       <div className="mt-1 text-sm text-gray-700">{notification.content}</div>
-      <div
-        className={`mt-1 text-xs font-medium ${
-          notification.type === 'like' ? 'text-violet-500' : 'text-rose-500'
-        }`}
-      >
+      <div className="mt-2 text-xs font-medium text-gray-500">
         {notification.type === 'like' && '프로필 보러 가기'}
         {notification.type === 'match' && '채팅하러 가기'}
       </div>
-      <div className="text-[10px] text-gray-400 mt-1">
+      <div className="text-[10px] text-gray-400 mt-2">
         {formatDate(notification.createdAt)}
       </div>
     </div>
@@ -92,6 +67,7 @@ function NotificationItem({
 
 export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuthStore();
   const userId = user?.id;
 
@@ -114,23 +90,20 @@ export default function NotificationPage() {
         try {
           const data = JSON.parse(event.data);
           setNotifications((prev) => [data, ...prev]);
-        } catch (err) {
-          console.error('SSE JSON 파싱 실패:', err);
+          setError(null);
+        } catch {
+          setError('알림 데이터를 처리하는 중 오류가 발생했습니다.');
         }
       };
 
-      eventSource.onerror = (err) => {
-        console.error('SSE 연결 오류:', err);
+      eventSource.onerror = () => {
         eventSource?.close();
 
         if (retryCount < MAX_RETRIES) {
           retryCount++;
-          console.log(
-            `${RETRY_DELAY / 1000}초 후 재연결 시도 (${retryCount}/${MAX_RETRIES})`
-          );
           setTimeout(connectSSE, RETRY_DELAY);
         } else {
-          console.error('최대 재시도 횟수 초과');
+          setError('알림 연결에 실패했습니다. 페이지를 새로고침해주세요.');
         }
       };
     };
@@ -140,8 +113,9 @@ export default function NotificationPage() {
       try {
         const data = await fetchNotifications();
         setNotifications(data);
-      } catch (err) {
-        console.error('알림 목록 로드 실패:', err);
+        setError(null);
+      } catch {
+        setError('알림을 불러오는데 실패했습니다. 다시 시도해주세요.');
       }
     };
 
@@ -159,19 +133,9 @@ export default function NotificationPage() {
     try {
       await deleteNotification(notification.id);
       setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-    } catch (err) {
-      console.error('알림 삭제 실패:', err);
-    }
-  };
-
-  const handleRead = async (notification: Notification) => {
-    try {
-      await markNotificationAsRead(notification.id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
-      );
-    } catch (err) {
-      console.error('알림 읽음 처리 실패:', err);
+      setError(null);
+    } catch {
+      setError('알림 삭제에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -182,8 +146,9 @@ export default function NotificationPage() {
       try {
         await deleteAllNotifications();
         setNotifications([]);
-      } catch (err) {
-        console.error('전체 알림 삭제 실패:', err);
+        setError(null);
+      } catch {
+        setError('전체 알림 삭제에 실패했습니다. 다시 시도해주세요.');
       }
     }
   };
@@ -210,6 +175,12 @@ export default function NotificationPage() {
         )}
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+          {error}
+        </div>
+      )}
+
       {notifications.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">알림이 없습니다.</p>
       ) : (
@@ -218,7 +189,6 @@ export default function NotificationPage() {
             key={notification.id}
             notification={notification}
             onDelete={() => handleDelete(notification)}
-            onRead={() => handleRead(notification)}
           />
         ))
       )}
