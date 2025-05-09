@@ -1,10 +1,11 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function FailPage() {
+function FailContent() {
   const searchParams = useSearchParams();
   const errorCode = searchParams.get('code');
   const errorMessage = searchParams.get('message');
@@ -43,5 +44,13 @@ export default function FailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FailPage() {
+  return (
+    <Suspense fallback={<div>로딩중...</div>}>
+      <FailContent />
+    </Suspense>
   );
 }

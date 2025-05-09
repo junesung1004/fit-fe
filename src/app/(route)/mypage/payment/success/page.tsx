@@ -1,17 +1,19 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { confirmPayment } from '@/services/payment';
 
-export default function SuccessPage() {
+function SuccessContent() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const searchParams = useSearchParams();
   const paymentKey = searchParams.get('paymentKey');
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
+
+  console.log('결제 성공:', { paymentKey, orderId, amount });
 
   const handleConfirmPayment = async () => {
     try {
@@ -33,7 +35,16 @@ export default function SuccessPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6">
+    <div className="w-full min-h-full flex flex-col gap-10 items-center justify-center">
+      <div className="flex flex-col gap-6 w-full px-14">
+        <h1 className="text-2xl font-bold text-center">
+          결제가 완료되었습니다!
+        </h1>
+        <div className="flex flex-col gap-2">
+          <p>주문번호: {orderId}</p>
+          <p>결제금액: {amount}원</p>
+        </div>
+      </div>
       {isConfirmed ? (
         <div className="flex flex-col items-center max-w-[540px] w-full">
           <Image
@@ -92,5 +103,13 @@ export default function SuccessPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div>로딩중...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }
