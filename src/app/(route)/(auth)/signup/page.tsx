@@ -14,7 +14,7 @@ import {
   useEmailVerificationMutation,
   useSignUpMutation,
   useUploadImageMutataion,
-} from '@/hooks/mutation/useSignUpMutation';
+} from '@/hooks/mutations/useSignUpMutation';
 import { SignUpFormValues } from '@/types/signUp.type';
 import { toast } from 'react-toastify';
 import {

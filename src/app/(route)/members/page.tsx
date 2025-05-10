@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import {
   AdjustmentsHorizontalIcon,
@@ -10,13 +10,10 @@ import Button from '@/components/common/Button';
 import Divider from '@/components/common/Divider';
 import RangeSlider from '@/components/page/members/RangeSlider';
 import ProfileCard from '@/components/common/Profilecard';
-import {
-  fetchFilteredUsersFromGet,
-  fetchAnonymousUsers,
-  saveFilterSettings,
-  FilteredUser,
-} from '@/services/memeber';
-import { useAuthStore } from '@/store/authStore';
+import { useUsersQuery } from '@/hooks/queries/useUsersQuery';
+import { useFilterUsersMutation } from '@/hooks/mutations/useFilterUsersMutation';
+import { isAxiosError } from '@/lib/error';
+import { toast } from 'react-toastify';
 
 const REGION = [
   '',
@@ -41,53 +38,57 @@ const REGION = [
 
 export default function MembersPage() {
   const [isShowFilter, setIsShowFilter] = useState(false);
-  const [users, setUsers] = useState<FilteredUser[]>([]);
-  // const [distance, setDistance] = useState(0); // 일단 사용 안함
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
   const [region, setRegion] = useState('');
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        let data: FilteredUser[] = [];
-        if (isLoggedIn) {
-          data = await fetchFilteredUsersFromGet();
-        } else {
-          data = await fetchAnonymousUsers();
-        }
-        setUsers(data);
-      } catch (err) {
-        console.error('사용자 목록 로드 실패:', err);
+  const { data: users = [], error: usersError } = useUsersQuery();
+  const { mutate: filterUsers } = useFilterUsersMutation();
+
+  // 에러 발생 시 토스트 메시지 표시
+  React.useEffect(() => {
+    if (usersError) {
+      if (isAxiosError(usersError)) {
+        toast.error(
+          usersError.response?.data.message ||
+            '사용자 목록을 불러오는데 실패했습니다.'
+        );
+      } else {
+        toast.error('사용자 목록을 불러오는데 실패했습니다.');
       }
+    }
+  }, [usersError]);
+
+  const handleApplyFilter = (e: FormEvent) => {
+    e.preventDefault();
+    const filter = {
+      region,
+      minAge: age,
+      maxAge: 60,
+      minLikeCount: likes,
     };
-    fetchUsers();
-  }, [isLoggedIn]);
+    filterUsers(filter, {
+      onSuccess: () => {
+        toast.success('필터가 적용되었습니다.');
+        toggleFilter();
+      },
+      onError: (error) => {
+        if (isAxiosError(error)) {
+          toast.error(
+            error.response?.data.message || '필터 적용에 실패했습니다.'
+          );
+        } else {
+          toast.error('필터 적용에 실패했습니다.');
+        }
+      },
+    });
+  };
 
   const toggleFilter = () => setIsShowFilter((v) => !v);
   const resetFilter = () => {
-    // setDistance(0);
     setAge(20);
     setLikes(0);
     setRegion('');
-  };
-
-  const applyFilter = async (e: FormEvent) => {
-    e.preventDefault();
-    try {
-      await saveFilterSettings({
-        region,
-        minAge: age,
-        maxAge: 60,
-        minLikeCount: likes,
-      });
-      const refreshedUsers = await fetchFilteredUsersFromGet();
-      setUsers(refreshedUsers);
-      toggleFilter();
-    } catch (err) {
-      console.error('필터 적용 실패:', err);
-    }
   };
 
   return (
@@ -107,7 +108,7 @@ export default function MembersPage() {
               />
             </div>
             <Divider />
-            <form className="flex flex-col gap-7" onSubmit={applyFilter}>
+            <form className="flex flex-col gap-7" onSubmit={handleApplyFilter}>
               <div className="flex flex-col">
                 <label htmlFor="region" className="font-medium mb-1">
                   지역
@@ -125,19 +126,6 @@ export default function MembersPage() {
                   ))}
                 </select>
               </div>
-
-              {/* <RangeSlider
-                id="distance"
-                name="distance"
-                label="거리"
-                min={0}
-                max={10}
-                step={1}
-                value={distance}
-                unit="km"
-                rangeText="0km ~ 10km"
-                onChange={setDistance}
-              /> */}
               <RangeSlider
                 id="age"
                 name="age"

@@ -5,7 +5,7 @@ import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCard
 import {
   usePublicTodayDatingMatchMutation,
   useTodayDatingMatchMutation,
-} from '@/hooks/mutation/useTodayDatingMatchMutation';
+} from '@/hooks/mutations/useTodayDatingMatchMutation';
 import { selectAllMatchUser } from '@/services/todayDatingMatch';
 import { useAuthStore } from '@/store/authStore';
 import { UserDataType } from '@/types/homePage.type';

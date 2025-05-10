@@ -14,7 +14,7 @@ import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 import { toast } from 'react-toastify';
-import { useSendCoffeeChatMutation } from '@/hooks/mutation/useSendCoffeeChatMutation';
+import { useSendCoffeeChatMutation } from '@/hooks/mutations/useSendCoffeeChatMutation';
 import { isAxiosError } from '@/lib/error';
 
 export default function MemberDetailPage() {

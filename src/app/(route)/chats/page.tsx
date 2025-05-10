@@ -2,7 +2,7 @@
 
 import Button from '@/components/common/Button';
 import TagBadge from '@/components/common/TagBadge';
-import { useGetChatRoomDataMutation } from '@/hooks/mutation/useChatRoomDataMutation';
+import { useGetChatRoomDataMutation } from '@/hooks/mutations/useChatRoomDataMutation';
 import { useGetChatRoomQuery } from '@/hooks/queries/useGetChatRoomQuery';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';

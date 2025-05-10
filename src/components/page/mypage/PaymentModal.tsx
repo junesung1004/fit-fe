@@ -6,7 +6,7 @@ import {
 } from '@tosspayments/tosspayments-sdk';
 import { PaymentAmount, PaymentConfirmRequest } from '@/types/payment.type';
 import { TOSS_CLIENT_KEY } from '@/services/payment';
-import { useConfirmPaymentMutation } from '@/hooks/mutation/useConfirmPaymentMutation';
+import { useConfirmPaymentMutation } from '@/hooks/mutations/useConfirmPaymentMutation';
 
 interface PaymentModalProps {
   isOpen: boolean;

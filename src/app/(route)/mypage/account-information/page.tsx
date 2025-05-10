@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/common/Button';
-import { useLogOutMutation } from '@/hooks/mutation/useLogOutMutation';
-import { useUserDeleteMutation } from '@/hooks/mutation/useUserDeleteMutation';
+import { useLogOutMutation } from '@/hooks/mutations/useLogOutMutation';
+import { useUserDeleteMutation } from '@/hooks/mutations/useUserDeleteMutation';
 import { getMyProfile } from '@/services/user';
 
 export default function AccountInformationPage() {

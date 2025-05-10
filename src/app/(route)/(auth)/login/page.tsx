@@ -3,7 +3,7 @@
 import React, { FormEvent, useRef } from 'react';
 import Image from 'next/image';
 import Button from '@/components/common/Button';
-import { useLoginMutation } from '@/hooks/mutation/useLoginMutation';
+import { useLoginMutation } from '@/hooks/mutations/useLoginMutation';
 import { LoginProps } from '@/services/login';
 
 export default function LoginPage() {
