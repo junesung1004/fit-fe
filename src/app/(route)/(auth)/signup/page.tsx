@@ -104,7 +104,6 @@ export default function SignUpPage() {
     });
     return () => subscription.unsubscribe();
   }, [watch, setValue]);
-  
 
   const handleImageChange = (
     index: number,
@@ -221,7 +220,7 @@ export default function SignUpPage() {
               type="button"
               rounded="full"
               variant="outline"
-              size="full"
+              size="md-full"
               onClick={() => handleClickEmailSuccess(emailSuccessCode)}
             >
               인증 확인
