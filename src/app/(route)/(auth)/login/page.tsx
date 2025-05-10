@@ -65,11 +65,11 @@ export default function LoginPage() {
             회원가입
           </a>
           <span>|</span>
-          <a href="/find-id" className="hover:underline">
-            아이디 찾기
+          <a href="/login/find-email" className="hover:underline">
+            이메일 찾기
           </a>
           <span>|</span>
-          <a href="/find-password" className="hover:underline">
+          <a href="/login/find-password" className="hover:underline">
             비밀번호 찾기
           </a>
         </div>
