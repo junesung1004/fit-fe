@@ -210,7 +210,7 @@ export default function SignUpPage() {
           <div className="flex items-center gap-3">
             <input
               value={emailSuccessCode}
-              className="w-full border border-violet-500 rounded-full py-2 px-4"
+              className="w-full border border-violet-500 rounded-full h-10 px-4"
               id="email-code"
               type="text"
               placeholder="6자리 인증코드를 입력해주세요."
