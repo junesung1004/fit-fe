@@ -3,9 +3,9 @@
 import NavItem from '@/components/page/mypage/NavItem';
 import PaymentModal from '@/components/page/mypage/PaymentModal';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
-import { getUserCoffeeCount } from '@/services/userCoffee';
-import { getMyProfile } from '@/services/user';
+import React, { useState } from 'react';
+import { useCoffeeCountQuery } from '@/hooks/queries/useCoffeeCountQuery';
+import { useMyProfileQuery } from '@/hooks/queries/useMyProfileQuery';
 import { PaymentDataType } from '@/types/payment.type';
 
 const PAYMENT_DATA: PaymentDataType[] = [
@@ -17,34 +17,10 @@ const PAYMENT_DATA: PaymentDataType[] = [
 ];
 
 export default function PaymentPage() {
-  const [coffeeCount, setCoffeeCount] = useState<number | string>(0);
+  const { data: coffeeCount } = useCoffeeCountQuery();
+  const { data: user } = useMyProfileQuery();
   const [selectedPayment, setSelectedPayment] =
     useState<PaymentDataType | null>(null);
-  const [userInfo, setUserInfo] = useState<{
-    name: string;
-    email: string;
-    phone: string;
-  } | null>(null);
-
-  useEffect(() => {
-    const fetchCoffee = async () => {
-      const user = await getMyProfile();
-      if (user) {
-        const count = await getUserCoffeeCount();
-        if (typeof count === 'number') {
-          setCoffeeCount(count);
-        } else {
-          setCoffeeCount('?');
-        }
-        setUserInfo({
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-        });
-      }
-    };
-    fetchCoffee();
-  }, []);
 
   const handlePaymentClick = (payment: PaymentDataType) => {
     setSelectedPayment(payment);
@@ -122,15 +98,15 @@ export default function PaymentPage() {
         </div>
       </div>
 
-      {selectedPayment && userInfo && (
+      {selectedPayment && user && (
         <PaymentModal
           isOpen={!!selectedPayment}
           onClose={handleCloseModal}
           quantity={selectedPayment.quantity}
           price={selectedPayment.price}
-          userName={userInfo.name}
-          userEmail={userInfo.email}
-          userPhone={userInfo.phone}
+          userName={user.name}
+          userEmail={user.email}
+          userPhone={user.phone}
         />
       )}
     </div>

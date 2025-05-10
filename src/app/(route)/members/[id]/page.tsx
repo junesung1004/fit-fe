@@ -8,14 +8,14 @@ import { HeartIcon } from '@heroicons/react/24/solid';
 import TagBadge from '@/components/common/TagBadge';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
 import Button from '@/components/common/Button';
-import { sendNotification } from '@/services/notification'; // ✅ 변경된 import
+import { sendNotification } from '@/services/notification';
 import { likeMember } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
-import { sendCoffeeChat } from '@/services/chat';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { useSendCoffeeChatMutation } from '@/hooks/mutation/useSendCoffeeChatMutation';
 
 interface ErrorResponse {
   message: string;
@@ -24,13 +24,13 @@ interface ErrorResponse {
 export default function MemberDetailPage() {
   const params = useParams();
   const userId = params.id as string;
-
   const { isLoggedIn } = useAuthStore();
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [member, setMember] = useState<MemberDetailResponse | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [, setCoffeeChatId] = useState<string | null>(null);
+  const sendCoffeeChatMutation = useSendCoffeeChatMutation();
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -78,7 +78,7 @@ export default function MemberDetailPage() {
     if (!userId) return toast.error('상대방 ID가 없습니다!');
 
     try {
-      const response = await sendCoffeeChat({
+      const response = await sendCoffeeChatMutation.mutateAsync({
         title: '커피챗 신청이 왔어요!',
         content: '커피챗을 신청하셨습니다. 확인해보세요 ☕',
         type: 'COFFEE_CHAT',
@@ -93,7 +93,7 @@ export default function MemberDetailPage() {
         type: 'coffee_chat_request',
         title: '커피챗 신청',
         content: '커피챗 요청이 도착했어요 ☕',
-      }); // ✅ SSE 방식으로 변경
+      });
 
       toast.success('커피챗 신청이 완료되었습니다!');
     } catch (error) {
