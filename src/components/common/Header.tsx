@@ -30,7 +30,7 @@ export default function Header() {
     };
 
     fetchCoffeeCount();
-  }, [user]);
+  }, [user, coffeeCount]);
 
   return isLoggedIn ? (
     <header className="relative flex items-center justify-between h-20 border-b px-4">
