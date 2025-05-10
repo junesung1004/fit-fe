@@ -5,8 +5,7 @@ export const getUserCoffeeCount = async (): Promise<number | string> => {
   try {
     const res = await instance.get<number>('/user/user-coffee');
     return res.data;
-  } catch (error) {
-    console.error('커피 개수 조회 실패:', error);
+  } catch {
     return '?';
   }
 };
