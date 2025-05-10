@@ -36,7 +36,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="absolute bottom-0 w-full h-[80px] flex items-center border-t bg-gray-50">
+      <footer className="absolute bottom-0 w-full h-[80px] flex items-center border-t bg-gray-50 z-10">
         <nav className="w-full flex">
           <ul className="flex w-full justify-around">
             {menus.map(({ href, icon: Icon, label, auth }) => {

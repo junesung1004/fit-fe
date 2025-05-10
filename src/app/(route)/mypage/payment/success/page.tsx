@@ -54,7 +54,7 @@ function SuccessContent() {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center p-6">
+    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center p-6 z-50">
       <div className="w-full max-w-2xl">
         {isConfirmed ? (
           <div className="bg-white rounded-2xl shadow-lg p-8">

@@ -7,6 +7,8 @@ import {
 import { PaymentAmount, PaymentConfirmRequest } from '@/types/payment.type';
 import { TOSS_CLIENT_KEY } from '@/services/payment';
 import { useConfirmPaymentMutation } from '@/hooks/mutations/useConfirmPaymentMutation';
+import { isAxiosError } from '@/lib/error';
+import { toast } from 'react-toastify';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -104,7 +106,11 @@ export default function PaymentModal({
         confirmPayment(confirmData);
       }
     } catch (error) {
-      console.error('결제 요청 실패:', error);
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data?.message
+        : '결제 요청 중 오류가 발생했습니다.';
+
+      toast.error(errorMessage);
     }
   };
 
