@@ -18,9 +18,12 @@ export default function Header() {
   const [coffeeCount, setCoffeeCount] = useState<number | string>(0);
 
   useEffect(() => {
+    console.log('useEffect 실행됨', { user, coffeeCount });
     const fetchCoffeeCount = async () => {
       if (user) {
+        console.log('getUserCoffeeCount 호출 전');
         const count = await getUserCoffeeCount();
+        console.log('getUserCoffeeCount 결과:', count);
         if (typeof count === 'number') {
           setCoffeeCount(count);
         } else {
