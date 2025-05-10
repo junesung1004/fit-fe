@@ -7,7 +7,22 @@ export interface FilteredUser {
   profileImage: string;
 }
 
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+export interface FilterParams {
+  region: string;
+  minAge: number;
+  maxAge: number;
+  minLikeCount: number;
+}
+
+export interface UsersQueryParams extends PaginationParams {
+  filter?: FilterParams;
+}
+
 export interface FilteredUsersResponse {
   users: FilteredUser[];
-  nextCursor: string;
 }

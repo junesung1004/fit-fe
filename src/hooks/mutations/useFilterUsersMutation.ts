@@ -4,13 +4,7 @@ import {
   fetchPublicFilteredUsers,
 } from '@/services/memeber';
 import { useAuthStore } from '@/store/authStore';
-
-interface FilterParams {
-  region: string;
-  minAge: number;
-  maxAge: number;
-  minLikeCount: number;
-}
+import { FilterParams } from '@/types/member.type';
 
 export const useFilterUsersMutation = () => {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);

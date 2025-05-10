@@ -10,6 +10,7 @@ import Button from '@/components/common/Button';
 import Divider from '@/components/common/Divider';
 import RangeSlider from '@/components/page/members/RangeSlider';
 import ProfileCard from '@/components/common/Profilecard';
+import Pagination from '@/components/common/Pagination';
 import { useUsersQuery } from '@/hooks/queries/useUsersQuery';
 import { useFilterUsersMutation } from '@/hooks/mutations/useFilterUsersMutation';
 import { isAxiosError } from '@/lib/error';
@@ -41,8 +42,13 @@ export default function MembersPage() {
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
   const [region, setRegion] = useState('');
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
 
-  const { data: users = [], error: usersError } = useUsersQuery();
+  const { data: users = [], error: usersError } = useUsersQuery({
+    page,
+    limit: ITEMS_PER_PAGE,
+  });
   const { mutate: filterUsers } = useFilterUsersMutation();
 
   // 에러 발생 시 토스트 메시지 표시
@@ -66,6 +72,8 @@ export default function MembersPage() {
       minAge: age,
       maxAge: 60,
       minLikeCount: likes,
+      page,
+      limit: ITEMS_PER_PAGE,
     };
     filterUsers(filter, {
       onSuccess: () => {
@@ -196,6 +204,13 @@ export default function MembersPage() {
             </Link>
           ))}
         </div>
+
+        <Pagination
+          currentPage={page}
+          totalItems={users.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );
