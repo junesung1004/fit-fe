@@ -17,7 +17,7 @@ const PAYMENT_DATA: PaymentDataType[] = [
 ];
 
 export default function PaymentPage() {
-  const [coffeeCount, setCoffeeCount] = useState<number>(0);
+  const [coffeeCount, setCoffeeCount] = useState<number | string>(0);
   const [selectedPayment, setSelectedPayment] =
     useState<PaymentDataType | null>(null);
   const [userInfo, setUserInfo] = useState<{
@@ -30,8 +30,12 @@ export default function PaymentPage() {
     const fetchCoffee = async () => {
       const user = await getMyProfile();
       if (user) {
-        const count = await getUserCoffeeCount(user.id);
-        setCoffeeCount(count);
+        const count = await getUserCoffeeCount();
+        if (typeof count === 'number') {
+          setCoffeeCount(count);
+        } else {
+          setCoffeeCount('?');
+        }
         setUserInfo({
           name: user.name,
           email: user.email,

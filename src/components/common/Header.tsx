@@ -8,22 +8,24 @@ import { useAuthStore } from '@/store/authStore';
 import Button from './Button';
 import { useNotificationStore } from '@/store/notificationStore';
 import { useEffect, useState } from 'react';
-import { getUserCoffeeCount } from '@/services/userCoffee'; // 커피 서비스 import!
+import { getUserCoffeeCount } from '@/services/userCoffee';
 
 export default function Header() {
   const pathName = usePathname();
   const router = useRouter();
   const { isLoggedIn, user } = useAuthStore();
-
   const { notifications, hasNew } = useNotificationStore();
-
-  const [coffeeCount, setCoffeeCount] = useState<number>(0); // 나의 커피 상태
+  const [coffeeCount, setCoffeeCount] = useState<number | string>(0);
 
   useEffect(() => {
     const fetchCoffeeCount = async () => {
       if (user) {
-        const count = await getUserCoffeeCount(); // 서비스 사용
-        setCoffeeCount(count);
+        const count = await getUserCoffeeCount();
+        if (typeof count === 'number') {
+          setCoffeeCount(count);
+        } else {
+          setCoffeeCount('?');
+        }
       }
     };
 
