@@ -22,7 +22,7 @@ export default function Header() {
   useEffect(() => {
     const fetchCoffeeCount = async () => {
       if (user) {
-        const count = await getUserCoffeeCount(user.id); // 서비스 사용
+        const count = await getUserCoffeeCount(); // 서비스 사용
         setCoffeeCount(count);
       }
     };
