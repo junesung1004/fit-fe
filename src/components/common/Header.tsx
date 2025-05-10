@@ -14,7 +14,9 @@ export default function Header() {
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
   const { notifications, hasNew } = useNotificationStore();
-  const { data: coffeeCount } = useCoffeeCountQuery();
+  const { data: coffeeCount } = useCoffeeCountQuery({
+    enabled: isLoggedIn,
+  });
 
   return isLoggedIn ? (
     <header className="relative flex items-center justify-between h-20 border-b px-4">
