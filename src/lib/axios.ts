@@ -9,11 +9,19 @@ const instance = axios.create({
 
 // 인증이 필요하지 않은 API 경로들
 const PUBLIC_PATHS = [
-  '/auth/login',
-  '/auth/signup',
-  '/auth/email/verification',
-  '/auth/email/send',
-  '/auth/refresh',
+  '/auth/register',
+  '/auth/check-email',
+  '/auth/check-nickname',
+  '/auth/send-verification-email',
+  '/auth/verify-email',
+  '/auth/google',
+  '/auth/google/login/callback',
+  '/auth/kakao',
+  '/auth/kakao/login/callback',
+  '/auth/naver',
+  '/auth/naver/login/callback',
+  '/match/random/public',
+  '/user/filtered-users',
 ];
 
 // 응답 인터셉터 추가
