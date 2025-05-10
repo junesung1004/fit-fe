@@ -10,6 +10,8 @@ import { Message, ChatRoomProps } from '@/types/chats.type';
 import { Message as MessageComponent } from '@/components/page/chats/Message';
 import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery';
 import { useGetUserRegionFestivalsQuery } from '@/hooks/queries/useGetUserRegionFestivalsQuery';
+import { toast } from 'react-toastify';
+import { isAxiosError } from '@/lib/error';
 
 // 날짜 포맷 변환 함수
 const formatDate = (dateStr: string) =>
@@ -25,18 +27,37 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   const festivalsPerPage = 2;
   const pageButtonLimit = 5;
 
-  const { data: chatRoomData, isLoading: isChatLoading } =
-    useGetChatMessagesQuery(chatRoomId, userId);
-  const { data: festivalData } = useGetUserRegionFestivalsQuery(userId || '');
+  const {
+    data: chatRoomData,
+    isLoading: isChatLoading,
+    error: chatError,
+  } = useGetChatMessagesQuery(chatRoomId, userId);
+  const { data: festivalData, error: festivalError } =
+    useGetUserRegionFestivalsQuery(userId || '');
   const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (chatError) {
+      if (isAxiosError(chatError)) {
+        const errorMessage = chatError.response?.data?.message;
+        toast.error(errorMessage || '채팅방 정보를 불러오는데 실패했습니다.');
+      } else {
+        toast.error('채팅방 정보를 불러오는데 실패했습니다.');
+      }
+    }
+
+    if (festivalError) {
+      if (isAxiosError(festivalError)) {
+        const errorMessage = festivalError.response?.data?.message;
+        toast.error(errorMessage || '축제 정보를 불러오는데 실패했습니다.');
+      } else {
+        toast.error('축제 정보를 불러오는데 실패했습니다.');
+      }
+    }
+  }, [chatError, festivalError]);
 
   // 채팅방 메시지 초기 데이터 설정 및 스크롤
   useEffect(() => {
-    console.log('메시지 초기화 useEffect 실행', {
-      chatRoomDataMessages: chatRoomData?.messages?.length,
-      festivalData: festivalData?.length,
-    });
-
     if (chatRoomData?.messages) {
       // 축제 정보를 메시지 형태로 변환
       const festivalMessage: Message = {
@@ -56,26 +77,20 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
         scrollToBottom();
       }, 100);
     }
-  }, [chatRoomData, festivalData]);
+  }, [chatRoomData, festivalData, chatRoomId]);
 
   // 새 메시지 추가 시 스크롤 최하단으로 이동
   useEffect(() => {
-    console.log('스크롤 useEffect 실행', {
-      messagesLength: messages.length,
-      lastMessage: messages[messages.length - 1]?.content,
-    });
     scrollToBottom();
   }, [messages]);
 
   // 소켓 연결 및 메시지 수신 설정
   useEffect(() => {
-    console.log('소켓 연결 useEffect 실행', { userId, chatRoomId });
     if (!userId) return;
 
     socket.connect();
 
     socket.on('connect', () => {
-      console.log('소켓 연결됨');
       setIsConnected(true);
       socket.emit('join', {
         chatRoomId,
@@ -84,12 +99,10 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     });
 
     socket.on('message', (message: Message) => {
-      console.log('새 메시지 수신', message);
       setMessages((prev) => [...prev, message]);
     });
 
     return () => {
-      console.log('소켓 연결 해제');
       socket.disconnect();
     };
   }, [chatRoomId, userId]);
@@ -102,15 +115,19 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     e.preventDefault();
     if (!inputMessage.trim() || !userId) return;
 
-    socket.emit('message', {
-      content: inputMessage,
-      userId,
-      chatRoomId,
-      profileImage: chatRoomData?.partner?.profileImage || '/default.png',
-      name: chatRoomData?.partner?.name || '알 수 없음',
-    });
+    try {
+      socket.emit('message', {
+        content: inputMessage,
+        userId,
+        chatRoomId,
+        profileImage: chatRoomData?.partner?.profileImage || '/default.png',
+        name: chatRoomData?.partner?.name || '알 수 없음',
+      });
 
-    setInputMessage('');
+      setInputMessage('');
+    } catch {
+      toast.error('메시지 전송에 실패했습니다.');
+    }
   };
 
   if (isChatLoading || !isConnected) {
