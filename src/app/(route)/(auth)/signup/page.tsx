@@ -16,13 +16,13 @@ import {
   useUploadImageMutataion,
 } from '@/hooks/mutation/useSignUpMutation';
 import { SignUpFormValues } from '@/types/signUp.type';
-import {
-  INTERESTS,
-  LISTENING,
-  MBTI,
-  SELPINTRO,
-} from '@/constants/signupDummyData';
 import { toast } from 'react-toastify';
+import {
+  useFeedbackQuery,
+  useInterestsQuery,
+  useIntroduceQuery,
+} from '@/hooks/queries/useSignUpInfoQuery';
+import MbtiSelector from '@/components/common/MbtiSelctor';
 
 export default function SignUpPage() {
   const {
@@ -53,6 +53,21 @@ export default function SignUpPage() {
   const [isImageValid, setIsImageValid] = useState(false);
   const { mutate, isPending } = useSignUpMutation();
   const [isEmailCode, setIsEmailCode] = useState(false);
+
+  //회원가입 관심사, 피드백, 이런사람이에요 state
+  const { data: interest } = useInterestsQuery();
+  // console.log('관심사 : ', interest);
+  const interestNames =
+    interest?.map((el: { id: number; name: string }) => el.name) ?? [];
+  // console.log('관심사 : ', interestNames);
+  const { data: feedback } = useFeedbackQuery();
+  const feedbackNames =
+    feedback?.map((el: { id: number; name: string }) => el.name) ?? [];
+  //console.log('피드백 ㅣ ', feedbackNames);
+  const { data: introduce } = useIntroduceQuery();
+  // console.log('저는 이런사람이에요 : ', introduce);
+  const introduceNames =
+    introduce?.map((el: { id: number; name: string }) => el.name) ?? [];
 
   const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
   const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
@@ -396,24 +411,17 @@ export default function SignUpPage() {
         />
 
         {/* MBTI 필드 */}
-        <MultiToggleButtonGroup
-          label="MBTI"
-          name="mbti"
-          options={MBTI}
-          required
-          limit={1}
-          min={1}
+        <MbtiSelector
           register={register}
-          setValue={setValue}
-          trigger={trigger}
-          error={errors.mbti as FieldError}
+          error={errors.mbti?.message as string}
+          required
         />
 
         {/* 관심사 필드 */}
         <MultiToggleButtonGroup
           label="관심사"
           name="interests"
-          options={INTERESTS}
+          options={interestNames}
           required
           limit={3}
           min={2}
@@ -427,7 +435,7 @@ export default function SignUpPage() {
         <MultiToggleButtonGroup
           label="이런 얘기 많이 들어요"
           name="listening"
-          options={LISTENING}
+          options={feedbackNames}
           required
           limit={3}
           min={1}
@@ -441,7 +449,7 @@ export default function SignUpPage() {
         <MultiToggleButtonGroup
           label="저는 이런 사람이에요"
           name="selfintro"
-          options={SELPINTRO}
+          options={introduceNames}
           required
           limit={3}
           min={1}

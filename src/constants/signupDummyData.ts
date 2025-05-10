@@ -27,22 +27,3 @@ export const SELPINTRO = [
   '털털한 편이에요',
   '훌륭한 요리실력',
 ];
-
-export const MBTI = [
-  'ISTJ',
-  'ISFJ',
-  'INFJ',
-  'INTJ',
-  'ISTP',
-  'ISFP',
-  'INFP',
-  'INTP',
-  'ESTP',
-  'ESFP',
-  'ENFP',
-  'ENTP',
-  'ESTJ',
-  'ESFJ',
-  'ENFJ',
-  'ENTJ',
-];

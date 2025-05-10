@@ -8,7 +8,7 @@ interface UserDeleteResponse {
 
 export const userDelete = async () => {
   try {
-    const response = await instance.post('/auth/delete-account');
+    const response = await instance.delete('/auth/delete-account');
     return response;
   } catch (error) {
     const err = error as AxiosError<UserDeleteResponse>;

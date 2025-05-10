@@ -81,6 +81,7 @@ export const getMyProfile = async (): Promise<{
     return null;
   }
 };
+
 export const changePassword = async (
   oldPassword: string,
   newPassword: string,
@@ -96,5 +97,14 @@ export const changePassword = async (
   } catch (error) {
     console.error('비밀번호 변경 실패:', error);
     return false; // 실패
+  }
+};
+
+export const deleteUser = async () => {
+  try {
+    const response = await instance.delete(`auth/delete-account`);
+    return response.data;
+  } catch (error) {
+    console.error('회원 탈퇴 로직 api 에러 : ', error);
   }
 };

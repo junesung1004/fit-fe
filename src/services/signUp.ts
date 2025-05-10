@@ -105,3 +105,42 @@ export const emailVerificationSuccess = async (code: number) => {
     throw new Error(err.response?.data?.message || '이메일 인증코드 확인 실패');
   }
 };
+
+//회원가입 관심사 data api get 요청
+export const signupInterestCategoryData = async () => {
+  try {
+    const response = await instance.get(`/interest-category`);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 관심사 정보 불러오기 실패패');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+  }
+};
+
+//회원가입 저는 이런얘기 많이 들어요(피드백) data api get 요청
+export const signupFeedbackData = async () => {
+  try {
+    const response = await instance.get(`/feedback`);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 피드백 정보 불러오기 실패패');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+  }
+};
+
+// 회원가입 저는 이런 사람이에요 (introduce) data api get 요청
+export const signupIntroduceData = async () => {
+  try {
+    const response = await instance.get(`/introduction`);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<SignUpErrorResponse>;
+    console.error('❌ 저는 이런사람이에요 정보 불러오기 실패패');
+    console.error('📍 상태 코드:', err.response?.status);
+    console.error('📍 메시지:', err.response?.data?.message);
+  }
+};
