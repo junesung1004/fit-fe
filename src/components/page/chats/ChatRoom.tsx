@@ -12,7 +12,7 @@ import { useGetChatMessagesQuery } from '@/hooks/queries/useGetChatMessagesQuery
 import { useGetUserRegionFestivalsQuery } from '@/hooks/queries/useGetUserRegionFestivalsQuery';
 import { toast } from 'react-toastify';
 import { isAxiosError } from '@/lib/error';
-import Pagination from '@/components/common/Pagination';
+import Pagination from '@/components/page/chats/Pagination';
 
 // 날짜 포맷 변환 함수
 const formatDate = (dateStr: string) =>

@@ -35,19 +35,22 @@ export const fetchPublicFilteredUsers = async (
 // 로그인 회원목록 조회
 export const fetchLoggedInUsers = async (
   params?: PaginationParams
-): Promise<FilteredUser[]> => {
-  const res = await instance.get('/user-filter/list', {
+): Promise<FilteredUsersResponse> => {
+  const res = await instance.get<FilteredUsersResponse>('/user-filter/list', {
     params,
   });
-  return res.data.users;
+  return res.data;
 };
 
 // 비로그인 회원목록 조회
 export const fetchPublicUsers = async (
   params?: PaginationParams
-): Promise<FilteredUser[]> => {
-  const res = await instance.get('/user-filter/public-list', {
-    params,
-  });
-  return res.data.users;
+): Promise<FilteredUsersResponse> => {
+  const res = await instance.get<FilteredUsersResponse>(
+    '/user-filter/public-list',
+    {
+      params,
+    }
+  );
+  return res.data;
 };

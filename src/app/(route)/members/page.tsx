@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
+import { useState, FormEvent, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import {
   AdjustmentsHorizontalIcon,
@@ -10,11 +10,12 @@ import Button from '@/components/common/Button';
 import Divider from '@/components/common/Divider';
 import RangeSlider from '@/components/page/members/RangeSlider';
 import ProfileCard from '@/components/common/Profilecard';
-import Pagination from '@/components/common/Pagination';
+import Spinner from '@/components/common/Spinner';
 import { useUsersQuery } from '@/hooks/queries/useUsersQuery';
 import { useFilterUsersMutation } from '@/hooks/mutations/useFilterUsersMutation';
 import { isAxiosError } from '@/lib/error';
 import { toast } from 'react-toastify';
+import { FilteredUser } from '@/types/member.type';
 
 const REGION = [
   '',
@@ -42,17 +43,47 @@ export default function MembersPage() {
   const [age, setAge] = useState(20);
   const [likes, setLikes] = useState(0);
   const [region, setRegion] = useState('');
-  const [page, setPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
 
-  const { data: users = [], error: usersError } = useUsersQuery({
-    page,
-    limit: ITEMS_PER_PAGE,
+  const {
+    data,
+    error: usersError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useUsersQuery({
+    take: 6,
   });
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback(
+    (node: HTMLAnchorElement) => {
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [fetchNextPage]
+  );
+
   const { mutate: filterUsers } = useFilterUsersMutation();
 
+  const users =
+    data?.pages
+      .flatMap((page) => page.users)
+      .reduce<Map<string, FilteredUser>>((acc, user) => {
+        if (!acc.has(user.id)) {
+          acc.set(user.id, user);
+        }
+        return acc;
+      }, new Map())
+      .values() ?? [];
+  const uniqueUsers = Array.from(users);
+
   // 에러 발생 시 토스트 메시지 표시
-  React.useEffect(() => {
+  useEffect(() => {
     if (usersError) {
       if (isAxiosError(usersError)) {
         toast.error(
@@ -72,8 +103,8 @@ export default function MembersPage() {
       minAge: age,
       maxAge: 60,
       minLikeCount: likes,
-      page,
-      limit: ITEMS_PER_PAGE,
+      page: 1,
+      limit: 6,
     };
     filterUsers(filter, {
       onSuccess: () => {
@@ -191,8 +222,16 @@ export default function MembersPage() {
         <p className="text-gray-400 text-sm">새로운 인연을 찾아 보세요!</p>
 
         <div className="flex flex-wrap gap-7 pt-5">
-          {users.map((u) => (
-            <Link key={u.id} href={`/members/${u.id}`}>
+          {uniqueUsers.map((u, index) => (
+            <Link
+              key={u.id}
+              href={`/members/${u.id}`}
+              ref={
+                index === uniqueUsers.length - 1 && hasNextPage
+                  ? lastElementRef
+                  : undefined
+              }
+            >
               <ProfileCard
                 name={u.nickname}
                 age={u.age}
@@ -204,13 +243,11 @@ export default function MembersPage() {
             </Link>
           ))}
         </div>
-
-        <Pagination
-          currentPage={page}
-          totalItems={users.length}
-          itemsPerPage={ITEMS_PER_PAGE}
-          onPageChange={setPage}
-        />
+        {isFetchingNextPage && (
+          <div className="text-center py-4">
+            <Spinner size="sm" color="primary" />
+          </div>
+        )}
       </div>
     </div>
   );

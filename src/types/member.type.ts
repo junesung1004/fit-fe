@@ -8,8 +8,8 @@ export interface FilteredUser {
 }
 
 export interface PaginationParams {
-  page: number;
-  limit: number;
+  cursor?: string | null;
+  take: number;
 }
 
 export interface FilterParams {
@@ -25,4 +25,5 @@ export interface UsersQueryParams extends PaginationParams {
 
 export interface FilteredUsersResponse {
   users: FilteredUser[];
+  nextCursor: string | null;
 }
