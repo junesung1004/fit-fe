@@ -27,11 +27,20 @@ function NotificationItem({
   const router = useRouter();
 
   const handleCardClick = () => {
-    const path =
-      notification.type === 'like'
-        ? `/members/${notification.data?.senderId}`
-        : `/chats/${notification.data?.senderId}`;
-    router.push(path);
+    if (notification.type === 'LIKE') {
+      router.push(`/members/${notification.data.senderId}`);
+      return;
+    }
+    if (notification.type === 'CHAT') {
+     router.push(
+      `/chats/${notification.data.chatRoomId}?userId=${notification.data.senderId}`
+    );
+    }
+    if (notification.type === 'COFFEE_CHAT') {
+      router.push(
+      `/chats/${notification.data.chatRoomId}?userId=${notification.data.senderId}`);
+      return;
+    }
   };
 
   return (
@@ -56,7 +65,7 @@ function NotificationItem({
       <div className="mt-1 text-sm text-gray-700">{notification.content}</div>
       <div className="mt-2 text-xs font-medium text-gray-500">
         {notification.type === 'like' && '프로필 보러 가기'}
-        {notification.type === 'match' && '채팅하러 가기'}
+        {notification.type === 'CHAT' && '채팅하러 가기'}
       </div>
       <div className="text-[10px] text-gray-400 mt-2">
         {formatDate(notification.createdAt)}
@@ -88,8 +97,14 @@ export default function NotificationPage() {
 
       eventSource.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
-          setNotifications((prev) => [data, ...prev]);
+          const parsed = JSON.parse(event.data);
+          if (Array.isArray(parsed)) {
+            // 전체 알림 리스트를 다시 받을 때
+            setNotifications(parsed);
+          } else {
+            // 새 알림 한 건
+            setNotifications((prev) => [parsed, ...prev]);
+          }
           setError(null);
         } catch {
           setError('알림 데이터를 처리하는 중 오류가 발생했습니다.');
@@ -98,7 +113,6 @@ export default function NotificationPage() {
 
       eventSource.onerror = () => {
         eventSource?.close();
-
         if (retryCount < MAX_RETRIES) {
           retryCount++;
           setTimeout(connectSSE, RETRY_DELAY);
@@ -108,7 +122,6 @@ export default function NotificationPage() {
       };
     };
 
-    // 초기 알림 목록 로드
     const loadNotifications = async () => {
       try {
         const data = await fetchNotifications();
@@ -141,7 +154,6 @@ export default function NotificationPage() {
 
   const handleClearAll = async () => {
     if (!userId) return;
-
     if (confirm('전체 알림을 삭제하시겠습니까?')) {
       try {
         await deleteAllNotifications();
