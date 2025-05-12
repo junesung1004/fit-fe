@@ -2,6 +2,21 @@ import { create } from 'zustand';
 import { socket } from '@/lib/socket';
 import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 
+// 현재 로그인한 사용자 ID를 가져오는 함수
+const getCurrentUserId = (): string | null => {
+  try {
+    // 실제 저장 방식에 따라 수정 필요
+    const userInfo = localStorage.getItem('user_info');
+    if (!userInfo) return null;
+
+    const parsed = JSON.parse(userInfo);
+    return parsed.id || null;
+  } catch (e) {
+    console.error('Failed to get current user ID', e);
+    return null;
+  }
+};
+
 export const useUserStatusStore = create<UserStatusState>((set, get) => ({
   userStatuses: {},
 
@@ -14,6 +29,12 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
       {} as Record<string, boolean>
     );
 
+    // 현재 사용자는 항상 온라인으로 표시
+    const currentUserId = getCurrentUserId();
+    if (currentUserId) {
+      newStatuses[currentUserId] = true;
+    }
+
     set((state) => ({
       userStatuses: { ...state.userStatuses, ...newStatuses },
     }));
@@ -21,6 +42,12 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 
   fetchUserStatuses: (userIds) => {
     if (userIds.length === 0) return;
+
+    // 현재 사용자를 온라인으로 표시
+    const currentUserId = getCurrentUserId();
+    if (currentUserId) {
+      get().updateUserStatuses([{ userId: currentUserId, isActive: true }]);
+    }
 
     if (!socket.connected) {
       socket.connect();
@@ -46,6 +73,14 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         setTimeout(() => {
           get().fetchUserStatuses(userIds);
         }, 1000);
+      }
+    });
+
+    // 연결 직후 자신의 상태 업데이트
+    socket.on('connect', () => {
+      const currentUserId = getCurrentUserId();
+      if (currentUserId) {
+        get().updateUserStatuses([{ userId: currentUserId, isActive: true }]);
       }
     });
   },
