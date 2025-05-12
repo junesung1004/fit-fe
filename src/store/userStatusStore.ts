@@ -5,12 +5,12 @@ import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 // 현재 로그인한 사용자 ID를 가져오는 함수
 const getCurrentUserId = (): string | null => {
   try {
-    // 실제 저장 방식에 따라 수정 필요
-    const userInfo = localStorage.getItem('user_info');
-    if (!userInfo) return null;
+    // auth-storage에서 사용자 정보 가져오기
+    const authStorage = localStorage.getItem('auth-storage');
+    if (!authStorage) return null;
 
-    const parsed = JSON.parse(userInfo);
-    return parsed.id || null;
+    const parsed = JSON.parse(authStorage);
+    return parsed.state?.user?.id || null;
   } catch (e) {
     console.error('Failed to get current user ID', e);
     return null;
@@ -46,7 +46,9 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     // 현재 사용자를 온라인으로 표시
     const currentUserId = getCurrentUserId();
     if (currentUserId) {
-      get().updateUserStatuses([{ userId: currentUserId, isActive: true }]);
+      set((state) => ({
+        userStatuses: { ...state.userStatuses, [currentUserId]: true },
+      }));
     }
 
     if (!socket.connected) {
@@ -80,7 +82,9 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     socket.on('connect', () => {
       const currentUserId = getCurrentUserId();
       if (currentUserId) {
-        get().updateUserStatuses([{ userId: currentUserId, isActive: true }]);
+        set((state) => ({
+          userStatuses: { ...state.userStatuses, [currentUserId]: true },
+        }));
       }
     });
   },
