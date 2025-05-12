@@ -169,11 +169,7 @@ export default function SignUpPage() {
         ...data,
         images: validImageUrls,
       };
-      mutate(payload, {
-        onSuccess: () => {
-          window.location.reload(); // 회원가입 후 상태 초기화
-        },
-      });
+      mutate(payload);
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
     }
