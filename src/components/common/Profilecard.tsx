@@ -1,13 +1,15 @@
 import React from 'react';
-
+import Image from 'next/image';
+import { useUserStatusStore } from '@/store/userStatusStore';
 
 type ProfileCardProps = {
   name: string;
   age: number;
   region: string;
   likes?: number;
+  userId: string;
   isOnline: boolean;
-  profileImageUrl: string; 
+  profileImageUrl: string;
   onClick?: () => void;
 };
 
@@ -16,26 +18,33 @@ const ProfileCard = ({
   age,
   region,
   likes = 0,
-  isOnline,
+  userId,
+  isOnline: isOnlineProp,
   profileImageUrl,
   onClick,
 }: ProfileCardProps) => {
+  const { userStatuses } = useUserStatusStore();
+  const isOnline = userStatuses[userId] || isOnlineProp;
+
   return (
-    <div 
-    className="w-[120px] p-4 bg-white rounded-lg shadow-md cursor-pointer" 
-    onClick={onClick} >
+    <div
+      className="w-[120px] p-4 bg-white rounded-lg shadow-md cursor-pointer"
+      onClick={onClick}
+    >
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-4">
         <div className="w-24 h-24 relative ">
-        <div className="flex justify-center mb-4">
-  <div className="w-24 h-24 relative">
-      <img
-      src={profileImageUrl || '/default.png'}
-      alt="Profile Image"
-      className="rounded-full object-cover w-full h-full"
-    />
-    </div>
-    </div>
+          <div className="flex justify-center mb-4">
+            <div className="w-24 h-24 relative">
+              <Image
+                src={profileImageUrl || '/default.png'}
+                alt="Profile Image"
+                className="rounded-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 96px"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

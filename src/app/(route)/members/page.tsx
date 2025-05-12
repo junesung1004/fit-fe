@@ -16,6 +16,7 @@ import { useFilterUsersMutation } from '@/hooks/mutations/useFilterUsersMutation
 import { isAxiosError } from '@/lib/error';
 import { toast } from 'react-toastify';
 import { FilteredUser } from '@/types/member.type';
+import { useUserStatusStore } from '@/store/userStatusStore';
 
 const REGION = [
   '',
@@ -47,6 +48,7 @@ export default function MembersPage() {
   const [region, setRegion] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<FilteredUser[]>([]);
   const [isFiltered, setIsFiltered] = useState(false);
+  const { userStatuses, fetchUserStatuses } = useUserStatusStore();
 
   const {
     data,
@@ -88,7 +90,13 @@ export default function MembersPage() {
 
   const uniqueUsers = isFiltered ? filteredUsers : Array.from(users);
 
-  // 에러 발생 시 토스트 메시지 표시
+  useEffect(() => {
+    if (uniqueUsers.length > 0) {
+      const userIds = uniqueUsers.map((user) => user.id);
+      fetchUserStatuses(userIds);
+    }
+  }, [uniqueUsers, fetchUserStatuses]);
+
   useEffect(() => {
     if (usersError) {
       if (isAxiosError(usersError)) {
@@ -255,11 +263,12 @@ export default function MembersPage() {
               }
             >
               <ProfileCard
+                userId={u.id}
                 name={u.nickname}
                 age={u.age}
                 likes={u.likeCount}
                 region={u.region}
-                isOnline={true}
+                isOnline={userStatuses[u.id] || false}
                 profileImageUrl={u.profileImage ?? '/default.png'}
               />
             </Link>

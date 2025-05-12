@@ -19,6 +19,7 @@ import {
 } from '@/services/chat';
 import { isAxiosError } from '@/lib/error';
 import { toast } from 'react-toastify';
+import { useUserStatusStore } from '@/store/userStatusStore';
 
 interface SparkUser {
   id: string;
@@ -54,14 +55,13 @@ const getKoreanAge = (birthday: string | null): number => {
 
 export default function FriendsPage() {
   const router = useRouter();
-
   const [roundProfiles, setRoundProfiles] = useState<SparkUser[]>([]);
   const [likeProfiles, setLikeProfiles] = useState<SparkUser[]>([]);
   const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
-
   const [isRoundExpanded, setIsRoundExpanded] = useState(false);
   const [isLikeExpanded, setIsLikeExpanded] = useState(false);
   const [isCoffeeChatExpanded, setIsCoffeeChatExpanded] = useState(false);
+  const { userStatuses, fetchUserStatuses } = useUserStatusStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,10 +111,23 @@ export default function FriendsPage() {
       setRoundProfiles(removeDuplicates(simplifiedMatchList));
       setLikeProfiles(removeDuplicates(simplifiedLikeList));
       setCoffeeChatProfiles(removeDuplicates(simplifiedCoffeeChatList));
+
+      // 프로필 설정 후 모든 사용자 ID를 상태 업데이트 요청
+      const allProfileIds = [
+        ...simplifiedMatchList.map((p) => p.id),
+        ...simplifiedLikeList.map((p) => p.id),
+        ...simplifiedCoffeeChatList.map((p) => p.id),
+      ];
+
+      // 중복 제거
+      const uniqueUserIds = [...new Set(allProfileIds)];
+      if (uniqueUserIds.length > 0) {
+        fetchUserStatuses(uniqueUserIds);
+      }
     };
 
     fetchData();
-  }, []);
+  }, [fetchUserStatuses]);
 
   const handleClickMemberDetailMove = (id: string) => {
     router.push(`/members/${id}`);
@@ -227,11 +240,12 @@ export default function FriendsPage() {
             className="cursor-pointer"
           >
             <ProfileCard
+              userId={profile.id}
               name={profile.nickname}
               age={getKoreanAge(profile.birthday)}
               region={profile.region}
               likes={profile.likeCount}
-              isOnline={true}
+              isOnline={userStatuses[profile.id] || false}
               profileImageUrl={profile.profileImage}
             />
           </div>

@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logofit from '@/assets/1.png';
+import { useUserStatusStore } from '@/store/userStatusStore';
 
 export default function MatchingResultsPage() {
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
@@ -15,14 +16,26 @@ export default function MatchingResultsPage() {
   const [isFalse, setIsFalse] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<MatchResult | null>(null);
   const router = useRouter();
+  const { userStatuses, fetchUserStatuses } = useUserStatusStore();
 
   useEffect(() => {
     const loadMatchResults = async () => {
       const data = await fetchMatchResults();
       setMatchResults(data);
+
+      // 모든 사용자 ID 수집하여 온라인 상태 가져오기
+      const userIds = data.flatMap((result) => [
+        result.currentUser.id,
+        result.selectedUser.id,
+      ]);
+
+      // 중복 제거 후 상태 요청
+      if (userIds.length > 0) {
+        fetchUserStatuses([...new Set(userIds)]);
+      }
     };
     loadMatchResults();
-  }, []);
+  }, [fetchUserStatuses]);
 
   // URL 쿼리로 success 값 받아서 팝업 상태 설정
   useEffect(() => {
@@ -118,11 +131,12 @@ export default function MatchingResultsPage() {
           >
             <Link href={`/members/${group.currentUser.id}`}>
               <ProfileCard
+                userId={group.currentUser.id}
                 name={group.currentUser.nickname}
                 age={group.currentUser.age}
                 likes={group.currentUser.likeCount}
                 region={group.currentUser.region}
-                isOnline={true}
+                isOnline={userStatuses[group.currentUser.id] || false}
                 profileImageUrl={group.currentUser.profileImage}
               />
             </Link>
@@ -141,11 +155,12 @@ export default function MatchingResultsPage() {
 
             <Link href={`/members/${group.selectedUser.id}`}>
               <ProfileCard
+                userId={group.selectedUser.id}
                 name={group.selectedUser.nickname}
                 age={group.selectedUser.age}
                 likes={group.selectedUser.likeCount}
                 region={group.selectedUser.region}
-                isOnline={true}
+                isOnline={userStatuses[group.selectedUser.id] || false}
                 profileImageUrl={group.selectedUser.profileImage}
               />
             </Link>

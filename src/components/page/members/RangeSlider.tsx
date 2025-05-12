@@ -1,4 +1,4 @@
-import { RangeSliderProps } from '@/types/range-slider.type';
+import { RangeSliderProps } from '@/types/rangeSlider.type';
 
 const SLIDER_THUMB_STYLES = `
   [&::-webkit-slider-thumb]:appearance-none
