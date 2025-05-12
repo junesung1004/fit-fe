@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, FormEvent, useRef, useCallback, useEffect } from 'react';
+import {
+  useState,
+  FormEvent,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import Link from 'next/link';
 import {
   AdjustmentsHorizontalIcon,
@@ -90,12 +97,15 @@ export default function MembersPage() {
 
   const uniqueUsers = isFiltered ? filteredUsers : Array.from(users);
 
+  const userIds = useMemo(() => {
+    return uniqueUsers.map((user) => user.id);
+  }, [uniqueUsers]);
+
   useEffect(() => {
-    if (uniqueUsers.length > 0) {
-      const userIds = uniqueUsers.map((user) => user.id);
+    if (userIds.length > 0) {
       fetchUserStatuses(userIds);
     }
-  }, [uniqueUsers, fetchUserStatuses]);
+  }, [userIds, fetchUserStatuses]);
 
   useEffect(() => {
     if (usersError) {

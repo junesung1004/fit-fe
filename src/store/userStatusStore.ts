@@ -48,17 +48,27 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 
     // 현재 사용자를 온라인으로 표시
     const currentUserId = getCurrentUserId();
-    if (currentUserId) {
+    const currentState = get();
+
+    // 이미 동일한 사용자 ID 집합에 대해 요청했다면 다시 요청하지 않음
+    const existingUserIds = Object.keys(currentState.userStatuses);
+    const newUserIds = userIds.filter((id) => !existingUserIds.includes(id));
+
+    // 현재 사용자 ID가 있고 아직 상태에 없는 경우에만 업데이트
+    if (currentUserId && !currentState.userStatuses[currentUserId]) {
       set((state) => ({
         userStatuses: { ...state.userStatuses, [currentUserId]: true },
       }));
     }
 
-    if (!socket.connected) {
-      socket.connect();
-    }
+    // 새로운 사용자 ID가 있을 때만 소켓 요청
+    if (newUserIds.length > 0) {
+      if (!socket.connected) {
+        socket.connect();
+      }
 
-    socket.emit('get:user:status', { userIds });
+      socket.emit('get:user:status', { userIds });
+    }
   },
 
   initSocketListeners: () => {
