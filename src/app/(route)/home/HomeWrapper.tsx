@@ -1,6 +1,6 @@
 'use client';
 
-import HomeFristProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
+import HomeFirstProfileCardList from '@/components/page/home/HomeFirstProfileCardList';
 import HomeTwoProfileCardList from '@/components/page/home/HomeSecondProfileCardList';
 import {
   usePublicTodayDatingMatchMutation,
@@ -28,6 +28,9 @@ export default function HomeWrapper() {
   const { mutate: todayDatingUser } = useTodayDatingMatchMutation();
   const { mutate: publicTodayDatingUser } = usePublicTodayDatingMatchMutation();
   const {} = useAuthStore();
+
+  const isAllSelected = firstSelected && secondSelected;
+  const isNoMatchUser = !firstUser && !twoUser && !thirdUser && !fourUser; // ⭐ 추가
 
   const getPublicTodayDatingUserMatch = () => {
     publicTodayDatingUser(undefined, {
@@ -118,8 +121,6 @@ export default function HomeWrapper() {
     setSecondSelected(true);
   };
 
-  const isAllSelected = firstSelected && secondSelected;
-
   return (
     <main className="p-3">
       <h1 className="text-lg font-semibold">매일 오전 10시</h1>
@@ -127,32 +128,46 @@ export default function HomeWrapper() {
         당신을 기다리는 인연이 도착합니다.
       </small>
 
-      {/* ✅ 선택 완료 메시지는 띄우되, 카드 리스트는 유지 */}
-      {isAllSelected && (
-        <div className="flex flex-col items-center justify-center mt-5 mb-5">
-          <p className="text-violet-500 font-semibold text-lg">
-            오늘의 인연을 모두 선택하셨습니다 🎉
+      {/* ✅ 매칭할 사용자가 아예 없을 때 */}
+      {isNoMatchUser ? (
+        <div className="flex flex-col items-center justify-center mt-10">
+          <p className="text-2xl font-bold text-violet-600">
+            오늘 매칭할 사람이 없습니다.
+          </p>
+          <p className="text-gray-500 mt-2">
+            내일 오전 10시에 새로운 인연을 만나보세요 ☀️
           </p>
         </div>
-      )}
+      ) : (
+        <>
+          {/* ✅ 매칭을 모두 선택한 경우 */}
+          {isAllSelected && (
+            <div className="flex flex-col items-center justify-center mt-5 mb-5">
+              <p className="text-violet-500 font-semibold text-lg">
+                오늘의 인연을 모두 선택하셨습니다 🎉
+              </p>
+            </div>
+          )}
 
-      {/* ✅ 카드 리스트는 항상 보여줌 */}
-      <div className="flex flex-col gap-6">
-        {firstUser && twoUser && (
-          <HomeFristProfileCardList
-            firstUser={firstUser}
-            secondUser={twoUser}
-            onSelectAll={handleSelectAllFirst}
-          />
-        )}
-        {thirdUser && fourUser && (
-          <HomeTwoProfileCardList
-            thirdUser={thirdUser}
-            fourUser={fourUser}
-            onSelectAll={handleSelectAllSecond}
-          />
-        )}
-      </div>
+          {/* ✅ 카드 리스트는 항상 보여줌 */}
+          <div className="flex flex-col gap-6">
+            {firstUser && twoUser && (
+              <HomeFirstProfileCardList
+                firstUser={firstUser}
+                secondUser={twoUser}
+                onSelectAll={handleSelectAllFirst}
+              />
+            )}
+            {thirdUser && fourUser && (
+              <HomeTwoProfileCardList
+                thirdUser={thirdUser}
+                fourUser={fourUser}
+                onSelectAll={handleSelectAllSecond}
+              />
+            )}
+          </div>
+        </>
+      )}
     </main>
   );
 }

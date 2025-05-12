@@ -28,6 +28,14 @@ function NotificationItem({
 
   const handleCardClick = () => {
     if (notification.type === 'LIKE') {
+      router.push('/friends');
+      return;
+    }
+    if (notification.type === 'MATCH_REQUEST') {
+      router.push('/friends');
+      return;
+    }
+    if (notification.type === 'MATCH_ACCEPT') {
       router.push(`/members/${notification.data.senderId}`);
       return;
     }
@@ -36,9 +44,13 @@ function NotificationItem({
       `/chats/${notification.data.chatRoomId}?userId=${notification.data.senderId}`
     );
     }
-    if (notification.type === 'COFFEE_CHAT') {
+    if (notification.type === 'COFFEE_CHAT_ACCEPT') {
       router.push(
       `/chats/${notification.data.chatRoomId}?userId=${notification.data.senderId}`);
+      return;
+    }
+     if (notification.type === 'COFFEE_CHAT_REQUEST') {
+     router.push('/friends');
       return;
     }
   };
