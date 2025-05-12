@@ -13,6 +13,8 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 import { passBothUsers } from '@/services/passMatch';
+import { isAxiosError } from '@/lib/error';
+import { toast } from 'react-toastify';
 
 interface SecondProps {
   thirdUser: UserDataType | null;
@@ -47,7 +49,7 @@ export default function HomeSecondProfileCardList({
     }
 
     if (!thirdUser.matchId) {
-      console.error('matchId가 없습니다.');
+      toast.error('매칭 정보를 찾을 수 없습니다.');
       return;
     }
 
@@ -65,8 +67,14 @@ export default function HomeSecondProfileCardList({
 
       setIsListSelected(true);
       onSelectAll();
-    } catch (err) {
-      console.error('매칭 선택 실패:', err);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || '매칭 선택에 실패했습니다.'
+        );
+      } else {
+        toast.error('매칭 선택에 실패했습니다.');
+      }
     }
   };
 
@@ -88,25 +96,34 @@ export default function HomeSecondProfileCardList({
       setSelectedFourth(true);
       setIsListSelected(true);
       onSelectAll();
-    } catch (err) {
-      console.error('모두 선택 실패:', err);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || '모두 선택에 실패했습니다.'
+        );
+      } else {
+        toast.error('모두 선택에 실패했습니다.');
+      }
     }
   };
 
   const handlePassBoth = async () => {
-      if (!isLoggedIn) {
-        setShowLoginAlert(true);
-        return;
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
+    }
+
+    try {
+      await passBothUsers(thirdUser.id.toString(), fourUser.id.toString());
+      setIsListSelected(true);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '거절에 실패했습니다.');
+      } else {
+        toast.error('거절에 실패했습니다.');
       }
-    
-      try {
-        await passBothUsers(thirdUser.id.toString(), fourUser.id.toString());
-        
-        setIsListSelected(true);
-      } catch (err) {
-        console.error('모두 패스 실패:', err);
-      }
-    };
+    }
+  };
 
   const moveToDetail = (id: number) => {
     if (!isListSelected) {
@@ -121,12 +138,12 @@ export default function HomeSecondProfileCardList({
     fourUser.profile.profileImage?.[0]?.imageUrl ??
     '/default.png';
 
-    return (
-      <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
-        {isListSelected && (
+  return (
+    <div className="flex flex-col gap-3 p-4 border shadow-xl rounded-xl mt-6 bg-white relative">
+      {isListSelected && (
         <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center rounded-xl z-20">
           <p className="text-white text-2xl font-bold">
-          {selectedThird || selectedFourth ? '선택 완료' : '패스'}
+            {selectedThird || selectedFourth ? '선택 완료' : '거절 완료'}
           </p>
         </div>
       )}
@@ -211,14 +228,14 @@ export default function HomeSecondProfileCardList({
 
       {/* 하단 버튼 */}
       <div className="flex justify-center items-center gap-3 mt-4 z-10">
-      <Button
-        rounded="full"
-        variant="outline"
-        onClick={handlePassBoth}
-        disabled={isListSelected}
-      >
-        X
-      </Button>
+        <Button
+          rounded="full"
+          variant="outline"
+          onClick={handlePassBoth}
+          disabled={isListSelected}
+        >
+          X
+        </Button>
 
         <Button
           rounded="full"

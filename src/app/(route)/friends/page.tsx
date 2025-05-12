@@ -17,6 +17,8 @@ import {
   acceptCoffeeChatRequest,
   rejectCoffeeChatRequest,
 } from '@/services/chat';
+import { isAxiosError } from '@/lib/error';
+import { toast } from 'react-toastify';
 
 interface SparkUser {
   id: string;
@@ -30,8 +32,9 @@ interface SparkUser {
 }
 
 type ProfileType = 'match' | 'like' | 'coffee';
-// eslint-disable-next-line no-unused-vars
-type AcceptFn = ((id: string) => void) | ((chatId: string, userId: string) => void);
+type AcceptFn =
+  // eslint-disable-next-line no-unused-vars
+  ((id: string) => void) | ((chatId: string, userId: string) => void);
 
 const removeDuplicates = (list: SparkUser[]) => {
   const seen = new Set();
@@ -119,14 +122,17 @@ export default function FriendsPage() {
 
   const handleAccept = async (id: string) => {
     try {
-      const response = await acceptMatchRequest(id);
-      console.log('매칭 수락 응답:', response.data);
-      const { isSuccess } = response.data;
-      console.log('isSuccess 값:', isSuccess);
-
+      await acceptMatchRequest(id);
       router.push(`/chats/${id}`);
     } catch (error) {
-      console.error('매칭 수락 실패:', error);
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+        if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
+          setRoundProfiles((prev) => prev.filter((user) => user.id !== id));
+        }
+      } else {
+        toast.error('매칭 수락 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -135,7 +141,11 @@ export default function FriendsPage() {
       const response = await passMatchRequest(id);
       router.push(`/matching-result?success=${response.data.isSuccess}`);
     } catch (error) {
-      console.error('거절 실패:', error);
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('매칭 거절 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -145,17 +155,31 @@ export default function FriendsPage() {
       const chatRoomId = res.chatRoomId ?? userId;
       router.push(`/chats/${chatRoomId}?userId=${userId}`);
     } catch (error) {
-      console.error('커피챗 수락 실패:', error);
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+        // 이미 채팅방이 있는 경우 해당 유저를 목록에서 제거
+        if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
+          setCoffeeChatProfiles((prev) =>
+            prev.filter((user) => user.id !== userId)
+          );
+        }
+      } else {
+        toast.error('커피챗 수락 중 오류가 발생했습니다.');
+      }
     }
   };
 
   const handleCoffeeReject = async (id: string) => {
     try {
       await rejectCoffeeChatRequest(id);
-      alert('커피챗 거절 완료!');
+      toast.success('커피챗 거절 완료!');
       setCoffeeChatProfiles((prev) => prev.filter((user) => user.id !== id));
     } catch (error) {
-      console.error('커피챗 거절 실패:', error);
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('커피챗 거절 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -181,11 +205,14 @@ export default function FriendsPage() {
             onAccept={() => {
               if (type === 'coffee') {
                 if (!profile.coffeeChatId) {
-                  console.warn('⚠️ 커피챗 ID 없음:', profile);
+                  toast.error('커피챗 ID가 없습니다.');
                   return;
                 }
                 // eslint-disable-next-line no-unused-vars
-                (onAccept as (chatId: string, userId: string) => void)(profile.coffeeChatId, profile.id);
+                (onAccept as (chatId: string, userId: string) => void)(
+                  profile.coffeeChatId,
+                  profile.id
+                );
               } else {
                 // eslint-disable-next-line no-unused-vars
                 (onAccept as (id: string) => void)(profile.id);
