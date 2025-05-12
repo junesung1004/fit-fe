@@ -45,6 +45,8 @@ export default function MembersPage() {
   const [minLikes, setMinLikes] = useState(0);
   const [maxLikes, setMaxLikes] = useState(100);
   const [region, setRegion] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState<FilteredUser[]>([]);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const {
     data,
@@ -52,6 +54,7 @@ export default function MembersPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    refetch: refetchUsers,
   } = useUsersQuery({
     take: 6,
   });
@@ -61,13 +64,13 @@ export default function MembersPage() {
     (node: HTMLAnchorElement) => {
       if (observerRef.current) observerRef.current.disconnect();
       observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !isFiltered) {
           fetchNextPage();
         }
       });
       if (node) observerRef.current.observe(node);
     },
-    [fetchNextPage]
+    [fetchNextPage, isFiltered]
   );
 
   const { mutate: filterUsers } = useFilterUsersMutation();
@@ -82,7 +85,8 @@ export default function MembersPage() {
         return acc;
       }, new Map())
       .values() ?? [];
-  const uniqueUsers = Array.from(users);
+
+  const uniqueUsers = isFiltered ? filteredUsers : Array.from(users);
 
   // 에러 발생 시 토스트 메시지 표시
   useEffect(() => {
@@ -102,15 +106,17 @@ export default function MembersPage() {
     e.preventDefault();
     const filter = {
       region,
-      minAge,
-      maxAge,
-      minLikeCount: minLikes,
-      maxLikeCount: maxLikes,
+      ageMin: minAge,
+      ageMax: maxAge,
+      minLikes,
+      maxLikes,
       page: 1,
       limit: 6,
     };
+    setIsFiltered(true);
     filterUsers(filter, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setFilteredUsers(data);
         toast.success('필터가 적용되었습니다.');
         toggleFilter();
       },
@@ -133,6 +139,9 @@ export default function MembersPage() {
     setMinLikes(0);
     setMaxLikes(100);
     setRegion('');
+    setFilteredUsers([]);
+    setIsFiltered(false);
+    refetchUsers();
   };
 
   return (

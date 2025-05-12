@@ -24,13 +24,8 @@ export const useLoginMutation = () => {
         nickname: user.nickname,
       });
 
-      console.log('✅ 로그인 응답:', res);
-
       toast.success(`${user.nickname}님 환영합니다.`);
       router.push('/home');
-    },
-    onError: (error) => {
-      toast.error(error.message || '로그인 실패');
     },
   });
 };

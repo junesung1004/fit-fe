@@ -14,9 +14,12 @@ export interface PaginationParams {
 
 export interface FilterParams {
   region: string;
-  minAge: number;
-  maxAge: number;
-  minLikeCount: number;
+  ageMin: number;
+  ageMax: number;
+  minLikes: number;
+  maxLikes: number;
+  page: number;
+  limit: number;
 }
 
 export interface UsersQueryParams extends PaginationParams {
