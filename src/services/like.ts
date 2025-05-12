@@ -12,7 +12,7 @@ export const likeMember = async (likedUserId: string) => {
 };
 
 // 좋아요 상태 확인 API
-export const getLikeStatus = async (likedUserId: number) => {
+export const getLikeStatus = async (likedUserId: string) => {
   try {
     const response = await instance.get(`/like/${likedUserId}/status`);
     return response.data; // true or false

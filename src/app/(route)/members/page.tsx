@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  useState,
-  FormEvent,
-  useRef,
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   AdjustmentsHorizontalIcon,
@@ -23,6 +16,7 @@ import { useFilterUsersMutation } from '@/hooks/mutations/useFilterUsersMutation
 import { isAxiosError } from '@/lib/error';
 import { toast } from 'react-toastify';
 import { FilteredUser } from '@/types/member.type';
+import { useLikeStore } from '@/store/likeStore';
 import { useUserStatusStore } from '@/store/userStatusStore';
 
 const REGION = [
@@ -63,10 +57,10 @@ export default function MembersPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch: refetchUsers,
-  } = useUsersQuery({
-    take: 6,
-  });
+    refetch,
+  } = useUsersQuery({ take: 6 });
+  const { mutate: filterUsers } = useFilterUsersMutation();
+  const { likeChanged, resetLikeChanged } = useLikeStore();
 
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useCallback(
@@ -82,21 +76,24 @@ export default function MembersPage() {
     [fetchNextPage, isFiltered]
   );
 
-  const { mutate: filterUsers } = useFilterUsersMutation();
-
   const users =
     data?.pages
       .flatMap((page) => page.users)
       .reduce<Map<string, FilteredUser>>((acc, user) => {
-        if (!acc.has(user.id)) {
-          acc.set(user.id, user);
-        }
+        if (!acc.has(user.id)) acc.set(user.id, user);
         return acc;
       }, new Map())
       .values() ?? [];
 
   const uniqueUsers = isFiltered ? filteredUsers : Array.from(users);
 
+  // ✅ 좋아요 변경되면 목록 새로고침
+  useEffect(() => {
+    if (likeChanged) {
+      refetch(); // 서버에서 다시 가져오기
+      resetLikeChanged(); // 플래그 초기화
+    }
+  }, [likeChanged, refetch, resetLikeChanged]);
   const userIds = useMemo(() => {
     return uniqueUsers.map((user) => user.id);
   }, [uniqueUsers]);
@@ -109,18 +106,16 @@ export default function MembersPage() {
 
   useEffect(() => {
     if (usersError) {
-      if (isAxiosError(usersError)) {
-        toast.error(
-          usersError.response?.data.message ||
-            '사용자 목록을 불러오는데 실패했습니다.'
-        );
-      } else {
-        toast.error('사용자 목록을 불러오는데 실패했습니다.');
-      }
+      const message = isAxiosError(usersError)
+        ? usersError.response?.data.message
+        : '사용자 목록을 불러오는데 실패했습니다.';
+      toast.error(message);
     }
   }, [usersError]);
 
-  const handleApplyFilter = (e: FormEvent) => {
+  const toggleFilter = () => setIsShowFilter((v) => !v);
+
+  const handleApplyFilter = (e: React.FormEvent) => {
     e.preventDefault();
     const filter = {
       region,
@@ -139,18 +134,14 @@ export default function MembersPage() {
         toggleFilter();
       },
       onError: (error) => {
-        if (isAxiosError(error)) {
-          toast.error(
-            error.response?.data.message || '필터 적용에 실패했습니다.'
-          );
-        } else {
-          toast.error('필터 적용에 실패했습니다.');
-        }
+        const message = isAxiosError(error)
+          ? error.response?.data.message
+          : '필터 적용에 실패했습니다.';
+        toast.error(message);
       },
     });
   };
 
-  const toggleFilter = () => setIsShowFilter((v) => !v);
   const resetFilter = () => {
     setMinAge(20);
     setMaxAge(60);
@@ -159,15 +150,16 @@ export default function MembersPage() {
     setRegion('');
     setFilteredUsers([]);
     setIsFiltered(false);
-    refetchUsers();
+    refetch();
   };
 
   return (
     <div
       className={`relative w-full h-[calc(100vh-160px)] flex flex-col ${isShowFilter ? 'overflow-hidden' : ''}`}
     >
+      {/* 필터 모달 */}
       {isShowFilter && (
-        <div className="absolute inset-0 z-10 bg-zinc-900/80 px-8 py-10 flex items-center justify-center">
+        <div className="absolute inset-0 z-10 bg-zinc-900/80 flex items-center justify-center">
           <div className="bg-white rounded-3xl p-6 flex flex-col gap-6 w-full max-w-md">
             <div className="flex items-center">
               <h1 className="mx-auto text-lg font-semibold">필터</h1>
@@ -229,7 +221,6 @@ export default function MembersPage() {
                   setMaxLikes(max);
                 }}
               />
-
               <div className="flex gap-3">
                 <Button
                   variant="outline"
@@ -249,6 +240,7 @@ export default function MembersPage() {
         </div>
       )}
 
+      {/* 목록 */}
       <div className="w-full py-10 px-8 flex flex-col">
         <div className="flex justify-between items-center">
           <h1 className="font-semibold">접속 중인 이성</h1>
@@ -284,6 +276,7 @@ export default function MembersPage() {
             </Link>
           ))}
         </div>
+
         {isFetchingNextPage && (
           <div className="text-center py-4">
             <Spinner size="sm" color="primary" />

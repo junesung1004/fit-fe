@@ -1,17 +1,18 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { HeartIcon } from '@heroicons/react/24/solid';
+import { ArrowLeftIcon, HeartIcon } from '@heroicons/react/24/solid';
 import TagBadge from '@/components/common/TagBadge';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
 import Button from '@/components/common/Button';
 import { sendNotification } from '@/services/notification';
-import { likeMember } from '@/services/like';
+import { likeMember, getLikeStatus } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
+import { useLikeStore } from '@/store/likeStore'; // ✅ 추가
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 import { toast } from 'react-toastify';
 import { useSendCoffeeChatMutation } from '@/hooks/mutations/useSendCoffeeChatMutation';
@@ -19,13 +20,18 @@ import { isAxiosError } from '@/lib/error';
 
 export default function MemberDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const userId = params.id as string;
   const { isLoggedIn } = useAuthStore();
+  const { setLikeChanged } = useLikeStore(); // ✅ 추가
+
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [member, setMember] = useState<MemberDetailResponse | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [isClicked, setIsClicked] = useState(false);
   const [, setCoffeeChatId] = useState<string | null>(null);
+
   const sendCoffeeChatMutation = useSendCoffeeChatMutation();
 
   useEffect(() => {
@@ -33,6 +39,9 @@ export default function MemberDetailPage() {
       try {
         const data = await fetchUserInfo(userId);
         setMember(data);
+        setLikeCount(data.likeCount);
+        const likeStatus = await getLikeStatus(userId);
+        setIsLiked(likeStatus);
       } catch (error) {
         if (isAxiosError(error)) {
           const errorMessage = error.response?.data?.message;
@@ -52,6 +61,7 @@ export default function MemberDetailPage() {
     }
 
     if (!userId) return toast.error('상대방 ID가 없습니다!');
+
     try {
       if (!isLiked) {
         await likeMember(userId);
@@ -59,10 +69,12 @@ export default function MemberDetailPage() {
           type: 'LIKE',
           title: '좋아요 알림',
           content: '회원님을 마음에 들어하는 사람이 있어요 💕',
-        }); // ✅ SSE 방식으로 변경
+        });
         toast.success('좋아요 알림이 전송되었습니다!');
+        setLikeCount((prev) => prev + 1);
+        setIsLiked(true);
+        setLikeChanged(true); // ✅ 좋아요 성공하면 store 업데이트
       }
-      setIsLiked((prev) => !prev);
       setIsClicked(true);
       setTimeout(() => setIsClicked(false), 300);
     } catch (error) {
@@ -73,6 +85,10 @@ export default function MemberDetailPage() {
         toast.error('좋아요 알림 전송에 실패했습니다.');
       }
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   const handleDatingChatRequest = async () => {
@@ -87,7 +103,7 @@ export default function MemberDetailPage() {
       const response = await sendCoffeeChatMutation.mutateAsync({
         title: '커피챗 신청이 왔어요!',
         content: '커피챗을 신청하셨습니다. 확인해보세요 ☕',
-        type: 'COFFEE_CHAT',
+        type: 'COFFEE_CHAT_REQUEST',
         receiverId: userId,
         data: {},
       });
@@ -105,14 +121,9 @@ export default function MemberDetailPage() {
       if (isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
         if (errorMessage?.includes('이미 요청된 커피챗이 존재합니다')) {
-          toast.warning(
-            '이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.'
-          );
+          toast.warning('이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.');
         } else {
-          toast.error(
-            errorMessage ||
-              '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
-          );
+          toast.error(errorMessage || '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         }
       } else {
         toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
@@ -127,6 +138,16 @@ export default function MemberDetailPage() {
 
   return (
     <div className="w-full min-h-full flex flex-col gap-4 px-2 xs:px-20 py-5">
+      
+{/* 상단 뒤로가기 (글자 없이 화살표만) */}
+ <button
+    className="absolute top-22 left-6"
+    onClick={handleBack}
+  >
+    <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
+  </button>
+
+
       <MemberProfileDetailCard>
         <MemberProfileDetailCard.Image>
           <Image
@@ -149,14 +170,7 @@ export default function MemberDetailPage() {
           <motion.div
             style={{ color: isLiked ? '#f87171' : '#d1d5db' }}
             onClick={handleLikeToggle}
-            animate={
-              isClicked
-                ? {
-                    scale: [1, 1.4, 1],
-                    color: ['#f43f5e', '#be123c', '#f43f5e'],
-                  }
-                : {}
-            }
+            animate={isClicked ? { scale: [1, 1.4, 1], color: ['#f43f5e', '#be123c', '#f43f5e'] } : {}}
             transition={{ duration: 0.4 }}
             className="cursor-pointer"
           >
@@ -164,12 +178,12 @@ export default function MemberDetailPage() {
           </motion.div>
 
           <motion.div
-            key={isLiked ? 1 : 0}
+            key={likeCount}
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            {isLiked ? member.likeCount + 1 : member.likeCount}
+            {likeCount}
           </motion.div>
         </MemberProfileDetailCard.LikeCountBadge>
       </MemberProfileDetailCard>
