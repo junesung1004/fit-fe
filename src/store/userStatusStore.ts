@@ -5,6 +5,9 @@ import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 // 현재 로그인한 사용자 ID를 가져오는 함수
 const getCurrentUserId = (): string | null => {
   try {
+    // 브라우저 환경인지 확인
+    if (typeof window === 'undefined') return null;
+
     // auth-storage에서 사용자 정보 가져오기
     const authStorage = localStorage.getItem('auth-storage');
     if (!authStorage) return null;
@@ -93,6 +96,9 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 let updateInterval: NodeJS.Timeout | null = null;
 
 export const startStatusUpdates = () => {
+  // 서버 사이드에서 실행되는 경우 실행하지 않음
+  if (typeof window === 'undefined') return;
+
   if (updateInterval) return;
 
   // 소켓 리스너 초기화
