@@ -40,8 +40,10 @@ const REGION = [
 
 export default function MembersPage() {
   const [isShowFilter, setIsShowFilter] = useState(false);
-  const [age, setAge] = useState(20);
-  const [likes, setLikes] = useState(0);
+  const [minAge, setMinAge] = useState(20);
+  const [maxAge, setMaxAge] = useState(60);
+  const [minLikes, setMinLikes] = useState(0);
+  const [maxLikes, setMaxLikes] = useState(100);
   const [region, setRegion] = useState('');
 
   const {
@@ -100,9 +102,10 @@ export default function MembersPage() {
     e.preventDefault();
     const filter = {
       region,
-      minAge: age,
-      maxAge: 60,
-      minLikeCount: likes,
+      minAge,
+      maxAge,
+      minLikeCount: minLikes,
+      maxLikeCount: maxLikes,
       page: 1,
       limit: 6,
     };
@@ -125,8 +128,10 @@ export default function MembersPage() {
 
   const toggleFilter = () => setIsShowFilter((v) => !v);
   const resetFilter = () => {
-    setAge(20);
-    setLikes(0);
+    setMinAge(20);
+    setMaxAge(60);
+    setMinLikes(0);
+    setMaxLikes(100);
     setRegion('');
   };
 
@@ -172,10 +177,14 @@ export default function MembersPage() {
                 min={20}
                 max={60}
                 step={1}
-                value={age}
+                minValue={minAge}
+                maxValue={maxAge}
                 unit="세"
                 rangeText="20세 ~ 60세"
-                onChange={setAge}
+                onInput={(min, max) => {
+                  setMinAge(min);
+                  setMaxAge(max);
+                }}
               />
               <RangeSlider
                 id="likes"
@@ -184,10 +193,14 @@ export default function MembersPage() {
                 min={0}
                 max={100}
                 step={1}
-                value={likes}
+                minValue={minLikes}
+                maxValue={maxLikes}
                 unit="개"
                 rangeText="0개 ~ 100개"
-                onChange={setLikes}
+                onInput={(min, max) => {
+                  setMinLikes(min);
+                  setMaxLikes(max);
+                }}
               />
 
               <div className="flex gap-3">
