@@ -61,13 +61,15 @@ export default function SignUpPage() {
     interest?.map((el: { id: number; name: string }) => el.name) ?? [];
   // console.log('관심사 : ', interestNames);
   const { data: feedback } = useFeedbackQuery();
-  const feedbackNames =
-    feedback?.map((el: { id: number; name: string }) => el.name) ?? [];
+  const feedbackNames = Array.from(
+    new Set(feedback?.map((el: { id: number; name: string }) => el.name) ?? [])
+  ) as string[];
   //console.log('피드백 ㅣ ', feedbackNames);
   const { data: introduce } = useIntroduceQuery();
   // console.log('저는 이런사람이에요 : ', introduce);
-  const introduceNames =
-    introduce?.map((el: { id: number; name: string }) => el.name) ?? [];
+  const introduceNames = Array.from(
+    new Set(introduce?.map((el: { id: number; name: string }) => el.name) ?? [])
+  ) as string[];
 
   const { mutate: sendVerificationEmail } = useEmailVerificationMutation();
   const { mutate: checkEmail } = useEmailCheckMutation((isAvailable) => {
@@ -167,7 +169,11 @@ export default function SignUpPage() {
         ...data,
         images: validImageUrls,
       };
-      mutate(payload);
+      mutate(payload, {
+        onSuccess: () => {
+          window.location.reload(); // 회원가입 후 상태 초기화
+        },
+      });
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
     }
