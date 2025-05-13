@@ -72,9 +72,9 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 
     // 소켓 연결 전에 토큰 세팅
     const token = getCurrentUserToken();
-    if (token) {
-      setUserStatusSocketToken(token);
-    }
+    if (!token) return;
+
+    setUserStatusSocketToken(token);
 
     if (!userStatusSocket.connected) {
       userStatusSocket.connect();
@@ -111,6 +111,13 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         set((state) => ({
           userStatuses: { ...state.userStatuses, [currentUserId]: true },
         }));
+      }
+    });
+
+    userStatusSocket.on('connect_error', (err) => {
+      if (err.message === 'No token provided') {
+        // 재연결 시도 중지
+        userStatusSocket.io.opts.reconnection = false;
       }
     });
   },
