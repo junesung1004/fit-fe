@@ -2,12 +2,12 @@ import { create } from 'zustand';
 import { userStatusSocket } from '@/lib/socket';
 import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 import { createDebouncer } from '@/hooks/operators/useDebounce';
-import { isAxiosError } from '@/lib/error';
 
 const STATUS_UPDATE_INTERVAL = 60000;
 let updateInterval: NodeJS.Timeout | null = null;
 let isUpdating = false;
 
+// 디바운서 인스턴스 생성 (5초 디바운스)
 const statusDebouncer = createDebouncer<UserStatus>(5000);
 
 // 현재 사용자 ID 조회
@@ -17,15 +17,14 @@ const getCurrentUserId = (): string | null => {
     const authStorage = localStorage.getItem('auth-storage');
     if (!authStorage) return null;
     return JSON.parse(authStorage)?.state?.user?.id || null;
-  } catch {
+  } catch (e) {
+    console.error('사용자 ID 조회 실패:', e);
     return null;
   }
 };
 
-// 사용자 상태 저장
 export const useUserStatusStore = create<UserStatusState>((set, get) => ({
   userStatuses: {},
-  socketError: null,
 
   updateUserStatuses: (statuses) => {
     if (!statuses.length) return;
@@ -50,7 +49,6 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
   },
 
-  // 사용자 상태 조회
   fetchUserStatuses: (userIds) => {
     if (userIds.length === 0 || isUpdating) return;
     try {
@@ -66,22 +64,13 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         userStatusSocket.connect();
       }
       userStatusSocket.emit('get:user:status', { userIds });
-      set({ socketError: null });
     } catch (error) {
-      if (isAxiosError(error)) {
-        set({
-          socketError:
-            error.response?.data?.message || '사용자 상태 조회에 실패했습니다.',
-        });
-      } else {
-        set({ socketError: '사용자 상태 조회에 실패했습니다.' });
-      }
+      console.error('사용자 상태 조회 실패:', error);
     } finally {
       isUpdating = false;
     }
   },
 
-  // 소켓 이벤트 초기화 및 리스너 설정
   initSocketListeners: () => {
     userStatusSocket.off('userStatus');
     userStatusSocket.off('disconnect');
@@ -93,25 +82,23 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
 
     userStatusSocket.on('disconnect', () => {
-      set({ socketError: '소켓 연결이 끊어졌습니다.' });
+      console.log('소켓 연결이 끊어졌습니다.');
     });
 
     userStatusSocket.on('connect', () => {
+      console.log('소켓이 연결되었습니다.');
       const currentUserId = getCurrentUserId();
       if (currentUserId) {
         set((state) => ({
           userStatuses: { ...state.userStatuses, [currentUserId]: true },
-          socketError: null,
         }));
       }
     });
 
-    userStatusSocket.on('connect_error', () => {
-      set({ socketError: '소켓 연결에 실패했습니다.' });
+    userStatusSocket.on('connect_error', (err) => {
+      console.error('소켓 연결 에러:', err);
     });
   },
-
-  setSocketError: (error: string | null) => set({ socketError: error }),
 }));
 
 export const startStatusUpdates = () => {
