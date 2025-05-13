@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { userStatusSocket } from '@/lib/socket';
+import { isAxiosError } from '@/lib/error';
 
 interface AuthUser {
   id: string;
@@ -12,9 +13,12 @@ interface AuthState {
   isLoggedIn: boolean;
   accessToken: string | null;
   user: AuthUser | null;
+  socketError: string | null;
   // eslint-disable-next-line no-unused-vars
   login: (token: string, user: AuthUser) => void;
   logout: () => void;
+  // eslint-disable-next-line no-unused-vars
+  setSocketError: (error: string | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,9 +27,9 @@ export const useAuthStore = create<AuthState>()(
       isLoggedIn: false,
       accessToken: null,
       user: null,
+      socketError: null,
 
       login: (token, user) => {
-        console.log('로그인 시 전달된 토큰:', token);
         set({
           isLoggedIn: true,
           accessToken: token,
@@ -40,11 +44,17 @@ export const useAuthStore = create<AuthState>()(
             }
             userStatusSocket.auth = { token };
             userStatusSocket.connect();
-          } catch (e) {
-            console.error('소켓 재연결 실패:', e);
+            set({ socketError: null });
+          } catch (error) {
+            if (isAxiosError(error)) {
+              set({
+                socketError:
+                  error.response?.data?.message || '소켓 연결에 실패했습니다.',
+              });
+            } else {
+              set({ socketError: '소켓 연결에 실패했습니다.' });
+            }
           }
-        } else {
-          console.warn('토큰이 없어 소켓 연결을 시도하지 않습니다.');
         }
       },
 
@@ -53,7 +63,10 @@ export const useAuthStore = create<AuthState>()(
           isLoggedIn: false,
           accessToken: null,
           user: null,
+          socketError: null,
         }),
+
+      setSocketError: (error) => set({ socketError: error }),
     }),
     {
       name: 'auth-storage',
