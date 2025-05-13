@@ -6,8 +6,8 @@ import { createDebouncer } from '@/hooks/operators/useDebounce';
 const STATUS_UPDATE_INTERVAL = 60000;
 let updateInterval: NodeJS.Timeout | null = null;
 let isUpdating = false;
+let reconnectAttempted = false;
 
-// 디바운서 인스턴스 생성 (5초 디바운스)
 const statusDebouncer = createDebouncer<UserStatus>(5000);
 
 // 현재 사용자 ID 조회
@@ -17,12 +17,12 @@ const getCurrentUserId = (): string | null => {
     const authStorage = localStorage.getItem('auth-storage');
     if (!authStorage) return null;
     return JSON.parse(authStorage)?.state?.user?.id || null;
-  } catch (e) {
-    console.error('사용자 ID 조회 실패:', e);
+  } catch {
     return null;
   }
 };
 
+// 사용자 상태 저장
 export const useUserStatusStore = create<UserStatusState>((set, get) => ({
   userStatuses: {},
 
@@ -49,6 +49,7 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
   },
 
+  // 사용자 상태 조회
   fetchUserStatuses: (userIds) => {
     if (userIds.length === 0 || isUpdating) return;
     try {
@@ -64,13 +65,17 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         userStatusSocket.connect();
       }
       userStatusSocket.emit('get:user:status', { userIds });
-    } catch (error) {
-      console.error('사용자 상태 조회 실패:', error);
+    } catch {
+      if (!userStatusSocket.connected && !reconnectAttempted) {
+        reconnectAttempted = true;
+        userStatusSocket.connect();
+      }
     } finally {
       isUpdating = false;
     }
   },
 
+  // 소켓 이벤트 초기화 및 리스너 설정
   initSocketListeners: () => {
     userStatusSocket.off('userStatus');
     userStatusSocket.off('disconnect');
@@ -82,11 +87,14 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
 
     userStatusSocket.on('disconnect', () => {
-      console.log('소켓 연결이 끊어졌습니다.');
+      if (!reconnectAttempted) {
+        reconnectAttempted = true;
+        userStatusSocket.connect();
+      }
     });
 
     userStatusSocket.on('connect', () => {
-      console.log('소켓이 연결되었습니다.');
+      reconnectAttempted = false;
       const currentUserId = getCurrentUserId();
       if (currentUserId) {
         set((state) => ({
@@ -95,8 +103,11 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
       }
     });
 
-    userStatusSocket.on('connect_error', (err) => {
-      console.error('소켓 연결 에러:', err);
+    userStatusSocket.on('connect_error', () => {
+      if (!reconnectAttempted) {
+        reconnectAttempted = true;
+        userStatusSocket.connect();
+      }
     });
   },
 }));
@@ -118,5 +129,6 @@ export const stopStatusUpdates = () => {
     updateInterval = null;
   }
   isUpdating = false;
+  reconnectAttempted = false;
   statusDebouncer.cancel();
 };
