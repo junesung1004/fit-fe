@@ -2,42 +2,62 @@ import { create } from 'zustand';
 import { userStatusSocket, setUserStatusSocketToken } from '@/lib/socket';
 import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 
-// 현재 로그인한 사용자 ID를 가져오는 함수
+const MAX_RECONNECT_ATTEMPTS = 3;
+const RECONNECT_DELAY = 5000;
+const STATUS_UPDATE_INTERVAL = 10000;
+
+// 전역 상태 관리
+let reconnectAttempts = 0;
+let updateInterval: NodeJS.Timeout | null = null;
+let isUpdating = false;
+
+// 현재 사용자 ID 조회
 const getCurrentUserId = (): string | null => {
   try {
-    // 브라우저 환경인지 확인
     if (typeof window === 'undefined') return null;
-
-    // auth-storage에서 사용자 정보 가져오기
     const authStorage = localStorage.getItem('auth-storage');
     if (!authStorage) return null;
-
-    const parsed = JSON.parse(authStorage);
-    return parsed.state?.user?.id || null;
+    return JSON.parse(authStorage)?.state?.user?.id || null;
   } catch (e) {
-    console.error('Failed to get current user ID', e);
+    console.error('사용자 ID 조회 실패:', e);
     return null;
   }
 };
 
-// 현재 로그인한 사용자 토큰을 가져오는 함수
+// 현재 사용자 토큰 조회
 const getCurrentUserToken = (): string | null => {
   try {
     if (typeof window === 'undefined') return null;
     const authStorage = localStorage.getItem('auth-storage');
     if (!authStorage) return null;
-    const parsed = JSON.parse(authStorage);
-    return parsed.state?.token || null;
+    return JSON.parse(authStorage)?.state?.token || null;
   } catch (e) {
-    console.error('Failed to get current user token', e);
+    console.error('토큰 조회 실패:', e);
     return null;
   }
 };
 
+// 상태 업데이트 최적화를 위한 함수
+const updateUserStatus = (
+  currentStatuses: Record<string, boolean>,
+  newStatuses: Record<string, boolean>
+): Record<string, boolean> => {
+  const hasChanges = Object.entries(newStatuses).some(
+    ([userId, isActive]) => currentStatuses[userId] !== isActive
+  );
+
+  if (!hasChanges) return currentStatuses;
+
+  return { ...currentStatuses, ...newStatuses };
+};
+
+// 사용자 상태 업데이트 함수
 export const useUserStatusStore = create<UserStatusState>((set, get) => ({
   userStatuses: {},
 
   updateUserStatuses: (statuses) => {
+    if (!statuses.length) return;
+
     const newStatuses = statuses.reduce(
       (acc, { userId, isActive }) => {
         acc[userId] = isActive;
@@ -46,66 +66,84 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
       {} as Record<string, boolean>
     );
 
-    // 현재 사용자는 항상 온라인으로 표시
     const currentUserId = getCurrentUserId();
     if (currentUserId) {
       newStatuses[currentUserId] = true;
     }
 
     set((state) => ({
-      userStatuses: { ...state.userStatuses, ...newStatuses },
+      userStatuses: updateUserStatus(state.userStatuses, newStatuses),
     }));
   },
 
   fetchUserStatuses: (userIds) => {
-    if (userIds.length === 0) return;
+    if (userIds.length === 0 || isUpdating) return;
 
-    // 현재 사용자를 온라인으로 표시
-    const currentUserId = getCurrentUserId();
-    const currentState = get();
+    try {
+      isUpdating = true;
+      const currentUserId = getCurrentUserId();
+      const currentState = get();
 
-    if (currentUserId && !currentState.userStatuses[currentUserId]) {
-      set((state) => ({
-        userStatuses: { ...state.userStatuses, [currentUserId]: true },
-      }));
+      if (currentUserId && !currentState.userStatuses[currentUserId]) {
+        set((state) => ({
+          userStatuses: { ...state.userStatuses, [currentUserId]: true },
+        }));
+      }
+
+      const token = getCurrentUserToken();
+      setUserStatusSocketToken(token || '');
+
+      if (!userStatusSocket.connected) {
+        userStatusSocket.connect();
+      }
+
+      userStatusSocket.emit('get:user:status', { userIds });
+    } catch (error) {
+      console.error('사용자 상태 조회 실패:', error);
+    } finally {
+      isUpdating = false;
     }
-
-    // 소켓 연결 전에 토큰 세팅
-    const token = getCurrentUserToken();
-    if (!token) return;
-
-    setUserStatusSocketToken(token);
-
-    if (!userStatusSocket.connected) {
-      userStatusSocket.connect();
-    }
-
-    userStatusSocket.emit('get:user:status', { userIds });
   },
 
   initSocketListeners: () => {
-    // 이미 리스너가 등록되어 있으면 중복 등록 방지를 위해 제거
+    // 기존 리스너 제거
     userStatusSocket.off('userStatus');
+    userStatusSocket.off('disconnect');
+    userStatusSocket.off('connect');
+    userStatusSocket.off('connect_error');
 
     // 새로운 리스너 등록
     userStatusSocket.on('userStatus', (statuses: UserStatus[]) => {
-      console.log('userStatus 수신', statuses);
+      console.log('사용자 상태 업데이트 수신:', statuses);
       get().updateUserStatuses(statuses);
     });
 
-    // 소켓 연결이 끊어지면 다시 연결
     userStatusSocket.on('disconnect', () => {
+      console.log('소켓 연결이 끊어졌습니다. 재연결을 시도합니다.');
       const userIds = Object.keys(get().userStatuses);
-      if (userIds.length > 0 && !userStatusSocket.connected) {
+
+      if (userIds.length > 0 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        const token = getCurrentUserToken();
+        reconnectAttempts++;
+        console.log(
+          `재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`
+        );
+
+        setUserStatusSocketToken(token || '');
         userStatusSocket.connect();
+
         setTimeout(() => {
           get().fetchUserStatuses(userIds);
-        }, 1000);
+        }, RECONNECT_DELAY);
+      } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        console.error('최대 재연결 시도 횟수를 초과했습니다.');
+        stopStatusUpdates();
       }
     });
 
-    // 연결 직후 자신의 상태 업데이트
     userStatusSocket.on('connect', () => {
+      console.log('소켓이 연결되었습니다.');
+      reconnectAttempts = 0;
       const currentUserId = getCurrentUserId();
       if (currentUserId) {
         set((state) => ({
@@ -115,21 +153,31 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
 
     userStatusSocket.on('connect_error', (err) => {
-      if (err.message === 'No token provided') {
-        // 재연결 시도 중지
-        userStatusSocket.io.opts.reconnection = false;
+      console.error('소켓 연결 에러:', err);
+      if (
+        err.message === 'No token provided' &&
+        reconnectAttempts < MAX_RECONNECT_ATTEMPTS
+      ) {
+        const token = getCurrentUserToken();
+        reconnectAttempts++;
+        console.log(
+          `재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`
+        );
+
+        setUserStatusSocketToken(token || '');
+        userStatusSocket.connect();
+      } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        console.error('최대 재연결 시도 횟수를 초과했습니다.');
+        stopStatusUpdates();
       }
     });
   },
 }));
 
-let updateInterval: NodeJS.Timeout | null = null;
-
+// 사용자 상태 업데이트 시작
 export const startStatusUpdates = () => {
-  if (typeof window === 'undefined') return;
-  if (updateInterval) return;
+  if (typeof window === 'undefined' || updateInterval) return;
 
-  // 소켓 연결 전에 토큰 세팅
   const token = getCurrentUserToken();
   if (token) {
     setUserStatusSocketToken(token);
@@ -142,12 +190,33 @@ export const startStatusUpdates = () => {
     if (userIds.length > 0) {
       useUserStatusStore.getState().fetchUserStatuses(userIds);
     }
-  }, 10000);
+  }, STATUS_UPDATE_INTERVAL);
 };
 
+// 사용자 상태 업데이트 중지
 export const stopStatusUpdates = () => {
   if (updateInterval) {
     clearInterval(updateInterval);
     updateInterval = null;
   }
+  isUpdating = false;
+  reconnectAttempts = 0;
 };
+
+// 사용자 상태 소켓 재연결
+export function reconnectUserStatusSocket(newToken: string) {
+  console.log('소켓 재연결 시도');
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    console.error('최대 재연결 시도 횟수를 초과했습니다.');
+    return;
+  }
+
+  if (userStatusSocket.connected) {
+    userStatusSocket.disconnect();
+  }
+
+  reconnectAttempts++;
+  console.log(`재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
+  setUserStatusSocketToken(newToken);
+  userStatusSocket.connect();
+}
