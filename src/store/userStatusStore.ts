@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 import { userStatusSocket } from '@/lib/socket';
 import { UserStatus, UserStatusState } from '@/types/userStatus.type';
+import { createDebouncer } from '@/hooks/operators/useDebounce';
 
-const STATUS_UPDATE_INTERVAL = 10000;
+const STATUS_UPDATE_INTERVAL = 60000;
 let updateInterval: NodeJS.Timeout | null = null;
 let isUpdating = false;
+
+// 디바운서 인스턴스 생성 (5초 디바운스)
+const statusDebouncer = createDebouncer<UserStatus>(5000);
 
 // 현재 사용자 ID 조회
 const getCurrentUserId = (): string | null => {
@@ -24,20 +28,25 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 
   updateUserStatuses: (statuses) => {
     if (!statuses.length) return;
-    const newStatuses = statuses.reduce(
-      (acc, { userId, isActive }) => {
-        acc[userId] = isActive;
-        return acc;
-      },
-      {} as Record<string, boolean>
-    );
-    const currentUserId = getCurrentUserId();
-    if (currentUserId) {
-      newStatuses[currentUserId] = true;
-    }
-    set((state) => ({
-      userStatuses: { ...state.userStatuses, ...newStatuses },
-    }));
+
+    statuses.forEach((status) => {
+      statusDebouncer.add((allStatuses) => {
+        const newStatuses = allStatuses.reduce(
+          (acc, { userId, isActive }) => {
+            acc[userId] = isActive;
+            return acc;
+          },
+          {} as Record<string, boolean>
+        );
+
+        const currentUserId = getCurrentUserId();
+        if (currentUserId) {
+          newStatuses[currentUserId] = true;
+        }
+
+        set({ userStatuses: newStatuses });
+      }, status);
+    });
   },
 
   fetchUserStatuses: (userIds) => {
@@ -69,12 +78,13 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     userStatusSocket.off('connect_error');
 
     userStatusSocket.on('userStatus', (statuses: UserStatus[]) => {
-      console.log('사용자 상태 업데이트 수신:', statuses);
       get().updateUserStatuses(statuses);
     });
+
     userStatusSocket.on('disconnect', () => {
       console.log('소켓 연결이 끊어졌습니다.');
     });
+
     userStatusSocket.on('connect', () => {
       console.log('소켓이 연결되었습니다.');
       const currentUserId = getCurrentUserId();
@@ -84,6 +94,7 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         }));
       }
     });
+
     userStatusSocket.on('connect_error', (err) => {
       console.error('소켓 연결 에러:', err);
     });
@@ -107,4 +118,5 @@ export const stopStatusUpdates = () => {
     updateInterval = null;
   }
   isUpdating = false;
+  statusDebouncer.cancel();
 };
