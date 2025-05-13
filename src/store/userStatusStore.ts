@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { socket } from '@/lib/socket';
+import { userStatusSocket } from '@/lib/socket';
 import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 
 // 현재 로그인한 사용자 ID를 가져오는 함수
@@ -58,27 +58,28 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     }
 
     // 항상 실시간 상태를 요청하기 위해 모든 userIds에 대해 소켓 요청
-    if (!socket.connected) {
-      socket.connect();
+    if (!userStatusSocket.connected) {
+      userStatusSocket.connect();
     }
 
-    socket.emit('get:user:status', { userIds });
+    userStatusSocket.emit('get:user:status', { userIds });
   },
 
   initSocketListeners: () => {
     // 이미 리스너가 등록되어 있으면 중복 등록 방지를 위해 제거
-    socket.off('userStatus');
+    userStatusSocket.off('userStatus');
 
     // 새로운 리스너 등록
-    socket.on('userStatus', (statuses: UserStatus[]) => {
+    userStatusSocket.on('userStatus', (statuses: UserStatus[]) => {
+      console.log('userStatus 수신', statuses);
       get().updateUserStatuses(statuses);
     });
 
     // 소켓 연결이 끊어지면 다시 연결
-    socket.on('disconnect', () => {
+    userStatusSocket.on('disconnect', () => {
       const userIds = Object.keys(get().userStatuses);
-      if (userIds.length > 0 && !socket.connected) {
-        socket.connect();
+      if (userIds.length > 0 && !userStatusSocket.connected) {
+        userStatusSocket.connect();
         setTimeout(() => {
           get().fetchUserStatuses(userIds);
         }, 1000);
@@ -86,7 +87,7 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
 
     // 연결 직후 자신의 상태 업데이트
-    socket.on('connect', () => {
+    userStatusSocket.on('connect', () => {
       const currentUserId = getCurrentUserId();
       if (currentUserId) {
         set((state) => ({
@@ -114,7 +115,7 @@ export const startStatusUpdates = () => {
     if (userIds.length > 0) {
       useUserStatusStore.getState().fetchUserStatuses(userIds);
     }
-  }, 5000);
+  }, 10000); // 10초
 };
 
 export const stopStatusUpdates = () => {

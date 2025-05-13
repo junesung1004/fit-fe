@@ -69,7 +69,7 @@ const ProfileCard = ({
           isOnline ? 'text-green-500' : 'text-red-500'
         }`}
       >
-        {isOnline ? '● 접속 중' : '● 오프라인'}
+        {isOnline ? '● 접속 중' : '● 접속 종료'}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { socket } from '@/lib/socket';
+import { chatSocket } from '@/lib/socket';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
@@ -88,22 +88,22 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
   useEffect(() => {
     if (!userId) return;
 
-    socket.connect();
+    chatSocket.connect();
 
-    socket.on('connect', () => {
+    chatSocket.on('connect', () => {
       setIsConnected(true);
-      socket.emit('join', {
+      chatSocket.emit('join', {
         chatRoomId,
         userId,
       });
     });
 
-    socket.on('message', (message: Message) => {
+    chatSocket.on('message', (message: Message) => {
       setMessages((prev) => [...prev, message]);
     });
 
     return () => {
-      socket.disconnect();
+      chatSocket.disconnect();
     };
   }, [chatRoomId, userId]);
 
@@ -116,7 +116,7 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
     if (!inputMessage.trim() || !userId) return;
 
     try {
-      socket.emit('message', {
+      chatSocket.emit('message', {
         content: inputMessage,
         userId,
         chatRoomId,

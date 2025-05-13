@@ -12,7 +12,7 @@ import { sendNotification } from '@/services/notification';
 import { likeMember, getLikeStatus } from '@/services/like';
 import { fetchUserInfo, MemberDetailResponse } from '@/services/memberDetail';
 import { useAuthStore } from '@/store/authStore';
-import { useLikeStore } from '@/store/likeStore'; // ✅ 추가
+import { useLikeStore } from '@/store/likeStore';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 import { toast } from 'react-toastify';
 import { useSendCoffeeChatMutation } from '@/hooks/mutations/useSendCoffeeChatMutation';
@@ -23,15 +23,13 @@ export default function MemberDetailPage() {
   const router = useRouter();
   const userId = params.id as string;
   const { isLoggedIn } = useAuthStore();
-  const { setLikeChanged } = useLikeStore(); // ✅ 추가
-
+  const { setLikeChanged } = useLikeStore();
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [member, setMember] = useState<MemberDetailResponse | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isClicked, setIsClicked] = useState(false);
   const [, setCoffeeChatId] = useState<string | null>(null);
-
   const sendCoffeeChatMutation = useSendCoffeeChatMutation();
 
   useEffect(() => {
@@ -54,46 +52,45 @@ export default function MemberDetailPage() {
     getUserInfo();
   }, [userId]);
 
-const handleLikeToggle = async () => {
-  if (!isLoggedIn) {
-    setShowLoginAlert(true);
-    return;
-  }
-
-  if (!userId) return toast.error('상대방 ID가 없습니다!');
-
-  try {
-    if (!isLiked) {
-      // 좋아요 누르기
-      await likeMember(userId);
-      await sendNotification(userId, {
-        type: 'LIKE',
-        title: '좋아요 알림',
-        content: '회원님을 마음에 들어하는 사람이 있어요 💕',
-      });
-      toast.success('좋아요 알림이 전송되었습니다!');
-      setLikeCount((prev) => prev + 1);
-      setIsLiked(true);
-    } else {
-      // ❗ 좋아요 취소하기
-      await likeMember(userId); // ✅ 백엔드에서 toggle처럼 구현되어 있는 경우 그대로 사용
-      toast.success('좋아요를 취소했습니다.');
-      setLikeCount((prev) => (prev > 0 ? prev - 1 : 0));
-      setIsLiked(false);
+  const handleLikeToggle = async () => {
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
     }
-    setLikeChanged(true); // ✅ 좋아요 변경 상태를 항상 업데이트
-    setIsClicked(true);
-    setTimeout(() => setIsClicked(false), 300);
-  } catch (error) {
-    if (isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message;
-      toast.error(errorMessage || '요청에 실패했습니다.');
-    } else {
-      toast.error('요청에 실패했습니다.');
-    }
-  }
-};
 
+    if (!userId) return toast.error('상대방 ID가 없습니다!');
+
+    try {
+      if (!isLiked) {
+        // 좋아요 누르기
+        await likeMember(userId);
+        await sendNotification(userId, {
+          type: 'LIKE',
+          title: '좋아요 알림',
+          content: '회원님을 마음에 들어하는 사람이 있어요 💕',
+        });
+        toast.success('좋아요 알림이 전송되었습니다!');
+        setLikeCount((prev) => prev + 1);
+        setIsLiked(true);
+      } else {
+        // 좋아요 취소하기
+        await likeMember(userId);
+        toast.success('좋아요를 취소했습니다.');
+        setLikeCount((prev) => (prev > 0 ? prev - 1 : 0));
+        setIsLiked(false);
+      }
+      setLikeChanged(true);
+      setIsClicked(true);
+      setTimeout(() => setIsClicked(false), 300);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message;
+        toast.error(errorMessage || '좋아요 알림 요청에 실패했습니다.');
+      } else {
+        toast.error('좋아요 알림 요청에 실패했습니다.');
+      }
+    }
+  };
 
   const handleBack = () => {
     router.back();
@@ -129,9 +126,14 @@ const handleLikeToggle = async () => {
       if (isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
         if (errorMessage?.includes('이미 요청된 커피챗이 존재합니다')) {
-          toast.warning('이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.');
+          toast.warning(
+            '이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.'
+          );
         } else {
-          toast.error(errorMessage || '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          toast.error(
+            errorMessage ||
+              '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+          );
         }
       } else {
         toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
@@ -146,15 +148,10 @@ const handleLikeToggle = async () => {
 
   return (
     <div className="w-full min-h-full flex flex-col gap-4 px-2 xs:px-20 py-5">
-      
-{/* 상단 뒤로가기 (글자 없이 화살표만) */}
- <button
-    className="absolute top-22 left-6"
-    onClick={handleBack}
-  >
-    <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
-  </button>
-
+      {/* 상단 뒤로가기 (글자 없이 화살표만) */}
+      <button className="absolute top-22 left-6" onClick={handleBack}>
+        <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
+      </button>
 
       <MemberProfileDetailCard>
         <MemberProfileDetailCard.Image>
@@ -178,7 +175,14 @@ const handleLikeToggle = async () => {
           <motion.div
             style={{ color: isLiked ? '#f87171' : '#d1d5db' }}
             onClick={handleLikeToggle}
-            animate={isClicked ? { scale: [1, 1.4, 1], color: ['#f43f5e', '#be123c', '#f43f5e'] } : {}}
+            animate={
+              isClicked
+                ? {
+                    scale: [1, 1.4, 1],
+                    color: ['#f43f5e', '#be123c', '#f43f5e'],
+                  }
+                : {}
+            }
             transition={{ duration: 0.4 }}
             className="cursor-pointer"
           >

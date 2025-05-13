@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { startStatusUpdates, stopStatusUpdates } from '@/store/userStatusStore';
-import { socket } from '@/lib/socket';
+import { userStatusSocket } from '@/lib/socket';
 
 export default function SocketProvider({
   children,
@@ -23,7 +23,7 @@ export default function SocketProvider({
           const parsed = JSON.parse(authStorage);
           const token = parsed.state?.token;
           if (token) {
-            socket.auth = { token };
+            userStatusSocket.auth = { token };
           }
         }
       } catch (e) {
@@ -47,16 +47,16 @@ export default function SocketProvider({
       console.error('Socket error:', error);
     };
 
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-    socket.on('error', handleError);
+    userStatusSocket.on('connect', handleConnect);
+    userStatusSocket.on('disconnect', handleDisconnect);
+    userStatusSocket.on('error', handleError);
 
     startStatusUpdates();
 
     return () => {
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-      socket.off('error', handleError);
+      userStatusSocket.off('connect', handleConnect);
+      userStatusSocket.off('disconnect', handleDisconnect);
+      userStatusSocket.off('error', handleError);
       stopStatusUpdates();
       initialized.current = false;
     };
