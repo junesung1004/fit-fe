@@ -133,18 +133,29 @@ export default function FriendsPage() {
     router.push(`/members/${id}`);
   };
 
-  const handleAccept = async (id: string) => {
+  const handleAccept = async (partnerId: string) => {
     try {
-      await acceptMatchRequest(id);
-      router.push(`/chats/${id}`);
-    } catch (error) {
+      const response = await acceptMatchRequest(partnerId);
+
+      if (!response) {
+        toast.error('서버 응답이 없습니다.');
+        return;
+      }
+      const { id: chatRoomId} = response;
+
+      if (!chatRoomId) {
+        toast.error('채팅방 ID를 가져올 수 없습니다.');
+        return;
+      }
+      router.push(`/chats/${chatRoomId}?userId=${partnerId}`);
+  }   catch (error) {
       if (isAxiosError(error) && error.response?.data?.message) {
         toast.error(error.response.data.message);
         if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
-          setRoundProfiles((prev) => prev.filter((user) => user.id !== id));
+          setRoundProfiles((prev) => prev.filter((user) => user.id !== partnerId));
         }
       } else {
-        toast.error('매칭 수락 중 오류가 발생했습니다.');
+      toast.error('매칭 수락 중 오류가 발생했습니다.');
       }
     }
   };
