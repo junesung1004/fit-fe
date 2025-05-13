@@ -137,6 +137,15 @@ export const ChatRoom = ({ chatRoomId }: ChatRoomProps) => {
       </div>
     );
   }
+  if (messages.length === 0) {
+  return (
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-gray-400">
+      <p>아직 대화가 없습니다.</p>
+      <p>첫 번째 메시지를 보내보세요!</p>
+    </div>
+  );
+}
+
 
   return (
     <div className="flex flex-col h-[calc(100vh-160px)] bg-violet-100">
