@@ -54,38 +54,46 @@ export default function MemberDetailPage() {
     getUserInfo();
   }, [userId]);
 
-  const handleLikeToggle = async () => {
-    if (!isLoggedIn) {
-      setShowLoginAlert(true);
-      return;
-    }
+const handleLikeToggle = async () => {
+  if (!isLoggedIn) {
+    setShowLoginAlert(true);
+    return;
+  }
 
-    if (!userId) return toast.error('상대방 ID가 없습니다!');
+  if (!userId) return toast.error('상대방 ID가 없습니다!');
 
-    try {
-      if (!isLiked) {
-        await likeMember(userId);
-        await sendNotification(userId, {
-          type: 'LIKE',
-          title: '좋아요 알림',
-          content: '회원님을 마음에 들어하는 사람이 있어요 💕',
-        });
-        toast.success('좋아요 알림이 전송되었습니다!');
-        setLikeCount((prev) => prev + 1);
-        setIsLiked(true);
-        setLikeChanged(true); // ✅ 좋아요 성공하면 store 업데이트
-      }
-      setIsClicked(true);
-      setTimeout(() => setIsClicked(false), 300);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message;
-        toast.error(errorMessage || '좋아요 알림 전송에 실패했습니다.');
-      } else {
-        toast.error('좋아요 알림 전송에 실패했습니다.');
-      }
+  try {
+    if (!isLiked) {
+      // 좋아요 누르기
+      await likeMember(userId);
+      await sendNotification(userId, {
+        type: 'LIKE',
+        title: '좋아요 알림',
+        content: '회원님을 마음에 들어하는 사람이 있어요 💕',
+      });
+      toast.success('좋아요 알림이 전송되었습니다!');
+      setLikeCount((prev) => prev + 1);
+      setIsLiked(true);
+    } else {
+      // ❗ 좋아요 취소하기
+      await likeMember(userId); // ✅ 백엔드에서 toggle처럼 구현되어 있는 경우 그대로 사용
+      toast.success('좋아요를 취소했습니다.');
+      setLikeCount((prev) => (prev > 0 ? prev - 1 : 0));
+      setIsLiked(false);
     }
-  };
+    setLikeChanged(true); // ✅ 좋아요 변경 상태를 항상 업데이트
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 300);
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message;
+      toast.error(errorMessage || '요청에 실패했습니다.');
+    } else {
+      toast.error('요청에 실패했습니다.');
+    }
+  }
+};
+
 
   const handleBack = () => {
     router.back();
