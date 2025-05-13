@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { userStatusSocket } from '@/lib/socket';
+import { userStatusSocket, setUserStatusSocketToken } from '@/lib/socket';
 import { UserStatus, UserStatusState } from '@/types/userStatus.type';
 
 // 현재 로그인한 사용자 ID를 가져오는 함수
@@ -16,6 +16,20 @@ const getCurrentUserId = (): string | null => {
     return parsed.state?.user?.id || null;
   } catch (e) {
     console.error('Failed to get current user ID', e);
+    return null;
+  }
+};
+
+// 현재 로그인한 사용자 토큰을 가져오는 함수
+const getCurrentUserToken = (): string | null => {
+  try {
+    if (typeof window === 'undefined') return null;
+    const authStorage = localStorage.getItem('auth-storage');
+    if (!authStorage) return null;
+    const parsed = JSON.parse(authStorage);
+    return parsed.state?.token || null;
+  } catch (e) {
+    console.error('Failed to get current user token', e);
     return null;
   }
 };
@@ -50,14 +64,18 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     const currentUserId = getCurrentUserId();
     const currentState = get();
 
-    // 현재 사용자 ID가 있고 아직 상태에 없는 경우에만 업데이트
     if (currentUserId && !currentState.userStatuses[currentUserId]) {
       set((state) => ({
         userStatuses: { ...state.userStatuses, [currentUserId]: true },
       }));
     }
 
-    // 항상 실시간 상태를 요청하기 위해 모든 userIds에 대해 소켓 요청
+    // 소켓 연결 전에 토큰 세팅
+    const token = getCurrentUserToken();
+    if (token) {
+      setUserStatusSocketToken(token);
+    }
+
     if (!userStatusSocket.connected) {
       userStatusSocket.connect();
     }
@@ -101,21 +119,23 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 let updateInterval: NodeJS.Timeout | null = null;
 
 export const startStatusUpdates = () => {
-  // 서버 사이드에서 실행되는 경우 실행하지 않음
   if (typeof window === 'undefined') return;
-
   if (updateInterval) return;
 
-  // 소켓 리스너 초기화
+  // 소켓 연결 전에 토큰 세팅
+  const token = getCurrentUserToken();
+  if (token) {
+    setUserStatusSocketToken(token);
+  }
+
   useUserStatusStore.getState().initSocketListeners();
 
-  // 주기적으로 상태 업데이트
   updateInterval = setInterval(() => {
     const userIds = Object.keys(useUserStatusStore.getState().userStatuses);
     if (userIds.length > 0) {
       useUserStatusStore.getState().fetchUserStatuses(userIds);
     }
-  }, 10000); // 10초
+  }, 10000);
 };
 
 export const stopStatusUpdates = () => {

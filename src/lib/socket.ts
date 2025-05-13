@@ -20,3 +20,8 @@ export const userStatusSocket = io(SOCKET_URL, {
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
 });
+
+// 토큰을 동적으로 할당하는 함수
+export function setUserStatusSocketToken(token: string) {
+  userStatusSocket.auth = { token };
+}
