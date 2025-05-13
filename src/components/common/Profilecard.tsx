@@ -19,12 +19,12 @@ const ProfileCard = ({
   region,
   likes = 0,
   userId,
-  isOnline: isOnlineProp,
+  isOnline,
   profileImageUrl,
   onClick,
 }: ProfileCardProps) => {
   const { userStatuses } = useUserStatusStore();
-  const isOnline = userStatuses[userId] || isOnlineProp;
+  const online = userStatuses?.[userId] ?? isOnline;
 
   return (
     <div
@@ -66,10 +66,10 @@ const ProfileCard = ({
       {/* 접속 상태 */}
       <div
         className={`text-center mt-2 ${
-          isOnline ? 'text-green-500' : 'text-red-500'
+          online ? 'text-green-500' : 'text-rose-300'
         }`}
       >
-        {isOnline ? '● 접속 중' : '● 접속 종료'}
+        {online ? '● 접속 중' : '● 접속 종료'}
       </div>
     </div>
   );
