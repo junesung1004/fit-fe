@@ -6,8 +6,6 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 const RECONNECT_DELAY = 5000;
 const STATUS_UPDATE_INTERVAL = 10000;
 
-// 전역 상태 관리
-let reconnectAttempts = 0;
 let updateInterval: NodeJS.Timeout | null = null;
 let isUpdating = false;
 
@@ -37,23 +35,10 @@ const getCurrentUserToken = (): string | null => {
   }
 };
 
-// 상태 업데이트 최적화를 위한 함수
-const updateUserStatus = (
-  currentStatuses: Record<string, boolean>,
-  newStatuses: Record<string, boolean>
-): Record<string, boolean> => {
-  const hasChanges = Object.entries(newStatuses).some(
-    ([userId, isActive]) => currentStatuses[userId] !== isActive
-  );
-
-  if (!hasChanges) return currentStatuses;
-
-  return { ...currentStatuses, ...newStatuses };
-};
-
 // 사용자 상태 업데이트 함수
 export const useUserStatusStore = create<UserStatusState>((set, get) => ({
   userStatuses: {},
+  reconnectAttempts: 0,
 
   updateUserStatuses: (statuses) => {
     if (!statuses.length) return;
@@ -72,12 +57,18 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     }
 
     set((state) => ({
-      userStatuses: updateUserStatus(state.userStatuses, newStatuses),
+      userStatuses: { ...state.userStatuses, ...newStatuses },
     }));
   },
 
   fetchUserStatuses: (userIds) => {
     if (userIds.length === 0 || isUpdating) return;
+
+    const token = getCurrentUserToken();
+    if (!token) {
+      console.warn('토큰이 없어 소켓 연결을 시도하지 않습니다.');
+      return;
+    }
 
     try {
       isUpdating = true;
@@ -90,8 +81,7 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         }));
       }
 
-      const token = getCurrentUserToken();
-      setUserStatusSocketToken(token || '');
+      setUserStatusSocketToken(token);
 
       if (!userStatusSocket.connected) {
         userStatusSocket.connect();
@@ -121,12 +111,13 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     userStatusSocket.on('disconnect', () => {
       console.log('소켓 연결이 끊어졌습니다. 재연결을 시도합니다.');
       const userIds = Object.keys(get().userStatuses);
+      const currentAttempts = get().reconnectAttempts;
 
-      if (userIds.length > 0 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      if (userIds.length > 0 && currentAttempts < MAX_RECONNECT_ATTEMPTS) {
         const token = getCurrentUserToken();
-        reconnectAttempts++;
+        set((state) => ({ reconnectAttempts: state.reconnectAttempts + 1 }));
         console.log(
-          `재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`
+          `재연결 시도 ${currentAttempts + 1}/${MAX_RECONNECT_ATTEMPTS}`
         );
 
         setUserStatusSocketToken(token || '');
@@ -135,7 +126,7 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
         setTimeout(() => {
           get().fetchUserStatuses(userIds);
         }, RECONNECT_DELAY);
-      } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+      } else if (currentAttempts >= MAX_RECONNECT_ATTEMPTS) {
         console.error('최대 재연결 시도 횟수를 초과했습니다.');
         stopStatusUpdates();
       }
@@ -143,7 +134,6 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 
     userStatusSocket.on('connect', () => {
       console.log('소켓이 연결되었습니다.');
-      reconnectAttempts = 0;
       const currentUserId = getCurrentUserId();
       if (currentUserId) {
         set((state) => ({
@@ -154,19 +144,21 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
 
     userStatusSocket.on('connect_error', (err) => {
       console.error('소켓 연결 에러:', err);
+      const currentAttempts = get().reconnectAttempts;
+
       if (
         err.message === 'No token provided' &&
-        reconnectAttempts < MAX_RECONNECT_ATTEMPTS
+        currentAttempts < MAX_RECONNECT_ATTEMPTS
       ) {
         const token = getCurrentUserToken();
-        reconnectAttempts++;
+        set((state) => ({ reconnectAttempts: state.reconnectAttempts + 1 }));
         console.log(
-          `재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`
+          `재연결 시도 ${currentAttempts + 1}/${MAX_RECONNECT_ATTEMPTS}`
         );
 
         setUserStatusSocketToken(token || '');
         userStatusSocket.connect();
-      } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+      } else if (currentAttempts >= MAX_RECONNECT_ATTEMPTS) {
         console.error('최대 재연결 시도 횟수를 초과했습니다.');
         stopStatusUpdates();
       }
@@ -200,13 +192,15 @@ export const stopStatusUpdates = () => {
     updateInterval = null;
   }
   isUpdating = false;
-  reconnectAttempts = 0;
+  useUserStatusStore.setState({ reconnectAttempts: 0 });
 };
 
 // 사용자 상태 소켓 재연결
 export function reconnectUserStatusSocket(newToken: string) {
   console.log('소켓 재연결 시도');
-  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+  const currentAttempts = useUserStatusStore.getState().reconnectAttempts;
+
+  if (currentAttempts >= MAX_RECONNECT_ATTEMPTS) {
     console.error('최대 재연결 시도 횟수를 초과했습니다.');
     return;
   }
@@ -215,8 +209,8 @@ export function reconnectUserStatusSocket(newToken: string) {
     userStatusSocket.disconnect();
   }
 
-  reconnectAttempts++;
-  console.log(`재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
+  useUserStatusStore.setState({ reconnectAttempts: currentAttempts + 1 });
+  console.log(`재연결 시도 ${currentAttempts + 1}/${MAX_RECONNECT_ATTEMPTS}`);
   setUserStatusSocketToken(newToken);
   userStatusSocket.connect();
 }

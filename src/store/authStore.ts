@@ -1,6 +1,7 @@
 // src/store/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { userStatusSocket } from '@/lib/socket';
 
 interface AuthUser {
   id: string;
@@ -23,13 +24,23 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       user: null,
 
-      // ✅ 여기서 실제로 인자를 사용해서 상태에 반영
-      login: (token, user) =>
+      login: (token, user) => {
         set({
           isLoggedIn: true,
           accessToken: token,
           user: user,
-        }),
+        });
+        // 소켓 재연결 처리
+        try {
+          if (userStatusSocket.connected) {
+            userStatusSocket.disconnect();
+          }
+          userStatusSocket.auth = { token };
+          userStatusSocket.connect();
+        } catch (e) {
+          console.error('소켓 재연결 실패:', e);
+        }
+      },
 
       logout: () =>
         set({

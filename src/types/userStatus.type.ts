@@ -9,6 +9,7 @@ export interface UserStatusPayload {
 
 export interface UserStatusState {
   userStatuses: Record<string, boolean>;
+  reconnectAttempts: number;
   // eslint-disable-next-line no-unused-vars
   updateUserStatuses: (statuses: UserStatus[]) => void;
   // eslint-disable-next-line no-unused-vars
