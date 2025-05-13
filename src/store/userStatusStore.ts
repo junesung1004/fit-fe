@@ -50,10 +50,6 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     const currentUserId = getCurrentUserId();
     const currentState = get();
 
-    // 이미 동일한 사용자 ID 집합에 대해 요청했다면 다시 요청하지 않음
-    const existingUserIds = Object.keys(currentState.userStatuses);
-    const newUserIds = userIds.filter((id) => !existingUserIds.includes(id));
-
     // 현재 사용자 ID가 있고 아직 상태에 없는 경우에만 업데이트
     if (currentUserId && !currentState.userStatuses[currentUserId]) {
       set((state) => ({
@@ -61,14 +57,12 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
       }));
     }
 
-    // 새로운 사용자 ID가 있을 때만 소켓 요청
-    if (newUserIds.length > 0) {
-      if (!socket.connected) {
-        socket.connect();
-      }
-
-      socket.emit('get:user:status', { userIds });
+    // 항상 실시간 상태를 요청하기 위해 모든 userIds에 대해 소켓 요청
+    if (!socket.connected) {
+      socket.connect();
     }
+
+    socket.emit('get:user:status', { userIds });
   },
 
   initSocketListeners: () => {
@@ -120,7 +114,7 @@ export const startStatusUpdates = () => {
     if (userIds.length > 0) {
       useUserStatusStore.getState().fetchUserStatuses(userIds);
     }
-  }, 30000);
+  }, 5000);
 };
 
 export const stopStatusUpdates = () => {

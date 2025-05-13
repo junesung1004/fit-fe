@@ -15,6 +15,25 @@ export default function SocketProvider({
     if (initialized.current) return;
     initialized.current = true;
 
+    // 토큰 설정
+    const setAuthToken = () => {
+      try {
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          const parsed = JSON.parse(authStorage);
+          const token = parsed.state?.token;
+          if (token) {
+            socket.auth = { token };
+          }
+        }
+      } catch (e) {
+        console.error('Failed to set auth token', e);
+      }
+    };
+
+    // 토큰 설정 후 연결
+    setAuthToken();
+
     // 연결 상태 이벤트 리스너 추가
     const handleConnect = () => {
       console.log('Socket connected');

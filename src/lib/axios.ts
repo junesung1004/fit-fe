@@ -27,39 +27,6 @@ const PUBLIC_PATHS = [
   '/user/filtered-users',
 ];
 
-// 디바이스 ID가 필요한 API 경로들
-const DEVICE_ID_REQUIRED_PATHS = ['/auth/login', '/match/random'];
-
-// 디바이스 ID 관리 함수
-function ensureDeviceId() {
-  let deviceId = localStorage.getItem('deviceId');
-  if (!deviceId) {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      deviceId = crypto.randomUUID();
-    } else {
-      deviceId =
-        Math.random().toString(36).substring(2) + Date.now().toString(36);
-    }
-    localStorage.setItem('deviceId', deviceId);
-  }
-  return deviceId;
-}
-
-// 요청 인터셉터 추가 - 특정 경로에만 디바이스 ID 헤더 추가
-instance.interceptors.request.use((config) => {
-  const url = config.url || '';
-
-  // 디바이스 ID가 필요한 경로인지 확인
-  if (DEVICE_ID_REQUIRED_PATHS.some((path) => url.includes(path))) {
-    const deviceId = ensureDeviceId();
-    if (deviceId && config.headers) {
-      config.headers['x-device-id'] = deviceId;
-    }
-  }
-
-  return config;
-});
-
 // 응답 인터셉터 추가
 instance.interceptors.response.use(
   (response) => response,
