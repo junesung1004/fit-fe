@@ -56,7 +56,6 @@ const getKoreanAge = (birthday: string | null): number => {
 
 export default function FriendsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
   const [roundProfiles, setRoundProfiles] = useState<SparkUser[]>([]);
   const [likeProfiles, setLikeProfiles] = useState<SparkUser[]>([]);
   const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
@@ -114,23 +113,20 @@ export default function FriendsPage() {
       setLikeProfiles(removeDuplicates(simplifiedLikeList));
       setCoffeeChatProfiles(removeDuplicates(simplifiedCoffeeChatList));
 
-      // 로그인한 경우에만 사용자 상태 업데이트 요청
-      if (user) {
-        const allProfileIds = [
-          ...simplifiedMatchList.map((p) => p.id),
-          ...simplifiedLikeList.map((p) => p.id),
-          ...simplifiedCoffeeChatList.map((p) => p.id),
-        ];
+      const allProfileIds = [
+        ...simplifiedMatchList.map((p) => p.id),
+        ...simplifiedLikeList.map((p) => p.id),
+        ...simplifiedCoffeeChatList.map((p) => p.id),
+      ];
 
-        const uniqueUserIds = [...new Set(allProfileIds)];
-        if (uniqueUserIds.length > 0) {
-          fetchUserStatuses(uniqueUserIds);
-        }
+      const uniqueUserIds = [...new Set(allProfileIds)];
+      if (uniqueUserIds.length > 0) {
+        fetchUserStatuses(uniqueUserIds);
       }
     };
 
     fetchData();
-  }, [fetchUserStatuses, user]);
+  }, [fetchUserStatuses]);
 
   const handleClickMemberDetailMove = (id: string) => {
     router.push(`/members/${id}`);
@@ -210,7 +206,6 @@ export default function FriendsPage() {
       }
     }
   };
-
 
   const handleCoffeeReject = async (id: string) => {
     try {

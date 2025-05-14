@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import { FilteredUser } from '@/types/member.type';
 import { useLikeStore } from '@/store/likeStore';
 import { useUserStatusStore } from '@/store/userStatusStore';
+import { useAuthStore } from '@/store/authStore';
 
 const REGION = [
   '',
@@ -41,6 +42,7 @@ const REGION = [
 ];
 
 export default function MembersPage() {
+  const { user } = useAuthStore();
   const [isShowFilter, setIsShowFilter] = useState(false);
   const [minAge, setMinAge] = useState(20);
   const [maxAge, setMaxAge] = useState(60);
@@ -99,10 +101,11 @@ export default function MembersPage() {
   }, [uniqueUsers]);
 
   useEffect(() => {
-    if (userIds.length > 0) {
+    // 로그인한 경우에만 소켓 요청
+    if (user && userIds.length > 0) {
       fetchUserStatuses(userIds);
     }
-  }, [userIds, fetchUserStatuses]);
+  }, [userIds, fetchUserStatuses, user]);
 
   useEffect(() => {
     if (usersError) {
