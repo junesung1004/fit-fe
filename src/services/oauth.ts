@@ -10,15 +10,15 @@ import {
 const OAUTH_ENDPOINTS: OAuthEndpoints = {
   google: {
     auth: 'https://accounts.google.com/o/oauth2/v2/auth',
-    callback: '/auth/google/callback',
+    callback: 'api/v1/auth/google/callback',
   },
   kakao: {
     auth: 'https://kauth.kakao.com/oauth/authorize',
-    callback: '/auth/kakao/callback',
+    callback: 'api/v1/auth/kakao/callback',
   },
   naver: {
     auth: 'https://nid.naver.com/oauth2.0/authorize',
-    callback: '/auth/naver/callback',
+    callback: 'api/v1/auth/naver/callback',
   },
 } as const;
 
@@ -41,7 +41,7 @@ const OAUTH_CONFIG = {
 export const handleSocialLogin = async (
   provider: OAuthProvider
 ): Promise<void> => {
-  const redirectUri = `${window.location.origin}/api/v1/auth/${provider}/callback`;
+  const redirectUri = `${window.location.origin}${OAUTH_ENDPOINTS[provider].callback}`;
   const config = OAUTH_CONFIG[provider];
   const endpoint = OAUTH_ENDPOINTS[provider].auth;
 
