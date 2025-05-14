@@ -1,4 +1,5 @@
 import axios from '@/lib/axios';
+import { AxiosError } from 'axios';
 import {
   OAuthProvider,
   OAuthLoginResponse,
@@ -43,6 +44,14 @@ export const handleSocialLogin = async (
   const config = OAUTH_CONFIG[provider];
   const endpoint = OAUTH_ENDPOINTS[provider].auth;
 
+  console.log('OAuth Config:', {
+    provider,
+    clientId: config.client_id,
+    scope: config.scope,
+    redirectUri,
+    endpoint,
+  });
+
   if (!config.client_id) {
     throw new Error(`${provider} 클라이언트 ID가 설정되지 않았습니다.`);
   }
@@ -63,6 +72,12 @@ export const handleSocialCallback = async (
   additionalParams: OAuthCallbackParams
 ): Promise<OAuthLoginResponse> => {
   try {
+    console.log(`${provider} 콜백 요청 시작:`, {
+      code,
+      additionalParams,
+      callbackUrl: OAUTH_ENDPOINTS[provider].callback,
+    });
+
     const response = await axios.post<OAuthLoginResponse>(
       OAUTH_ENDPOINTS[provider].callback,
       {
@@ -70,9 +85,29 @@ export const handleSocialCallback = async (
         code,
       }
     );
+
+    console.log(`${provider} 콜백 응답:`, response.data);
     return response.data;
   } catch (error) {
-    console.error(`${provider} 로그인 콜백 처리 중 오류:`, error);
-    throw new Error(`${provider} 로그인 처리 중 오류가 발생했습니다.`);
+    const axiosError = error as AxiosError;
+    console.error(`${provider} 로그인 콜백 처리 중 상세 오류:`, {
+      error: axiosError,
+      response: axiosError.response?.data,
+      status: axiosError.response?.status,
+      headers: axiosError.response?.headers,
+    });
+
+    // 에러를 던지지 않고 기본 응답 반환
+    return {
+      accessToken: '',
+      refreshToken: '',
+      isProfileComplete: false,
+      redirectUrl: '/login',
+      user: {
+        id: '',
+        email: '',
+        role: '',
+      },
+    };
   }
 };
