@@ -24,9 +24,8 @@ const OAUTH_ENDPOINTS: OAuthEndpoints = {
 export const handleSocialLogin = async (
   provider: OAuthProvider
 ): Promise<void> => {
-  const redirectUri = `${window.location.origin}/oauth/${provider}/callback`;
   const endpoint = OAUTH_ENDPOINTS[provider].auth;
-  window.location.href = `${axios.defaults.baseURL}${endpoint}?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  window.location.href = `${axios.defaults.baseURL}${endpoint}`;
 };
 
 export const handleSocialCallback = async (
