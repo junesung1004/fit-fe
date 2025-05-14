@@ -185,11 +185,17 @@ export default function FriendsPage() {
     try {
       const res = await acceptCoffeeChatRequest(coffeeChatId);
       const chatRoomId = res.chatRoomId ?? userId;
-      router.push(`/chats/${chatRoomId}?userId=${userId}`);
+
+      const myUserId = useAuthStore.getState().user?.id; // ✅ 내 id 가져오기
+      if (!myUserId) {
+        toast.error('로그인이 필요합니다.');
+        return;
+      }
+
+      router.push(`/chats/${chatRoomId}?userId=${myUserId}`); // ✅ 내 userId 넣기
     } catch (error) {
       if (isAxiosError(error) && error.response?.data?.message) {
         toast.error(error.response.data.message);
-        // 이미 채팅방이 있는 경우 해당 유저를 목록에서 제거
         if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
           setCoffeeChatProfiles((prev) =>
             prev.filter((user) => user.id !== userId)
@@ -200,6 +206,7 @@ export default function FriendsPage() {
       }
     }
   };
+
 
   const handleCoffeeReject = async (id: string) => {
     try {
