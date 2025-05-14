@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import ProfileCard from '@/components/common/Profilecard';
@@ -134,31 +135,38 @@ export default function FriendsPage() {
   };
 
   const handleAccept = async (partnerId: string) => {
-    try {
-      const response = await acceptMatchRequest(partnerId);
+  try {
+    const response = await acceptMatchRequest(partnerId);
 
-      if (!response) {
-        toast.error('서버 응답이 없습니다.');
-        return;
-      }
-      const { id: chatRoomId} = response;
-
-      if (!chatRoomId) {
-        toast.error('채팅방 ID를 가져올 수 없습니다.');
-        return;
-      }
-      router.push(`/chats/${chatRoomId}?userId=${partnerId}`);
-  }   catch (error) {
-      if (isAxiosError(error) && error.response?.data?.message) {
-        toast.error(error.response.data.message);
-        if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
-          setRoundProfiles((prev) => prev.filter((user) => user.id !== partnerId));
-        }
-      } else {
-      toast.error('매칭 수락 중 오류가 발생했습니다.');
-      }
+    if (!response) {
+      toast.error('서버 응답이 없습니다.');
+      return;
     }
-  };
+    const { id: chatRoomId } = response;
+
+    if (!chatRoomId) {
+      toast.error('채팅방 ID를 가져올 수 없습니다.');
+      return;
+    }
+
+    const myUserId = useAuthStore.getState().user?.id; //  여기서 내 id 가져오기
+    if (!myUserId) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+
+    router.push(`/chats/${chatRoomId}?userId=${myUserId}`); //  무조건 "내 userId" 넣기
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.data?.message) {
+      toast.error(error.response.data.message);
+      if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
+        setRoundProfiles((prev) => prev.filter((user) => user.id !== partnerId));
+      }
+    } else {
+      toast.error('매칭 수락 중 오류가 발생했습니다.');
+    }
+  }
+};
 
   const handleReject = async (id: string) => {
     try {
