@@ -50,7 +50,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="이메일 또는 아이디"
+            placeholder="이메일"
             ref={emailRef}
             className="block w-full mb-2 p-4 text-sm border border-rose-500 rounded"
           />

@@ -21,6 +21,7 @@ import {
 import { isAxiosError } from '@/lib/error';
 import { toast } from 'react-toastify';
 import { useUserStatusStore } from '@/store/userStatusStore';
+import { useGetChatRoomQuery } from '@/hooks/queries/useGetChatRoomQuery';
 
 interface SparkUser {
   id: string;
@@ -63,6 +64,7 @@ export default function FriendsPage() {
   const [isLikeExpanded, setIsLikeExpanded] = useState(false);
   const [isCoffeeChatExpanded, setIsCoffeeChatExpanded] = useState(false);
   const { userStatuses, fetchUserStatuses } = useUserStatusStore();
+  const { data: chatRooms } = useGetChatRoomQuery();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,14 +111,26 @@ export default function FriendsPage() {
         })
       );
 
-      setRoundProfiles(removeDuplicates(simplifiedMatchList));
+      // 채팅방에 있는 사용자들의 ID 목록
+      const chatRoomUserIds = chatRooms?.map((room) => room.partner?.id) || [];
+
+      // 채팅방에 없는 사용자들만 필터링
+      const filteredMatchList = simplifiedMatchList.filter(
+        (user) => !chatRoomUserIds.includes(user.id)
+      );
+
+      const filteredCoffeeChatList = simplifiedCoffeeChatList.filter(
+        (user) => !chatRoomUserIds.includes(user.id)
+      );
+
+      setRoundProfiles(removeDuplicates(filteredMatchList));
       setLikeProfiles(removeDuplicates(simplifiedLikeList));
-      setCoffeeChatProfiles(removeDuplicates(simplifiedCoffeeChatList));
+      setCoffeeChatProfiles(removeDuplicates(filteredCoffeeChatList));
 
       const allProfileIds = [
-        ...simplifiedMatchList.map((p) => p.id),
+        ...filteredMatchList.map((p) => p.id),
         ...simplifiedLikeList.map((p) => p.id),
-        ...simplifiedCoffeeChatList.map((p) => p.id),
+        ...filteredCoffeeChatList.map((p) => p.id),
       ];
 
       const uniqueUserIds = [...new Set(allProfileIds)];
@@ -126,7 +140,7 @@ export default function FriendsPage() {
     };
 
     fetchData();
-  }, [fetchUserStatuses]);
+  }, [fetchUserStatuses, chatRooms]);
 
   const handleClickMemberDetailMove = (id: string) => {
     router.push(`/members/${id}`);

@@ -1,5 +1,5 @@
 import { OAuthProvider } from '@/types/oauth.type';
-import OAuthCallback from '@/components/page/login/OAuthCallback';
+import OAuthCallback from '@/components/page/callback/OAuthCallback';
 
 interface OAuthCallbackPageProps {
   params: Promise<{ provider: string }>;
