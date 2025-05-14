@@ -41,7 +41,7 @@ const OAUTH_CONFIG = {
 export const handleSocialLogin = async (
   provider: OAuthProvider
 ): Promise<void> => {
-  const redirectUri = `${window.location.origin}/auth/${provider}/callback`;
+  const redirectUri = `${window.location.origin}/api/v1/auth/${provider}/callback`;
   const config = OAUTH_CONFIG[provider];
   const endpoint = OAUTH_ENDPOINTS[provider].auth;
 
