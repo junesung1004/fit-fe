@@ -56,6 +56,7 @@ const getKoreanAge = (birthday: string | null): number => {
 
 export default function FriendsPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [roundProfiles, setRoundProfiles] = useState<SparkUser[]>([]);
   const [likeProfiles, setLikeProfiles] = useState<SparkUser[]>([]);
   const [coffeeChatProfiles, setCoffeeChatProfiles] = useState<SparkUser[]>([]);
@@ -113,60 +114,63 @@ export default function FriendsPage() {
       setLikeProfiles(removeDuplicates(simplifiedLikeList));
       setCoffeeChatProfiles(removeDuplicates(simplifiedCoffeeChatList));
 
-      // 프로필 설정 후 모든 사용자 ID를 상태 업데이트 요청
-      const allProfileIds = [
-        ...simplifiedMatchList.map((p) => p.id),
-        ...simplifiedLikeList.map((p) => p.id),
-        ...simplifiedCoffeeChatList.map((p) => p.id),
-      ];
+      // 로그인한 경우에만 사용자 상태 업데이트 요청
+      if (user) {
+        const allProfileIds = [
+          ...simplifiedMatchList.map((p) => p.id),
+          ...simplifiedLikeList.map((p) => p.id),
+          ...simplifiedCoffeeChatList.map((p) => p.id),
+        ];
 
-      // 중복 제거
-      const uniqueUserIds = [...new Set(allProfileIds)];
-      if (uniqueUserIds.length > 0) {
-        fetchUserStatuses(uniqueUserIds);
+        const uniqueUserIds = [...new Set(allProfileIds)];
+        if (uniqueUserIds.length > 0) {
+          fetchUserStatuses(uniqueUserIds);
+        }
       }
     };
 
     fetchData();
-  }, [fetchUserStatuses]);
+  }, [fetchUserStatuses, user]);
 
   const handleClickMemberDetailMove = (id: string) => {
     router.push(`/members/${id}`);
   };
 
   const handleAccept = async (partnerId: string) => {
-  try {
-    const response = await acceptMatchRequest(partnerId);
+    try {
+      const response = await acceptMatchRequest(partnerId);
 
-    if (!response) {
-      toast.error('서버 응답이 없습니다.');
-      return;
-    }
-    const { id: chatRoomId } = response;
-
-    if (!chatRoomId) {
-      toast.error('채팅방 ID를 가져올 수 없습니다.');
-      return;
-    }
-
-    const myUserId = useAuthStore.getState().user?.id; //  여기서 내 id 가져오기
-    if (!myUserId) {
-      toast.error('로그인이 필요합니다.');
-      return;
-    }
-
-    router.push(`/chats/${chatRoomId}?userId=${myUserId}`); //  무조건 "내 userId" 넣기
-  } catch (error) {
-    if (isAxiosError(error) && error.response?.data?.message) {
-      toast.error(error.response.data.message);
-      if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
-        setRoundProfiles((prev) => prev.filter((user) => user.id !== partnerId));
+      if (!response) {
+        toast.error('서버 응답이 없습니다.');
+        return;
       }
-    } else {
-      toast.error('매칭 수락 중 오류가 발생했습니다.');
+      const { id: chatRoomId } = response;
+
+      if (!chatRoomId) {
+        toast.error('채팅방 ID를 가져올 수 없습니다.');
+        return;
+      }
+
+      const myUserId = useAuthStore.getState().user?.id; //  여기서 내 id 가져오기
+      if (!myUserId) {
+        toast.error('로그인이 필요합니다.');
+        return;
+      }
+
+      router.push(`/chats/${chatRoomId}?userId=${myUserId}`); //  무조건 "내 userId" 넣기
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+        if (error.response.data.message.includes('이미 채팅방이 있습니다')) {
+          setRoundProfiles((prev) =>
+            prev.filter((user) => user.id !== partnerId)
+          );
+        }
+      } else {
+        toast.error('매칭 수락 중 오류가 발생했습니다.');
+      }
     }
-  }
-};
+  };
 
   const handleReject = async (id: string) => {
     try {
