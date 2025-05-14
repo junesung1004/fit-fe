@@ -73,10 +73,13 @@ export const handleSocialCallback = async (
   additionalParams: OAuthCallbackParams
 ): Promise<OAuthLoginResponse> => {
   try {
+    const redirectUri = `${window.location.origin}${OAUTH_ENDPOINTS[provider].callback}`;
+
     console.log(`${provider} 콜백 요청 시작:`, {
       code,
       additionalParams,
       callbackUrl: OAUTH_ENDPOINTS[provider].callback,
+      redirectUri,
     });
 
     const response = await axios.post<OAuthLoginResponse>(
@@ -84,6 +87,8 @@ export const handleSocialCallback = async (
       {
         ...additionalParams,
         code,
+        provider,
+        redirectUri,
       }
     );
 
