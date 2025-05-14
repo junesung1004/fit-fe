@@ -10,15 +10,15 @@ import {
 const OAUTH_ENDPOINTS: OAuthEndpoints = {
   google: {
     auth: 'https://accounts.google.com/o/oauth2/v2/auth',
-    callback: 'api/v1/auth/google/callback',
+    callback: '/api/v1/auth/google/callback',
   },
   kakao: {
     auth: 'https://kauth.kakao.com/oauth/authorize',
-    callback: 'api/v1/auth/kakao/callback',
+    callback: '/api/v1/auth/kakao/callback',
   },
   naver: {
     auth: 'https://nid.naver.com/oauth2.0/authorize',
-    callback: 'api/v1/auth/naver/callback',
+    callback: '/api/v1/auth/naver/callback',
   },
 } as const;
 
