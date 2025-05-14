@@ -27,21 +27,23 @@ const OAUTH_CONFIG = {
     client_id:
       '517771775460-g31uhm1lunn5er4mdgq77lltn5j4nu8b.apps.googleusercontent.com',
     scope: 'email',
+    redirect_uri: 'https://fit-date.co.kr/auth/google/callback',
   },
   kakao: {
     client_id: 'dd09c3cc9f0f55669238e75de0493cb4',
     scope: 'account_email',
+    redirect_uri: 'https://fit-date.co.kr/auth/kakao/callback',
   },
   naver: {
     client_id: 'OGubX3GH_5yaMJhqJ3iu',
     scope: 'email',
+    redirect_uri: 'https://fit-date.co.kr/auth/naver/callback',
   },
 } as const;
 
 export const handleSocialLogin = async (
   provider: OAuthProvider
 ): Promise<void> => {
-  const redirectUri = `${window.location.origin}${OAUTH_ENDPOINTS[provider].callback}`;
   const config = OAUTH_CONFIG[provider];
   const endpoint = OAUTH_ENDPOINTS[provider].auth;
 
@@ -49,7 +51,7 @@ export const handleSocialLogin = async (
     provider,
     clientId: config.client_id,
     scope: config.scope,
-    redirectUri,
+    redirectUri: config.redirect_uri,
     endpoint,
   });
 
@@ -59,7 +61,7 @@ export const handleSocialLogin = async (
 
   const params = new URLSearchParams({
     client_id: config.client_id,
-    redirect_uri: redirectUri,
+    redirect_uri: config.redirect_uri,
     response_type: 'code',
     scope: config.scope,
   });
@@ -73,13 +75,13 @@ export const handleSocialCallback = async (
   additionalParams: OAuthCallbackParams
 ): Promise<OAuthLoginResponse> => {
   try {
-    const redirectUri = `${window.location.origin}${OAUTH_ENDPOINTS[provider].callback}`;
+    const config = OAUTH_CONFIG[provider];
 
     console.log(`${provider} 콜백 요청 시작:`, {
       code,
       additionalParams,
       callbackUrl: OAUTH_ENDPOINTS[provider].callback,
-      redirectUri,
+      redirectUri: config.redirect_uri,
     });
 
     const response = await axios.post<OAuthLoginResponse>(
@@ -88,7 +90,7 @@ export const handleSocialCallback = async (
         ...additionalParams,
         code,
         provider,
-        redirectUri,
+        redirectUri: config.redirect_uri,
       }
     );
 
