@@ -51,7 +51,12 @@ export default function ChatsPage() {
           <Image src="/icons/crying-face.png" alt="우는 아이콘" fill />
         </div>
         <span className="text-gray-400 text-2xl">채팅 목록이 없어요</span>
-        <Button size="lg" rounded="full" variant="outline">
+        <Button
+          size="lg"
+          rounded="full"
+          variant="outline"
+          onClick={() => router.push('/home')}
+        >
           라운드 선택하러 가기💓
         </Button>
       </div>

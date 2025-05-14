@@ -64,10 +64,6 @@ async function handleSuccessRedirect(
   result: OAuthLoginResponse,
   router: ReturnType<typeof useRouter>
 ) {
-  if (!result.isProfileComplete) {
-    router.push('/social-signup');
-    return;
-  }
-
+  // 백엔드에서 전달받은 redirectUrl을 그대로 사용
   router.push(result.redirectUrl);
 }
