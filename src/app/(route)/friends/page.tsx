@@ -298,7 +298,7 @@ export default function FriendsPage() {
       {/* 월드컵 */}
       <section className="pt-10">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="font-semibold text-lg">월드컵</h2>
+          <h2 className="font-semibold text-lg">매칭된 월드컵</h2>
         </div>
         {renderProfileCards(
           roundProfiles.slice(0, isRoundExpanded ? undefined : 3),
@@ -323,7 +323,7 @@ export default function FriendsPage() {
       {/* 호감 표시 */}
       <section>
         <div className="flex justify-between items-center mb-2">
-          <h2 className="font-semibold text-lg">호감 표시</h2>
+          <h2 className="font-semibold text-lg">받은 호감</h2>
         </div>
         {renderProfileCards(
           likeProfiles.slice(0, isLikeExpanded ? undefined : 3),
@@ -348,7 +348,7 @@ export default function FriendsPage() {
       {/* 커피챗 신청 */}
       <section>
         <div className="flex justify-between items-center mb-2">
-          <h2 className="font-semibold text-lg">커피챗 신청</h2>
+          <h2 className="font-semibold text-lg">신청 받은 커피챗</h2>
         </div>
         {renderProfileCards(
           coffeeChatProfiles.slice(0, isCoffeeChatExpanded ? undefined : 3),

@@ -67,12 +67,14 @@ export default function Header() {
       {/* right container */}
       <div className="flex justify-center items-center gap-1">
         {/* 나의 커피 */}
-        <div className="flex justify-center items-center gap-1 px-2 pb-0.5 border border-black rounded-full">
-          <div className="relative w-[30px] h-[30px]">
-            <Image src={'/coffee-beans.png'} alt="커피이미지" fill />
+        <Link href="/mypage/payment">
+          <div className="flex justify-center items-center gap-1 px-2 pb-0.5 border border-black rounded-full cursor-pointer">
+            <div className="relative w-[30px] h-[30px]">
+              <Image src={'/coffee-beans.png'} alt="커피이미지" fill />
+            </div>
+            <span className="pt-1">{coffeeCount}</span>
           </div>
-          <span className="pt-1">{coffeeCount}</span>
-        </div>
+        </Link>
 
         {/* 나의 알람 */}
         <Link href={'/notification'} className="relative">
