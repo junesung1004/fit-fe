@@ -14,7 +14,7 @@ const OAUTH_ENDPOINTS: OAuthEndpoints = {
   },
   kakao: {
     auth: 'https://kauth.kakao.com/oauth/authorize',
-    callback: '/auth/kakao/callback',
+    callback: '/api/v1/auth/kakao/callback',
   },
   naver: {
     auth: 'https://nid.naver.com/oauth2.0/authorize',
