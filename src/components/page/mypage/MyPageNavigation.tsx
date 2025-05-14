@@ -10,9 +10,7 @@ export default function MyPageNavigation() {
   const { data: coffeeCount } = useCoffeeCountQuery();
   const { data: user } = useMyProfileQuery();
 
-  if (!user) {
-    return null; // 비로그인 상태면 메뉴 숨김
-  }
+  if (!user) return null;
 
   return (
     <div className="w-full">
@@ -40,6 +38,21 @@ export default function MyPageNavigation() {
                 <p className="text-xl">나의 인기 확인</p>
                 <p className="text-xs text-gray-300">
                   나의 매력은 어떻게 되는지 확인해보세요!
+                </p>
+              </div>
+              <div className="relative w-[16px] h-[16px]">
+                <Image src={'/icons/Vector.png'} alt="화살표" fill />
+              </div>
+            </div>
+          </NavItem>
+
+          {/* 프로필 이미지 관리 페이지 */}
+          <NavItem href="/mypage/profile-images">
+            <div className="flex justify-between items-center px-7">
+              <div>
+                <p className="text-xl">프로필 이미지 관리</p>
+                <p className="text-xs text-gray-300">
+                  프로필 이미지를 등록하고 관리해보세요
                 </p>
               </div>
               <div className="relative w-[16px] h-[16px]">

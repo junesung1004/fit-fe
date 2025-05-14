@@ -6,8 +6,6 @@ import {
   OAuthEndpoints,
 } from '@/types/oauth.type';
 
-const baseUrl = 'https://api.fit-date.co.kr/api/v1';
-
 const OAUTH_ENDPOINTS: OAuthEndpoints = {
   google: {
     auth: '/auth/google',
@@ -28,29 +26,25 @@ export const handleSocialLogin = async (
 ): Promise<void> => {
   const redirectUri = `${window.location.origin}/oauth/${provider}/callback`;
   const endpoint = OAUTH_ENDPOINTS[provider].auth;
-  window.location.href = `${baseUrl}${endpoint}?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  window.location.href = `${axios.defaults.baseURL}${endpoint}?redirect_uri=${encodeURIComponent(redirectUri)}`;
 };
 
 export const handleSocialCallback = async (
   provider: OAuthProvider,
   code: string,
-  additionalParams?: OAuthCallbackParams
+  additionalParams: OAuthCallbackParams
 ): Promise<OAuthLoginResponse> => {
   try {
-    const endpoint = OAUTH_ENDPOINTS[provider].callback;
-    const params = new URLSearchParams({
-      code,
-      ...(additionalParams?.state && { state: additionalParams.state }),
-      ...(additionalParams?.scope && { scope: additionalParams.scope }),
-    });
-
-    const { data } = await axios.get<OAuthLoginResponse>(
-      `${endpoint}?${params.toString()}`
+    const response = await axios.post<OAuthLoginResponse>(
+      OAUTH_ENDPOINTS[provider].callback,
+      {
+        ...additionalParams,
+        code,
+      }
     );
-
-    return data;
+    return response.data;
   } catch (error) {
-    console.error('소셜 로그인 콜백 처리 중 오류:', error);
+    console.error(`${provider} 로그인 콜백 처리 중 오류:`, error);
     throw error;
   }
 };
