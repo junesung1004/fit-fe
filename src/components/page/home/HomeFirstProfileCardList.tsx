@@ -59,32 +59,32 @@ export default function HomeFirstProfileCardList({
         selectedUserId: selectedId.toString(),
       });
 
-  if (type === 'first') {
-    setSelectedFirst(true);
-  } else {
-    setSelectedSecond(true);
-  }
-
-  // ✅ 한 명만 선택해도 "선택 완료" 오버레이 띄우기
-  setIsListSelected(true);
-
-  // ✅ 둘 다 선택됐을 때만 select-all API 호출
-  if (type === 'first' && selectedSecond) {
-    onSelectAll();
-  }
-  if (type === 'second' && selectedFirst) {
-    onSelectAll();
-  }
-      } catch (error) {
-        if (isAxiosError(error)) {
-          toast.error(
-            error.response?.data?.message || '매칭 선택에 실패했습니다.'
-          );
-        } else {
-          toast.error('매칭 선택에 실패했습니다.');
-        }
+      if (type === 'first') {
+        setSelectedFirst(true);
+      } else {
+        setSelectedSecond(true);
       }
-    };
+
+      // ✅ 한 명만 선택해도 "선택 완료" 오버레이 띄우기
+      setIsListSelected(true);
+
+      // ✅ 둘 다 선택됐을 때만 select-all API 호출
+      if (type === 'first' && selectedSecond) {
+        onSelectAll();
+      }
+      if (type === 'second' && selectedFirst) {
+        onSelectAll();
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || '매칭 선택에 실패했습니다.'
+        );
+      } else {
+        toast.error('매칭 선택에 실패했습니다.');
+      }
+    }
+  };
 
   const handleSelectAllLocal = async () => {
     if (!isLoggedIn) {
@@ -92,7 +92,6 @@ export default function HomeFirstProfileCardList({
       return;
     }
 
-    
     if (!firstUser || !secondUser || !firstUser.matchId) return;
 
     try {
@@ -142,10 +141,10 @@ export default function HomeFirstProfileCardList({
   };
 
   const firstImg =
-    firstUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
+    firstUser?.profile?.profileImage?.[0]?.imageUrl ?? '/default.png';
   const secondImg =
-    secondUser.profile.profileImage?.[1]?.imageUrl ??
-    secondUser.profile.profileImage?.[0]?.imageUrl ??
+    secondUser?.profile?.profileImage?.[1]?.imageUrl ??
+    secondUser?.profile?.profileImage?.[0]?.imageUrl ??
     '/default.png';
 
   return (
@@ -166,7 +165,7 @@ export default function HomeFirstProfileCardList({
             backgroundImageUrl={firstImg}
           >
             <HomeProfileCard.Header>
-              <Mbti>{firstUser.profile.mbti.mbti}</Mbti>
+              <Mbti>{firstUser?.profile?.mbti?.mbti ?? 'MBTI'}</Mbti>
             </HomeProfileCard.Header>
             <HomeProfileCard.Body>
               <p className="text-cyan-200">{firstUser.nickname}</p>
@@ -207,7 +206,7 @@ export default function HomeFirstProfileCardList({
             backgroundImageUrl={secondImg}
           >
             <HomeProfileCard.Header>
-              <Mbti>{secondUser.profile.mbti.mbti}</Mbti>
+              <Mbti>{secondUser?.profile?.mbti?.mbti ?? 'MBTI'}</Mbti>
             </HomeProfileCard.Header>
             <HomeProfileCard.Body>
               <p className="text-cyan-200">{secondUser.nickname}</p>

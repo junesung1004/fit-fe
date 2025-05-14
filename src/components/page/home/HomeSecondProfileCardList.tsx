@@ -132,10 +132,10 @@ export default function HomeSecondProfileCardList({
   };
 
   const thirdImg =
-    thirdUser.profile.profileImage?.[0]?.imageUrl ?? '/default.png';
+    thirdUser?.profile?.profileImage?.[0]?.imageUrl ?? '/default.png';
   const fourImg =
-    fourUser.profile.profileImage?.[1]?.imageUrl ??
-    fourUser.profile.profileImage?.[0]?.imageUrl ??
+    fourUser?.profile?.profileImage?.[1]?.imageUrl ??
+    fourUser?.profile?.profileImage?.[0]?.imageUrl ??
     '/default.png';
 
   return (
@@ -155,7 +155,7 @@ export default function HomeSecondProfileCardList({
             backgroundImageUrl={thirdImg}
           >
             <HomeProfileCard.Header>
-              <Mbti>{thirdUser.profile.mbti.mbti}</Mbti>
+              <Mbti>{thirdUser?.profile?.mbti?.mbti ?? 'MBTI'}</Mbti>
             </HomeProfileCard.Header>
             <HomeProfileCard.Body>
               <p className="text-cyan-200">{thirdUser.nickname}</p>
@@ -196,7 +196,7 @@ export default function HomeSecondProfileCardList({
             backgroundImageUrl={fourImg}
           >
             <HomeProfileCard.Header>
-              <Mbti>{fourUser.profile.mbti.mbti}</Mbti>
+              <Mbti>{fourUser?.profile?.mbti?.mbti ?? 'MBTI'}</Mbti>
             </HomeProfileCard.Header>
             <HomeProfileCard.Body>
               <p className="text-cyan-200">{fourUser.nickname}</p>
