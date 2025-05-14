@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { OAuthProvider, OAuthLoginResponse } from '@/types/oauth.type';
 import { handleSocialCallback } from '@/services/oauth';
+import Spinner from '@/components/common/Spinner';
 
 interface OAuthCallbackProps {
   provider: OAuthProvider;
@@ -50,10 +51,9 @@ export default function OAuthCallback({
   }, [provider, router, code, state, scope]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center h-[calc(100vh-160px)]">
       <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4">소셜 로그인 처리 중...</h1>
-        <p className="text-gray-600">잠시만 기다려주세요.</p>
+        <Spinner size="lg" color="primary" />
       </div>
     </div>
   );
@@ -65,7 +65,7 @@ async function handleSuccessRedirect(
   router: ReturnType<typeof useRouter>
 ) {
   if (!result.isProfileComplete) {
-    router.push('/signup');
+    router.push('/social-signup');
     return;
   }
 
