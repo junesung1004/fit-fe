@@ -36,7 +36,7 @@ function NotificationItem({
       return;
     }
     if (notification.type === 'MATCH_ACCEPT') {
-      router.push(`/members/${notification.data.senderId}`);
+      router.push('/matching-results');
       return;
     }
     if (notification.type === 'CHAT') {
