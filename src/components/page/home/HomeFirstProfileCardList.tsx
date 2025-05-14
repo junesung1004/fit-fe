@@ -59,24 +59,32 @@ export default function HomeFirstProfileCardList({
         selectedUserId: selectedId.toString(),
       });
 
-      if (type === 'first') {
-        setSelectedFirst(true);
-      } else {
-        setSelectedSecond(true);
-      }
+  if (type === 'first') {
+    setSelectedFirst(true);
+  } else {
+    setSelectedSecond(true);
+  }
 
-      setIsListSelected(true);
-      onSelectAll();
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || '매칭 선택에 실패했습니다.'
-        );
-      } else {
-        toast.error('매칭 선택에 실패했습니다.');
+  // ✅ 한 명만 선택해도 "선택 완료" 오버레이 띄우기
+  setIsListSelected(true);
+
+  // ✅ 둘 다 선택됐을 때만 select-all API 호출
+  if (type === 'first' && selectedSecond) {
+    onSelectAll();
+  }
+  if (type === 'second' && selectedFirst) {
+    onSelectAll();
+  }
+      } catch (error) {
+        if (isAxiosError(error)) {
+          toast.error(
+            error.response?.data?.message || '매칭 선택에 실패했습니다.'
+          );
+        } else {
+          toast.error('매칭 선택에 실패했습니다.');
+        }
       }
-    }
-  };
+    };
 
   const handleSelectAllLocal = async () => {
     if (!isLoggedIn) {
@@ -84,6 +92,7 @@ export default function HomeFirstProfileCardList({
       return;
     }
 
+    
     if (!firstUser || !secondUser || !firstUser.matchId) return;
 
     try {
@@ -125,6 +134,7 @@ export default function HomeFirstProfileCardList({
       }
     }
   };
+
   const moveToDetail = (id: number) => {
     if (!isListSelected) {
       router.push(`/members/${id}`);
@@ -248,7 +258,7 @@ export default function HomeFirstProfileCardList({
         </Button>
       </div>
 
-      {/* ✅ 공통 로그인 모달 */}
+      {/* 공통 로그인 모달 */}
       {showLoginAlert && (
         <LoginRequiredModal onClose={() => setShowLoginAlert(false)} />
       )}
