@@ -24,16 +24,17 @@ const OAUTH_ENDPOINTS: OAuthEndpoints = {
 
 const OAUTH_CONFIG = {
   google: {
-    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    scope: 'email profile',
+    client_id:
+      '517771775460-g31uhm1lunn5er4mdgq77lltn5j4nu8b.apps.googleusercontent.com',
+    scope: 'email',
   },
   kakao: {
-    client_id: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID,
-    scope: 'profile_nickname profile_image account_email',
+    client_id: 'dd09c3cc9f0f55669238e75de0493cb4',
+    scope: 'account_email',
   },
   naver: {
-    client_id: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID,
-    scope: 'profile email',
+    client_id: 'OGubX3GH_5yaMJhqJ3iu',
+    scope: 'email',
   },
 } as const;
 
