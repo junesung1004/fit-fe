@@ -65,7 +65,7 @@ async function handleSuccessRedirect(
   router: ReturnType<typeof useRouter>
 ) {
   if (!result.isProfileComplete) {
-    router.push('/complete-profile');
+    router.push('/signup');
     return;
   }
 
