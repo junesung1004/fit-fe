@@ -43,10 +43,12 @@ export default function SocialSignUpPage() {
   const [uploadImageUrl, setUploadImageUrl] = useState<(string | null)[]>(
     Array(6).fill(null)
   );
+  const [isImageValid, setIsImageValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { mutate, isPending } = useSocialSignUpMutation();
 
-  //회원가입 관심사, 피드백, 이런사람이에요 state
+  const { mutate, isPending } = useSocialSignUpMutation();
+  const { mutate: uploadImage } = useSocialUploadImageMutataion();
+
   const { data: interest, isLoading: isInterestLoading } = useInterestsQuery();
   const interestNames =
     interest?.map((el: { id: number; name: string }) => el.name) ?? [];
@@ -59,10 +61,6 @@ export default function SocialSignUpPage() {
   const introduceNames = Array.from(
     new Set(introduce?.map((el: { id: number; name: string }) => el.name) ?? [])
   ) as string[];
-
-  const { mutate: uploadImage } = useSocialUploadImageMutataion();
-
-  const [isImageValid, setIsImageValid] = useState(false);
 
   const validateImages = useCallback(() => {
     const uploadedCount = images.filter(Boolean).length;
@@ -133,6 +131,7 @@ export default function SocialSignUpPage() {
   const handleCreateUserSubmit = async (data: SocialSignUpFormValues) => {
     try {
       console.log('소셜 회원가입 시도: ', data);
+      console.log('사용되는 mutation:', mutate);
       const validImageUrls = uploadImageUrl.filter(
         (url): url is string => url !== null && url !== undefined
       );
