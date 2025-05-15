@@ -10,8 +10,8 @@ import React, { ChangeEvent, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import {
   useSocialSignUpMutation,
-  useUploadImageMutataion,
-} from '@/hooks/mutations/useSignUpMutation';
+  useSocialUploadImageMutataion,
+} from '@/hooks/mutations/useSocialSignUpMutation';
 import { SocialSignUpFormValues } from '@/types/social.type';
 import { toast } from 'react-toastify';
 import {
@@ -60,7 +60,7 @@ export default function SocialSignUpPage() {
     new Set(introduce?.map((el: { id: number; name: string }) => el.name) ?? [])
   ) as string[];
 
-  const { mutate: uploadImage } = useUploadImageMutataion();
+  const { mutate: uploadImage } = useSocialUploadImageMutataion();
 
   const [isImageValid, setIsImageValid] = useState(false);
 

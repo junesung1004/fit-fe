@@ -20,7 +20,7 @@ export const socialSignUp = async (data: SocialSignUpPayload) => {
 };
 
 //이미지 업로드 API
-export const signUpImageUpload = async (file: File) => {
+export const socialSignUpImageUpload = async (file: File) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -34,7 +34,7 @@ export const signUpImageUpload = async (file: File) => {
 };
 
 //관심사 API
-export const signupInterestCategoryData = async () => {
+export const socialSignupInterestCategoryData = async () => {
   try {
     const response = await instance.get(`/interest-category`);
     return response.data;
@@ -46,7 +46,7 @@ export const signupInterestCategoryData = async () => {
 };
 
 // 피드백 API
-export const signupFeedbackData = async () => {
+export const socialSignupFeedbackData = async () => {
   try {
     const response = await instance.get(`/feedback`);
     return response.data;
@@ -58,7 +58,7 @@ export const signupFeedbackData = async () => {
 };
 
 // 자기소개 API
-export const signupIntroduceData = async () => {
+export const socialSignupIntroduceData = async () => {
   try {
     const response = await instance.get(`/introduction`);
     return response.data;
