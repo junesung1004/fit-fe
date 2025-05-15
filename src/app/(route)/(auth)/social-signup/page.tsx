@@ -21,6 +21,7 @@ import {
 } from '@/hooks/queries/useSignUpInfoQuery';
 import SocialMbtiSelector from '@/components/page/social/SocialMbtiSelector';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useAuthStore } from '@/store/authStore';
 
 export default function SocialSignUpPage() {
   const {
@@ -61,6 +62,8 @@ export default function SocialSignUpPage() {
   const introduceNames = Array.from(
     new Set(introduce?.map((el: { id: number; name: string }) => el.name) ?? [])
   ) as string[];
+
+  const { login } = useAuthStore();
 
   const validateImages = useCallback(() => {
     const uploadedCount = images.filter(Boolean).length;
@@ -141,9 +144,23 @@ export default function SocialSignUpPage() {
         ...data,
         images: validImageUrls,
       };
-      mutate(payload);
+      mutate(payload, {
+        onSuccess: (response) => {
+          // 회원가입 성공 후 로그인 처리
+          login(response.accessToken, {
+            id: response.userId,
+            nickname: data.nickname,
+          });
+          toast.success('회원가입이 완료되었습니다.');
+        },
+        onError: (error) => {
+          console.error('회원가입 도중 에러 발생:', error);
+          toast.error('회원가입에 실패했습니다.');
+        },
+      });
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
+      toast.error('회원가입에 실패했습니다.');
     }
   };
 

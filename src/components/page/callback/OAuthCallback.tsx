@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { OAuthProvider, OAuthLoginResponse } from '@/types/oauth.type';
 import { handleSocialCallback } from '@/services/oauth';
 import Spinner from '@/components/common/Spinner';
+import { useAuthStore } from '@/store/authStore';
 
 interface OAuthCallbackProps {
   provider: OAuthProvider;
@@ -20,6 +21,7 @@ export default function OAuthCallback({
   scope,
 }: OAuthCallbackProps) {
   const router = useRouter();
+  const { login } = useAuthStore();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -40,6 +42,14 @@ export default function OAuthCallback({
           additionalParams
         );
 
+        // 로그인 처리
+        if (result.accessToken) {
+          login(result.accessToken, {
+            id: result.user.id,
+            nickname: result.user.nickname || '',
+          });
+        }
+
         await handleSuccessRedirect(result, router);
       } catch (error) {
         console.error(`${provider} 로그인 콜백 처리 중 오류:`, error);
@@ -48,7 +58,7 @@ export default function OAuthCallback({
     };
 
     handleCallback();
-  }, [provider, router, code, state, scope]);
+  }, [provider, router, code, state, scope, login]);
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-160px)]">
