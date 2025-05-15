@@ -21,7 +21,7 @@ export default function OAuthCallback({
   scope,
 }: OAuthCallbackProps) {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { login, isLoggedIn } = useAuthStore();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -50,24 +50,49 @@ export default function OAuthCallback({
             token: result.accessToken,
             user: result.user,
           });
+
+          // 로그인 상태 업데이트
           login(result.accessToken, {
             id: result.user.id,
             nickname: result.user.nickname || '',
           });
+
+          // 상태 업데이트가 완료될 때까지 최대 3초 대기
+          let attempts = 0;
+          const maxAttempts = 30; // 3초 (100ms * 30)
+
+          while (!isLoggedIn && attempts < maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            attempts++;
+          }
+
           console.log('소셜 로그인 처리 완료');
+
+          await handleSuccessRedirect(result, router);
         } else {
           console.log('소셜 로그인 토큰이 없습니다:', result);
+          // 소셜 로그인 실패 시 각 제공자의 에러 페이지로 리다이렉트
+          const errorPages = {
+            kakao: 'https://accounts.kakao.com/weblogin/error',
+            google: 'https://accounts.google.com/error',
+            naver: 'https://nid.naver.com/error',
+          };
+          window.location.href = errorPages[provider] || '/login';
         }
-
-        await handleSuccessRedirect(result, router);
       } catch (error) {
         console.error(`${provider} 소셜 로그인 콜백 처리 중 오류:`, error);
-        router.push(`/login?error=${provider}-login-failed`);
+        // 에러 발생 시에도 각 제공자의 에러 페이지로 리다이렉트
+        const errorPages = {
+          kakao: 'https://accounts.kakao.com/weblogin/error',
+          google: 'https://accounts.google.com/error',
+          naver: 'https://nid.naver.com/error',
+        };
+        window.location.href = errorPages[provider] || '/login';
       }
     };
 
     handleCallback();
-  }, [provider, router, code, state, scope, login]);
+  }, [provider, router, code, state, scope, login, isLoggedIn]);
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-160px)]">
