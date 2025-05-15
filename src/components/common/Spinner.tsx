@@ -13,6 +13,12 @@ export default function Spinner({
     lg: 'w-12 h-12',
   };
 
+  const borderClasses = {
+    sm: 'border-2',
+    md: 'border-4',
+    lg: 'border-4',
+  };
+
   const colorClasses = {
     primary: 'border-rose-500 border-t-transparent',
     white: 'border-white border-t-transparent',
@@ -21,7 +27,7 @@ export default function Spinner({
   return (
     <div className="flex items-center justify-center">
       <div
-        className={`${sizeClasses[size]} ${colorClasses[color]} border-4 rounded-full animate-spin`}
+        className={`${sizeClasses[size]} ${borderClasses[size]} ${colorClasses[color]} rounded-full animate-spin`}
       />
     </div>
   );

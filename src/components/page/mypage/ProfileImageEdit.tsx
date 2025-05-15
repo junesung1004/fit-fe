@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getMyProfile } from '@/services/user';
 import Button from '@/components/common/Button';
+import Spinner from '@/components/common/Spinner';
 
 interface UserProfile {
   nickname: string;
@@ -15,14 +16,18 @@ export default function ProfileEdit() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null); // null이면 비로그인
   const [imgFile, setImgFile] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        setIsLoading(true);
         const data = await getMyProfile(); // 로그인된 유저 정보 가져오기
         setUser(data);
       } catch {
         setUser(null); // 비로그인 처리
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchUser();
@@ -34,6 +39,15 @@ export default function ProfileEdit() {
     const imageUrl = URL.createObjectURL(file);
     setImgFile(imageUrl);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <Spinner size="lg" color="primary" />
+        <p className="text-gray-500 mt-4">프로필 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
 
   // 비로그인 상태일 때
   if (!user) {

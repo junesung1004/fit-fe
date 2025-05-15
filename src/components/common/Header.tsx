@@ -18,6 +18,10 @@ export default function Header() {
     enabled: isLoggedIn,
   });
 
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
   return isLoggedIn ? (
     <header className="relative flex items-center justify-between h-20 border-b px-4">
       {/* left nav */}
@@ -103,7 +107,7 @@ export default function Header() {
 
       {/* right container */}
       <div className="absolute right-4">
-        <Button rounded="md" onClick={() => router.push('/login')}>
+        <Button rounded="md" onClick={handleLogin}>
           로그인
         </Button>
       </div>

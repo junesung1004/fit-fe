@@ -60,6 +60,7 @@ export default function MembersPage() {
     hasNextPage,
     isFetchingNextPage,
     refetch,
+    isLoading,
   } = useUsersQuery({ take: 6 });
   const { mutate: filterUsers } = useFilterUsersMutation();
   const { likeChanged, resetLikeChanged } = useLikeStore();
@@ -245,40 +246,49 @@ export default function MembersPage() {
 
       {/* 목록 */}
       <div className="w-full py-10 px-8 flex flex-col">
-        <div className="flex justify-between items-center">
-          <h1 className="font-semibold">접속 중인 이성</h1>
-          <AdjustmentsHorizontalIcon
-            width={24}
-            height={24}
-            className="cursor-pointer"
-            onClick={toggleFilter}
-          />
-        </div>
-        <p className="text-gray-400 text-sm">새로운 인연을 찾아 보세요!</p>
-
-        <div className="flex flex-wrap gap-7 pt-5">
-          {uniqueUsers.map((u, index) => (
-            <Link
-              key={u.id}
-              href={`/members/${u.id}`}
-              ref={
-                index === uniqueUsers.length - 1 && hasNextPage
-                  ? lastElementRef
-                  : undefined
-              }
-            >
-              <ProfileCard
-                userId={u.id}
-                name={u.nickname}
-                age={u.age}
-                likes={u.likeCount}
-                region={u.region}
-                isOnline={userStatuses[u.id] || false}
-                profileImageUrl={u.profileImage ?? '/default.png'}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)]">
+            <Spinner size="lg" color="primary" />
+            <p className="text-gray-500 mt-4">회원 목록을 불러오는 중...</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex justify-between items-center">
+              <h1 className="font-semibold">접속 중인 이성</h1>
+              <AdjustmentsHorizontalIcon
+                width={24}
+                height={24}
+                className="cursor-pointer"
+                onClick={toggleFilter}
               />
-            </Link>
-          ))}
-        </div>
+            </div>
+            <p className="text-gray-400 text-sm">새로운 인연을 찾아 보세요!</p>
+
+            <div className="flex flex-wrap gap-7 pt-5">
+              {uniqueUsers.map((u, index) => (
+                <Link
+                  key={u.id}
+                  href={`/members/${u.id}`}
+                  ref={
+                    index === uniqueUsers.length - 1 && hasNextPage
+                      ? lastElementRef
+                      : undefined
+                  }
+                >
+                  <ProfileCard
+                    userId={u.id}
+                    name={u.nickname}
+                    age={u.age}
+                    likes={u.likeCount}
+                    region={u.region}
+                    isOnline={userStatuses[u.id] || false}
+                    profileImageUrl={u.profileImage ?? '/default.png'}
+                  />
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         {isFetchingNextPage && (
           <div className="text-center py-4">

@@ -38,8 +38,9 @@ export default function ChatsPage() {
 
   if (isPending) {
     return (
-      <div className="w-full h-[calc(100vh-160px)] flex items-center justify-center">
-        <Spinner size="lg" />
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)]">
+        <Spinner size="lg" color="primary" />
+        <p className="text-gray-500 mt-4">채팅 목록을 불러오는 중...</p>
       </div>
     );
   }

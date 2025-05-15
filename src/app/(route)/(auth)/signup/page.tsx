@@ -55,17 +55,18 @@ export default function SignUpPage() {
   const [isEmailCode, setIsEmailCode] = useState(false);
 
   //회원가입 관심사, 피드백, 이런사람이에요 state
-  const { data: interest } = useInterestsQuery();
+  const { data: interest, isLoading: isInterestLoading } = useInterestsQuery();
   // console.log('관심사 : ', interest);
   const interestNames =
     interest?.map((el: { id: number; name: string }) => el.name) ?? [];
   // console.log('관심사 : ', interestNames);
-  const { data: feedback } = useFeedbackQuery();
+  const { data: feedback, isLoading: isFeedbackLoading } = useFeedbackQuery();
   const feedbackNames = Array.from(
     new Set(feedback?.map((el: { id: number; name: string }) => el.name) ?? [])
   ) as string[];
   //console.log('피드백 ㅣ ', feedbackNames);
-  const { data: introduce } = useIntroduceQuery();
+  const { data: introduce, isLoading: isIntroduceLoading } =
+    useIntroduceQuery();
   // console.log('저는 이런사람이에요 : ', introduce);
   const introduceNames = Array.from(
     new Set(introduce?.map((el: { id: number; name: string }) => el.name) ?? [])
@@ -431,6 +432,7 @@ export default function SignUpPage() {
           setValue={setValue}
           trigger={trigger}
           error={errors.interests as FieldError}
+          isLoading={isInterestLoading}
         />
 
         {/* 이런 얘기 많이 들어요 필드 */}
@@ -445,6 +447,7 @@ export default function SignUpPage() {
           setValue={setValue}
           trigger={trigger}
           error={errors.listening as FieldError}
+          isLoading={isFeedbackLoading}
         />
 
         {/* 저는 이런 사람이에요 필드 */}
@@ -459,6 +462,7 @@ export default function SignUpPage() {
           setValue={setValue}
           trigger={trigger}
           error={errors.selfintro as FieldError}
+          isLoading={isIntroduceLoading}
         />
 
         {/* 프로필 이미지 필드 */}
