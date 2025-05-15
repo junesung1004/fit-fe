@@ -1,14 +1,6 @@
 'use client';
 
-import React from 'react';
-import { UseFormRegister } from 'react-hook-form';
-import { SignUpFormValues } from '@/types/signUp.type';
-
-interface RegionSelectorProps {
-  register: UseFormRegister<SignUpFormValues>;
-  error?: string;
-  required?: boolean;
-}
+import { SocialRegionSelectorProps } from '@/types/social.type';
 
 const REGION = [
   { value: '', label: '선택하세요' },
@@ -35,7 +27,7 @@ export default function SocialRegionSelector({
   register,
   error,
   required,
-}: RegionSelectorProps) {
+}: SocialRegionSelectorProps) {
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="region" className="text-sm font-medium text-zinc-700">

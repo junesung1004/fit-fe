@@ -1,12 +1,4 @@
-import React from 'react';
-import { FieldError, UseFormRegisterReturn } from 'react-hook-form';
-
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  error?: FieldError;
-  isDirty?: boolean;
-  register?: UseFormRegisterReturn;
-}
+import { SocialInputProps } from '@/types/social.type';
 
 export default function SocialInput({
   label,
@@ -15,7 +7,7 @@ export default function SocialInput({
   register,
   className = '',
   ...props
-}: InputProps) {
+}: SocialInputProps) {
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium text-zinc-700">

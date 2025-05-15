@@ -1,14 +1,6 @@
 'use client';
 
-import React from 'react';
-import { UseFormRegister } from 'react-hook-form';
-import { SignUpFormValues } from '@/types/signUp.type';
-
-interface MbtiSelectorProps {
-  register: UseFormRegister<SignUpFormValues>;
-  error?: string;
-  required?: boolean;
-}
+import { SocialMbtiSelectorProps } from '@/types/social.type';
 
 const MBTI_OPTIONS = [
   { value: '', label: 'MBTI를 선택해주세요', description: '' },
@@ -34,7 +26,7 @@ export default function SocialMbtiSelector({
   register,
   error,
   required,
-}: MbtiSelectorProps) {
+}: SocialMbtiSelectorProps) {
   return (
     <div className="flex flex-col gap-2 w-full col-span-2">
       <label htmlFor="mbti" className="text-sm font-medium text-zinc-700">

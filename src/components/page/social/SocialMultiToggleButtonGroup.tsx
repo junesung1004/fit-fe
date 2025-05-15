@@ -1,32 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormTrigger,
-  FieldError,
-} from 'react-hook-form';
 import clsx from 'clsx';
-import { SignUpFormValues } from '@/types/signUp.type';
+import { SocialMultiToggleButtonGroupProps } from '@/types/social.type';
 import Spinner from '@/components/common/Spinner';
 
-interface Props {
-  label: string;
-  name: keyof SignUpFormValues;
-  options: string[];
-  required?: boolean;
-  limit?: number;
-  min?: number;
-  register: UseFormRegister<SignUpFormValues>;
-  setValue: UseFormSetValue<SignUpFormValues>;
-  trigger: UseFormTrigger<SignUpFormValues>;
-  error?: FieldError;
-  gridCols?: string;
-  isLoading?: boolean;
-}
-
-export default function MultiToggleButtonGroup({
+export default function SocialMultiToggleButtonGroup({
   label,
   name,
   options,
@@ -39,7 +18,7 @@ export default function MultiToggleButtonGroup({
   error,
   gridCols = 'grid-cols-3',
   isLoading = false,
-}: Props) {
+}: SocialMultiToggleButtonGroupProps) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (item: string) => {

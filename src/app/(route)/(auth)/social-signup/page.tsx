@@ -9,10 +9,10 @@ import SocialMultiToggleButtonGroup from '@/components/page/social/SocialMultiTo
 import React, { ChangeEvent, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import {
-  useSignUpMutation,
+  useSocialSignUpMutation,
   useUploadImageMutataion,
 } from '@/hooks/mutations/useSignUpMutation';
-import { SignUpFormValues } from '@/types/signUp.type';
+import { SocialSignUpFormValues } from '@/types/social.type';
 import { toast } from 'react-toastify';
 import {
   useFeedbackQuery,
@@ -22,7 +22,7 @@ import {
 import SocialMbtiSelector from '@/components/page/social/SocialMbtiSelector';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export default function SignUpPage() {
+export default function SocialSignUpPage() {
   const {
     register,
     setValue,
@@ -30,7 +30,7 @@ export default function SignUpPage() {
     trigger,
     watch,
     formState: { errors, dirtyFields, isValid },
-  } = useForm<SignUpFormValues>({
+  } = useForm<SocialSignUpFormValues>({
     mode: 'onChange',
     criteriaMode: 'all',
   });
@@ -44,7 +44,7 @@ export default function SignUpPage() {
     Array(6).fill(null)
   );
   const [error, setError] = useState<string | null>(null);
-  const { mutate, isPending } = useSignUpMutation();
+  const { mutate, isPending } = useSocialSignUpMutation();
 
   //회원가입 관심사, 피드백, 이런사람이에요 state
   const { data: interest, isLoading: isInterestLoading } = useInterestsQuery();
@@ -130,7 +130,7 @@ export default function SignUpPage() {
     });
   };
 
-  const handleCreateUserSubmit = async (data: SignUpFormValues) => {
+  const handleCreateUserSubmit = async (data: SocialSignUpFormValues) => {
     try {
       const validImageUrls = uploadImageUrl.filter(
         (url): url is string => url !== null && url !== undefined

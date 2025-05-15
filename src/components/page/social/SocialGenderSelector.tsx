@@ -1,12 +1,5 @@
 import React from 'react';
-import { UseFormRegisterReturn } from 'react-hook-form';
-
-interface SocialGenderSelectorProps {
-  register: UseFormRegisterReturn;
-  required?: boolean;
-  selectedGender?: string;
-  error?: string;
-}
+import { SocialGenderSelectorProps } from '@/types/social.type';
 
 export default function SocialGenderSelector({
   register,
