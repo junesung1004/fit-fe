@@ -90,6 +90,20 @@ export default function MyPageNavigation() {
               </div>
             </div>
           </NavItem>
+          {/* 마이페이지 가이드 페이지 */}
+          <NavItem href="/mypage/guide">
+            <div className="flex justify-between items-center px-7">
+              <div>
+                <p className="text-xl">앱 사용 설명서</p>
+                <p className="text-xs text-gray-300">
+                  앱 사용법을 쉽게 확인해보세요!
+                </p>
+            </div>
+              <div className="relative w-[16px] h-[16px]">
+                <Image src={'/icons/Vector.png'} alt="화살표" fill />
+              </div>
+            </div>
+          </NavItem>
         </ul>
       </nav>
     </div>
