@@ -28,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
       socketError: null,
 
       login: (token, user) => {
+        console.log('authStore login 호출:', { token, user });
         set({
           isLoggedIn: true,
           accessToken: token,

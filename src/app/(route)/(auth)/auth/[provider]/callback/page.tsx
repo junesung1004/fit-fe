@@ -13,6 +13,11 @@ export default async function OAuthCallbackPage({
   const { provider } = await params;
   const resolvedSearchParams = await searchParams;
 
+  console.log('소셜 로그인 콜백 페이지:', {
+    provider,
+    searchParams: resolvedSearchParams,
+  });
+
   const code =
     typeof resolvedSearchParams.code === 'string'
       ? resolvedSearchParams.code
@@ -25,6 +30,8 @@ export default async function OAuthCallbackPage({
     typeof resolvedSearchParams.scope === 'string'
       ? resolvedSearchParams.scope
       : undefined;
+
+  console.log('파싱된 파라미터:', { code, state, scope });
 
   return (
     <div className="w-full h-[calc(100vh-160px)] flex items-center justify-center">

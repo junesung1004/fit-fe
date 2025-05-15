@@ -42,17 +42,26 @@ export default function OAuthCallback({
           additionalParams
         );
 
+        console.log('소셜 로그인 응답:', result);
+
         // 로그인 처리
         if (result.accessToken) {
+          console.log('소셜 로그인 처리 시작:', {
+            token: result.accessToken,
+            user: result.user,
+          });
           login(result.accessToken, {
             id: result.user.id,
             nickname: result.user.nickname || '',
           });
+          console.log('소셜 로그인 처리 완료');
+        } else {
+          console.log('소셜 로그인 토큰이 없습니다:', result);
         }
 
         await handleSuccessRedirect(result, router);
       } catch (error) {
-        console.error(`${provider} 로그인 콜백 처리 중 오류:`, error);
+        console.error(`${provider} 소셜 로그인 콜백 처리 중 오류:`, error);
         router.push(`/login?error=${provider}-login-failed`);
       }
     };
