@@ -84,19 +84,24 @@ export const handleSocialCallback = async (
       redirectUri: config.redirect_uri,
     });
 
-    const response = await axios.post<OAuthLoginResponse>(
+    // 첫 번째 요청으로 사용자 정보 받기
+    const initialResponse = await axios.post<OAuthLoginResponse>(
       OAUTH_ENDPOINTS[provider].callback,
       {
-        ...additionalParams,
         code,
         provider,
         redirectUri: config.redirect_uri,
-        user: {
-          id: additionalParams.user?.id || '',
-          email: additionalParams.user?.email || '',
-          authProvider: provider,
-          isProfileComplete: additionalParams.user?.isProfileComplete || false,
-        },
+      }
+    );
+
+    // 받은 사용자 정보를 포함하여 두 번째 요청
+    const response = await axios.post<OAuthLoginResponse>(
+      OAUTH_ENDPOINTS[provider].callback,
+      {
+        code,
+        provider,
+        redirectUri: config.redirect_uri,
+        user: initialResponse.data.user,
       }
     );
 
