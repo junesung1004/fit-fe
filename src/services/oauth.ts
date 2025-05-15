@@ -91,6 +91,12 @@ export const handleSocialCallback = async (
         code,
         provider,
         redirectUri: config.redirect_uri,
+        user: {
+          id: additionalParams.user?.id || '',
+          email: additionalParams.user?.email || '',
+          authProvider: provider,
+          isProfileComplete: additionalParams.user?.isProfileComplete || false,
+        },
       }
     );
 

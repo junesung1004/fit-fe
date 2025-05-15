@@ -16,6 +16,12 @@ export interface OAuthCallbackParams {
   code: string;
   state?: string;
   scope?: string;
+  user?: {
+    id: string;
+    email: string;
+    authProvider: string;
+    isProfileComplete: boolean;
+  };
 }
 
 export interface OAuthEndpoint {
