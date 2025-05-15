@@ -52,7 +52,7 @@ export const useEmailCheckMutation = (
         onValid(false);
       } else {
         toast.success('사용 가능한 이메일입니다!');
-        onValid(true); // ✅ 중복 아님
+        onValid(true);
       }
     },
     onError: (error) => {

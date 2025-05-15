@@ -8,9 +8,7 @@ import {
 // 소셜 회원가입 API
 export const socialSignUp = async (data: SocialSignUpPayload) => {
   try {
-    console.log('소셜 회원가입 요청 데이터:', data);
     const response = await instance.post('/auth/social-register', data);
-    console.log('소셜 회원가입 응답:', response.data);
     return response.data;
   } catch (error) {
     const err = error as AxiosError<SocialSignUpErrorResponse>;

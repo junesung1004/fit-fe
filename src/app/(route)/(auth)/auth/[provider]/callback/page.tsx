@@ -1,6 +1,5 @@
 import { OAuthProvider } from '@/types/oauth.type';
 import OAuthCallback from '@/components/page/callback/OAuthCallback';
-import Spinner from '@/components/common/Spinner';
 
 interface OAuthCallbackPageProps {
   params: Promise<{ provider: string }>;
@@ -29,8 +28,6 @@ export default async function OAuthCallbackPage({
 
   return (
     <div className="w-full h-[calc(100vh-160px)] flex items-center justify-center">
-      <Spinner size="lg" color="primary" />
-      <p className="text-gray-600">소셜 로그인 처리 중...</p>
       <OAuthCallback
         provider={provider as OAuthProvider}
         code={code}

@@ -130,8 +130,6 @@ export default function SocialSignUpPage() {
 
   const handleCreateUserSubmit = async (data: SocialSignUpFormValues) => {
     try {
-      console.log('소셜 회원가입 시도: ', data);
-      console.log('사용되는 mutation:', mutate);
       const validImageUrls = uploadImageUrl.filter(
         (url): url is string => url !== null && url !== undefined
       );
@@ -143,7 +141,6 @@ export default function SocialSignUpPage() {
         ...data,
         images: validImageUrls,
       };
-      console.log('소셜 회원가입 전송 데이터: ', payload);
       mutate(payload);
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
