@@ -9,29 +9,38 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logofit from '@/assets/1.png';
 import { useUserStatusStore } from '@/store/userStatusStore';
+import Spinner from '@/components/common/Spinner';
 
 export default function MatchingResultsPage() {
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFalse, setIsFalse] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<MatchResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { userStatuses, fetchUserStatuses } = useUserStatusStore();
 
   useEffect(() => {
     const loadMatchResults = async () => {
-      const data = await fetchMatchResults();
-      setMatchResults(data);
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchMatchResults();
+        setMatchResults(data);
 
-      // 모든 사용자 ID 수집하여 온라인 상태 가져오기
-      const userIds = data.flatMap((result) => [
-        result.currentUser.id,
-        result.selectedUser.id,
-      ]);
+        const userIds = data.flatMap((result) => [
+          result.currentUser.id,
+          result.selectedUser.id,
+        ]);
 
-      // 중복 제거 후 상태 요청
-      if (userIds.length > 0) {
-        fetchUserStatuses([...new Set(userIds)]);
+        if (userIds.length > 0) {
+          await fetchUserStatuses([...new Set(userIds)]);
+        }
+      } catch {
+        setError('매칭 결과를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
       }
     };
     loadMatchResults();
@@ -66,6 +75,23 @@ export default function MatchingResultsPage() {
       setIsFalse(true);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)]">
+        <Spinner size="lg" color="primary" />
+        <p className="text-gray-500 mt-4">매칭 결과를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)]">
+        <p className="text-rose-300">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full min-h-full flex flex-col">

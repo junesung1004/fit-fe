@@ -6,16 +6,25 @@ import Button from '@/components/common/Button';
 import { useLogOutMutation } from '@/hooks/mutations/useLogOutMutation';
 import { useUserDeleteMutation } from '@/hooks/mutations/useUserDeleteMutation';
 import { getMyProfile } from '@/services/user';
+import Spinner from '@/components/common/Spinner';
 
 export default function AccountInformationPage() {
   const { mutate: logout } = useLogOutMutation();
   const { mutate: userDelete } = useUserDeleteMutation();
-  const [email, setEmail] = useState<string | null>(null); // 이메일 상태 추가
+  const [email, setEmail] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const data = await getMyProfile();
-      if (data) setEmail(data.email); // 이메일 저장
+      try {
+        setIsLoading(true);
+        const data = await getMyProfile();
+        if (data) setEmail(data.email);
+      } catch {
+        console.error('프로필을 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchUser();
   }, []);
@@ -34,7 +43,11 @@ export default function AccountInformationPage() {
         <h1 className="text-3xl mb-3">계정</h1>
         <div className="mb-10  w-full px-5 py-4 border border-black rounded-2xl flex gap-6  items-center">
           <span>이메일</span>
-          <span className="text-gray-400">{email ?? '로딩 중...'}</span>
+          {isLoading ? (
+            <Spinner size="sm" color="secondary" />
+          ) : (
+            <span className="text-gray-400">{email}</span>
+          )}
         </div>
 
         <h1 className="text-3xl mb-3">계정 관리</h1>

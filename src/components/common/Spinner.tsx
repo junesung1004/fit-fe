@@ -1,6 +1,6 @@
 interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'white';
+  color?: 'primary' | 'secondary' | 'white';
 }
 
 export default function Spinner({
@@ -21,6 +21,7 @@ export default function Spinner({
 
   const colorClasses = {
     primary: 'border-rose-500 border-t-transparent',
+    secondary: 'border-gray-400 border-t-transparent',
     white: 'border-white border-t-transparent',
   };
 
