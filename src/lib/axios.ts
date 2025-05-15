@@ -23,6 +23,7 @@ const PUBLIC_PATHS = [
   '/auth/kakao/login/callback',
   '/auth/naver',
   '/auth/naver/login/callback',
+  '/auth/social-register',
   '/match/random/public',
   '/user/filtered-users',
 ];
