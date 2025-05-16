@@ -16,6 +16,8 @@ interface AuthState {
   socketError: string | null;
   // eslint-disable-next-line no-unused-vars
   login: (token: string, user: AuthUser) => void;
+  // eslint-disable-next-line no-unused-vars
+  socialLogin: (user: AuthUser) => void;
   logout: () => void;
   // eslint-disable-next-line no-unused-vars
   setSocketError: (error: string | null) => void;
@@ -37,12 +39,12 @@ export const useAuthStore = create<AuthState>()(
           id: user.id,
           nickname: user.nickname || '',
           email: user.email,
-          role: user.role || 'USER', // 기본 역할 설정
+          role: user.role || 'USER',
         };
 
         set({
           isLoggedIn: true,
-          accessToken: token || null, // 토큰이 빈 문자열이면 null로 설정
+          accessToken: token || null,
           user: normalizedUser,
         });
 
@@ -62,6 +64,24 @@ export const useAuthStore = create<AuthState>()(
         } else {
           console.log('토큰이 없어 소켓 연결을 건너뜁니다.');
         }
+      },
+
+      socialLogin: (user) => {
+        console.log('authStore socialLogin 호출:', { user });
+
+        // 사용자 정보 정규화
+        const normalizedUser: AuthUser = {
+          id: user.id,
+          nickname: user.nickname || '',
+          email: user.email,
+          role: user.role || 'USER',
+        };
+
+        set({
+          isLoggedIn: true,
+          accessToken: null,
+          user: normalizedUser,
+        });
       },
 
       logout: () => {

@@ -21,7 +21,7 @@ export default function OAuthCallback({
   scope,
 }: OAuthCallbackProps) {
   const router = useRouter();
-  const { login, isLoggedIn } = useAuthStore();
+  const { socialLogin, isLoggedIn } = useAuthStore();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -57,13 +57,12 @@ export default function OAuthCallback({
             user: result.user,
           });
 
-          // 로그인 상태 업데이트
-          login('', {
-            // accessToken이 없는 경우 빈 문자열로 처리
+          // 소셜 로그인 상태 업데이트
+          socialLogin({
             id: result.user.id,
             nickname: result.user.nickname || '',
             email: result.user.email,
-            role: result.user.role || 'USER', // 기본 역할 설정
+            role: result.user.role || 'USER',
           });
 
           console.log('로그인 상태 업데이트 후:', {
@@ -111,7 +110,7 @@ export default function OAuthCallback({
     };
 
     handleCallback();
-  }, [provider, router, code, state, scope, login, isLoggedIn]);
+  }, [provider, router, code, state, scope, socialLogin, isLoggedIn]);
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-160px)]">
