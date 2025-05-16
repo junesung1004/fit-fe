@@ -30,18 +30,18 @@ export default function OAuthCallback({
           throw new Error('인증 코드가 없습니다.');
         }
 
-        const additionalParams = {
-          code,
-          state,
-          scope,
-        };
-
         console.log('소셜 로그인 콜백 시작:', {
           provider,
           code,
           state,
           scope,
         });
+
+        const additionalParams = {
+          code,
+          state,
+          scope,
+        };
 
         const result = await handleSocialCallback(
           provider,
@@ -51,55 +51,19 @@ export default function OAuthCallback({
 
         console.log('소셜 로그인 응답:', result);
 
-        // 사용자 정보가 있는 경우 로그인 처리
-        if (result.user) {
-          console.log('소셜 로그인 처리 시작:', {
-            user: result.user,
-          });
+        // 소셜 로그인 상태 업데이트
+        socialLogin({
+          id: result.user.id,
+          email: result.user.email,
+          nickname: result.user.nickname || '', // 닉네임이 없으면 빈 문자열로 설정
+          role: 'USER', // 기본 역할
+        });
 
-          // 소셜 로그인 상태 업데이트
-          socialLogin({
-            id: result.user.id,
-            nickname: result.user.nickname || '',
-            email: result.user.email,
-            role: result.user.role || 'USER',
-          });
-
-          console.log('로그인 상태 업데이트 후:', {
-            isLoggedIn,
-            user: result.user,
-          });
-
-          // 상태 업데이트가 완료될 때까지 최대 3초 대기
-          let attempts = 0;
-          const maxAttempts = 30; // 3초 (100ms * 30)
-
-          while (!isLoggedIn && attempts < maxAttempts) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            attempts++;
-            console.log('로그인 상태 대기 중:', { attempts, isLoggedIn });
-          }
-
-          console.log('소셜 로그인 처리 완료');
-
-          // 리다이렉트 전에 로컬 스토리지 확인
-          const storedAuth = localStorage.getItem('auth-storage');
-          console.log('로컬 스토리지 상태:', storedAuth);
-
-          await handleSuccessRedirect(result, router);
-        } else {
-          console.log('소셜 로그인 사용자 정보가 없습니다:', result);
-          // 소셜 로그인 실패 시 각 제공자의 에러 페이지로 리다이렉트
-          const errorPages = {
-            kakao: 'https://accounts.kakao.com/weblogin/error',
-            google: 'https://accounts.google.com/error',
-            naver: 'https://nid.naver.com/error',
-          };
-          window.location.href = errorPages[provider] || '/login';
-        }
+        console.log('소셜 로그인 처리 완료');
+        await handleSuccessRedirect(result, router);
       } catch (error) {
         console.error(`${provider} 소셜 로그인 콜백 처리 중 오류:`, error);
-        // 에러 발생 시에도 각 제공자의 에러 페이지로 리다이렉트
+        // 에러 발생 시 각 제공자의 에러 페이지로 리다이렉트
         const errorPages = {
           kakao: 'https://accounts.kakao.com/weblogin/error',
           google: 'https://accounts.google.com/error',
