@@ -46,7 +46,6 @@ export default function MatchingResultsPage() {
     loadMatchResults();
   }, [fetchUserStatuses]);
 
-  // URL 쿼리로 success 값 받아서 팝업 상태 설정
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const successParam = searchParams.get('success');
@@ -59,7 +58,7 @@ export default function MatchingResultsPage() {
 
   const handleClickChattingMove = () => {
     if (selectedMatch) {
-      router.push(`/chats/${selectedMatch.currentUser.id}`);
+      router.push(`/chats/${selectedMatch.selectedUser.id}`);
     }
   };
 
@@ -69,7 +68,7 @@ export default function MatchingResultsPage() {
 
   const handleShowResult = (match: MatchResult) => {
     setSelectedMatch(match);
-    if (match.matched) {
+    if (match.isSuccess) {
       setIsSuccess(true);
     } else {
       setIsFalse(true);
@@ -93,6 +92,7 @@ export default function MatchingResultsPage() {
     );
   }
 
+  
   return (
     <div className="relative w-full min-h-full flex flex-col">
       {/* 성공 팝업 */}
@@ -167,7 +167,6 @@ export default function MatchingResultsPage() {
               />
             </Link>
 
-            {/* 결과 버튼은 유지할 수도 있고 제거 가능 */}
             <div className="flex flex-col gap-5 justify-center items-center">
               <Image src={logofit} alt="로고" width={70} height={100} />
               <Button

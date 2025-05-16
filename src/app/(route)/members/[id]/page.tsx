@@ -1,10 +1,10 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowLeftIcon, HeartIcon } from '@heroicons/react/24/solid';
+import { HeartIcon } from '@heroicons/react/24/solid';
 import TagBadge from '@/components/common/TagBadge';
 import MemberProfileDetailCard from '@/components/common/ProfileDetailCard';
 import Button from '@/components/common/Button';
@@ -17,10 +17,10 @@ import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 import { toast } from 'react-toastify';
 import { useSendCoffeeChatMutation } from '@/hooks/mutations/useSendCoffeeChatMutation';
 import { isAxiosError } from '@/lib/error';
+import BackButton from '@/components/common/BackButton'; // ✅ 공통 뒤로가기
 
 export default function MemberDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const userId = params.id as string;
   const { isLoggedIn } = useAuthStore();
   const { setLikeChanged } = useLikeStore();
@@ -62,7 +62,6 @@ export default function MemberDetailPage() {
 
     try {
       if (!isLiked) {
-        // 좋아요 누르기
         await likeMember(userId);
         await sendNotification(userId, {
           type: 'LIKE',
@@ -73,7 +72,6 @@ export default function MemberDetailPage() {
         setLikeCount((prev) => prev + 1);
         setIsLiked(true);
       } else {
-        // 좋아요 취소하기
         await likeMember(userId);
         toast.success('좋아요를 취소했습니다.');
         setLikeCount((prev) => (prev > 0 ? prev - 1 : 0));
@@ -90,10 +88,6 @@ export default function MemberDetailPage() {
         toast.error('좋아요 알림 요청에 실패했습니다.');
       }
     }
-  };
-
-  const handleBack = () => {
-    router.back();
   };
 
   const handleDatingChatRequest = async () => {
@@ -126,14 +120,9 @@ export default function MemberDetailPage() {
       if (isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
         if (errorMessage?.includes('이미 요청된 커피챗이 존재합니다')) {
-          toast.warning(
-            '이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.'
-          );
+          toast.warning('이미 요청된 커피챗이 존재합니다. 상대방의 응답을 기다려주세요.');
         } else {
-          toast.error(
-            errorMessage ||
-              '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
-          );
+          toast.error(errorMessage || '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         }
       } else {
         toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
@@ -147,11 +136,9 @@ export default function MemberDetailPage() {
   const koreanAge = member.age;
 
   return (
-    <div className="w-full min-h-full flex flex-col gap-4 px-2 xs:px-20 py-5">
-      {/* 상단 뒤로가기 (글자 없이 화살표만) */}
-      <button className="absolute top-22 left-6" onClick={handleBack}>
-        <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
-      </button>
+    <div className="w-full min-h-full flex flex-col gap-4 px-2 xs:px-20 py-5 relative">
+      {/* ✅ 공통 뒤로가기 버튼 */}
+      <BackButton />
 
       <MemberProfileDetailCard>
         <MemberProfileDetailCard.Image>
@@ -177,10 +164,7 @@ export default function MemberDetailPage() {
             onClick={handleLikeToggle}
             animate={
               isClicked
-                ? {
-                    scale: [1, 1.4, 1],
-                    color: ['#f43f5e', '#be123c', '#f43f5e'],
-                  }
+                ? { scale: [1, 1.4, 1], color: ['#f43f5e', '#be123c', '#f43f5e'] }
                 : {}
             }
             transition={{ duration: 0.4 }}
@@ -188,7 +172,6 @@ export default function MemberDetailPage() {
           >
             <HeartIcon className="w-10 h-10" />
           </motion.div>
-
           <motion.div
             key={likeCount}
             initial={{ y: -10, opacity: 0 }}
@@ -228,9 +211,7 @@ export default function MemberDetailPage() {
         </div>
       </MemberProfileDetailCard.AboutMe>
 
-      {showLoginAlert && (
-        <LoginRequiredModal onClose={() => setShowLoginAlert(false)} />
-      )}
+      {showLoginAlert && <LoginRequiredModal onClose={() => setShowLoginAlert(false)} />}
     </div>
   );
 }

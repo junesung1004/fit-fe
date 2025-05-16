@@ -17,7 +17,7 @@ export interface MatchResult {
     region: string;
     profileImage: string;
   };
-  matched: boolean;
+   isSuccess: boolean;
 }
 
 export const fetchMatchResults = async (page: number = 1, limit: number = 10): Promise<MatchResult[]> => {
