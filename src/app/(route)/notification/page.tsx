@@ -115,8 +115,20 @@ export default function NotificationPage() {
           const parsed = JSON.parse(event.data);
           if (Array.isArray(parsed)) {
             setNotifications(parsed);
+            // 알림이 없으면 SSE 연결 종료
+            if (parsed.length === 0 && eventSource) {
+              eventSource.close();
+            }
           } else {
-            setNotifications((prev) => [parsed, ...prev]);
+            // 새 알림 한 건
+            setNotifications((prev) => {
+              const newNotifications = [parsed, ...prev];
+              // 알림이 없었다가 새로 생기면 SSE 연결 시작
+              if (prev.length === 0) {
+                connectSSE();
+              }
+              return newNotifications;
+            });
           }
           setError(null);
         } catch {
@@ -141,6 +153,11 @@ export default function NotificationPage() {
         const data = await fetchNotifications();
         setNotifications(data);
         setError(null);
+
+        // 알림이 있을 때만 SSE 연결
+        if (data.length > 0) {
+          connectSSE();
+        }
       } catch {
         setError('알림을 불러오는데 실패했습니다. 다시 시도해주세요.');
       } finally {
@@ -149,7 +166,6 @@ export default function NotificationPage() {
     };
 
     loadNotifications();
-    connectSSE();
 
     return () => {
       if (eventSource) {
