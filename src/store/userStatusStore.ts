@@ -131,4 +131,11 @@ export const stopStatusUpdates = () => {
   isUpdating = false;
   reconnectAttempted = false;
   statusDebouncer.cancel();
+
+  // 소켓 연결 종료
+  if (userStatusSocket.connected) {
+    userStatusSocket.disconnect();
+  }
+  // 소켓 인증 정보 초기화
+  userStatusSocket.auth = {};
 };
