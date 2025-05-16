@@ -63,7 +63,7 @@ export default function SocialSignUpPage() {
     new Set(introduce?.map((el: { id: number; name: string }) => el.name) ?? [])
   ) as string[];
 
-  const { login } = useAuthStore();
+  const { socialLogin } = useAuthStore();
 
   const validateImages = useCallback(() => {
     const uploadedCount = images.filter(Boolean).length;
@@ -146,21 +146,17 @@ export default function SocialSignUpPage() {
       };
       mutate(payload, {
         onSuccess: (response) => {
-          // 회원가입 성공 후 로그인 처리
-          login(response.accessToken, {
+          socialLogin({
             id: response.userId,
             nickname: data.nickname,
           });
-          toast.success('회원가입이 완료되었습니다.');
         },
         onError: (error) => {
           console.error('회원가입 도중 에러 발생:', error);
-          toast.error('회원가입에 실패했습니다.');
         },
       });
     } catch (error) {
       console.error('회원가입 도중 에러 발생:', error);
-      toast.error('회원가입에 실패했습니다.');
     }
   };
 
