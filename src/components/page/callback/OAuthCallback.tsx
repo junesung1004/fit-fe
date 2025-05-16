@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { OAuthProvider } from '@/types/oauth.type';
 import { handleSocialCallback } from '@/services/oauth';
@@ -22,14 +22,16 @@ export default function OAuthCallback({
 }: OAuthCallbackProps) {
   const router = useRouter();
   const { socialLogin } = useAuthStore();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
-    const processCallback = async () => {
-      if (!code || isProcessing) return;
+    if (!code) return;
+    if (isProcessingRef.current) return;
 
+    isProcessingRef.current = true;
+
+    const processCallback = async () => {
       try {
-        setIsProcessing(true);
         console.log('소셜 로그인 콜백 시작:', { provider, code, state, scope });
 
         const result = await handleSocialCallback(provider, code, {
@@ -53,19 +55,18 @@ export default function OAuthCallback({
         console.error('소셜 로그인 처리 중 오류:', error);
         router.push('/error');
       } finally {
-        setIsProcessing(false);
+        isProcessingRef.current = false;
       }
     };
 
     processCallback();
-  }, [code, provider, state, scope, router, socialLogin, isProcessing]);
+  }, [code, provider, state, scope, router, socialLogin]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)]">
       <div className="text-center">
         <Spinner size="lg" color="primary" />
-        <h2 className="text-2xl font-bold mt-4">소셜 로그인 처리 중...</h2>
-        <p className="text-gray-600">잠시만 기다려주세요.</p>
+        <p className="text-gray-600">소셜 로그인 처리 중...</p>
       </div>
     </div>
   );
