@@ -16,7 +16,6 @@ export interface SelectAllMatchPayload {
   secondSelectedUserId: string;
 }
 
-
 // 로그인 오늘의 매칭 4명 프로필 가져오는 api
 export const todayDatingMatch = async () => {
   try {

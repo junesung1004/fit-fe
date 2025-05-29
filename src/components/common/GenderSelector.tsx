@@ -25,25 +25,28 @@ export default function GenderSelector({
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>
       <div className="flex gap-4">
-        {['남자', '여자'].map((gender) => (
+        {[
+          { value: 'male', label: '남자' },
+          { value: 'female', label: '여자' },
+        ].map(({ value, label }) => (
           <label
-            key={gender}
+            key={value}
             className={clsx(
               'w-full text-center px-6 py-2 border rounded-full cursor-pointer text-sm transition-all',
-              selectedGender === gender
+              selectedGender === value
                 ? 'border-green-500 text-green-600 font-semibold'
                 : 'border-gray-300 text-gray-500'
             )}
           >
             <input
               type="radio"
-              value={gender}
+              value={value}
               {...register('gender', {
                 required: '성별을 선택해주세요.',
               })}
               className="hidden"
             />
-            {gender}
+            {label}
           </label>
         ))}
       </div>

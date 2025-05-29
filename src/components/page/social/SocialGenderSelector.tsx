@@ -18,7 +18,7 @@ export default function SocialGenderSelector({
         <div className="relative grid grid-cols-2 gap-3 h-[46px] rounded-xl">
           {[
             {
-              value: '남자',
+              value: 'male',
               label: '남성',
               icon: (
                 <svg
@@ -37,7 +37,7 @@ export default function SocialGenderSelector({
               ),
             },
             {
-              value: '여자',
+              value: 'female',
               label: '여성',
               icon: (
                 <svg
