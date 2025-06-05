@@ -87,7 +87,10 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
 
     userStatusSocket.on('disconnect', () => {
-      if (!reconnectAttempted) {
+      const authStorage = localStorage.getItem('auth-storage');
+      const isLoggedIn =
+        authStorage && JSON.parse(authStorage)?.state?.isLoggedIn;
+      if (isLoggedIn && !reconnectAttempted) {
         reconnectAttempted = true;
         userStatusSocket.connect();
       }
@@ -104,7 +107,10 @@ export const useUserStatusStore = create<UserStatusState>((set, get) => ({
     });
 
     userStatusSocket.on('connect_error', () => {
-      if (!reconnectAttempted) {
+      const authStorage = localStorage.getItem('auth-storage');
+      const isLoggedIn =
+        authStorage && JSON.parse(authStorage)?.state?.isLoggedIn;
+      if (isLoggedIn && !reconnectAttempted) {
         reconnectAttempted = true;
         userStatusSocket.connect();
       }

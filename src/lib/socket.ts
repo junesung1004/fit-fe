@@ -16,4 +16,5 @@ export const userStatusSocket = io(SOCKET_URL, {
   path: '/socket.io/status',
   transports: ['websocket'],
   withCredentials: true,
+  reconnection: false,
 });
