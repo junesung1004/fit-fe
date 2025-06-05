@@ -9,5 +9,8 @@ export const useGetChatRoomQuery = () => {
       const response = await getDatingChat();
       return response.rooms;
     },
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 };
