@@ -51,7 +51,6 @@ export const getChatMessages = async (
   }
 };
 
-
 //커피챗
 export interface CoffeeChatRequest {
   title: string;
@@ -64,8 +63,7 @@ export interface CoffeeChatRequest {
 export const sendCoffeeChat = async (payload: CoffeeChatRequest) => {
   const response = await instance.post('/coffee-chat/send', payload);
   return response.data;
-}
-
+};
 
 //커피챗 수락
 export const acceptCoffeeChatRequest = async (coffeeChatId: string) => {

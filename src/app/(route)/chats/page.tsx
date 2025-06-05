@@ -84,14 +84,14 @@ export default function ChatsPage() {
     <div className="w-full min-h-full flex flex-col gap-10 items-center py-6 px-5">
       {data.map((chatRoom: ChatRoomType) => (
         <div
-          key={chatRoom.partner?.id}
+          key={chatRoom.id}
           className="px-5 py-5 w-full h-auto bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 flex gap-10 justify-center items-center"
         >
           {/* 프로필 이미지 */}
           <div className="relative w-[120px] h-[120px]">
             <Image
               src={chatRoom.partner?.profileImage || '/default-profile.png'}
-              alt="프로필이미지"
+              alt={`${chatRoom.partner?.name}님의 프로필이미지`}
               fill
               className="object-cover rounded-md"
               sizes="120px"
@@ -103,7 +103,7 @@ export default function ChatsPage() {
             <div className="flex flex-col gap-2">
               <TagBadge>이름: {chatRoom.partner?.name}</TagBadge>
               <TagBadge>나이: {chatRoom.partner?.age}</TagBadge>
-              <TagBadge>키: {chatRoom.partner?.height}</TagBadge>
+              <TagBadge>키: {chatRoom.partner?.height}cm</TagBadge>
             </div>
           </div>
 

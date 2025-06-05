@@ -5,6 +5,9 @@ import { ChatRoomType } from '@/types/chats.type';
 export const useGetChatRoomQuery = () => {
   return useQuery<ChatRoomType[]>({
     queryKey: ['chatRooms'],
-    queryFn: getDatingChat,
+    queryFn: async () => {
+      const response = await getDatingChat();
+      return response.rooms;
+    },
   });
 };

@@ -139,8 +139,9 @@ export default function FriendsPage() {
         ];
 
         const uniqueUserIds = [...new Set(allProfileIds)];
+
         if (uniqueUserIds.length > 0) {
-          fetchUserStatuses(uniqueUserIds);
+          await fetchUserStatuses(uniqueUserIds);
         }
       } catch (error) {
         console.error('데이터 로딩 중 오류 발생:', error);
